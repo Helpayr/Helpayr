@@ -19,10 +19,8 @@ class ProfileMaker extends StatefulWidget {
 class _ProfileMakerState extends State<ProfileMaker> {
   PlatformFile pickedfile;
   PlatformFile pickedFileDp;
-
   PlatformFile pickedFileServiceBg;
   PlatformFile pickedFileServiceDp;
-
   UploadTask upload;
   final ImagePicker imgPicker = ImagePicker();
 
