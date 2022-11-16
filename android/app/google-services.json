@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "924328309699",
+    "project_id": "helpayr-58b50",
+    "storage_bucket": "helpayr-58b50.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:924328309699:android:f325023f7b3859cf048376",
+        "android_client_info": {
+          "package_name": "com.example.day4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "924328309699-4qfbsuokcp8an7obsc5tu558elgcqfga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWvOOT0E8C8xRM397PVH3ZrMXcHNoZsRo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "924328309699-4qfbsuokcp8an7obsc5tu558elgcqfga.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "924328309699-u1rbq5omfkvkld1qfhp405hn3tl622vu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.day4"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
