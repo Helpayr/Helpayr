@@ -242,7 +242,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
   bool isHelpersSelected = true;
   bool isServiceSelected = false;
   bool works = false;
-  bool prof = true;
+  bool prof = false;
 
   @override
   Widget build(BuildContext context) {
