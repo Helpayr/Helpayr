@@ -28,7 +28,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
   String profile_picUrl = "";
   String bg = "";
-  ScrollController _scrollController;
+
   bool isSaved = false;
 
   //ControlsStore
