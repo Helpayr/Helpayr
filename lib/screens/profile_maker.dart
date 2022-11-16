@@ -28,7 +28,6 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
   String profile_picUrl = "";
   String bg = "";
-
   bool isSaved = false;
 
   //ControlsStore
