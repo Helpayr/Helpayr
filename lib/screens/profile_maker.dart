@@ -489,6 +489,8 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                     height: 90,
                                     width: 90,
                                     decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 4, color: Colors.white),
                                         image: DecorationImage(
                                             fit: BoxFit.cover,
                                             image: pickedFileDp != null
@@ -497,8 +499,8 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                 : AssetImage('')),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black26,
-                                            offset: Offset(3, 0),
+                                            color: Colors.grey,
+                                            offset: Offset(2, 3),
                                             blurRadius: 6,
                                           ),
                                         ],
