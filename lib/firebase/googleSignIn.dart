@@ -39,7 +39,6 @@ class GoogleSignUpProvider extends ChangeNotifier {
       idToken: googleAuth.idToken,
     );
     await FirebaseAuth.instance.signInWithCredential(credential);
-
     await FirebaseFirestore.instance
         .collection("Helpers")
         .doc("People")

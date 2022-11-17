@@ -254,7 +254,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
             duration: Duration(milliseconds: 200),
             curve: Curves.easeInOut,
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 1.2,
+            height: MediaQuery.of(context).size.height * 1.4,
             decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.cover,
@@ -409,8 +409,8 @@ class _ProfileMakerState extends State<ProfileMaker> {
                           Stack(
                             children: [
                               Container(
-                                height: 160,
-                                width: MediaQuery.of(context).size.width / 1.3,
+                                height: 190,
+                                width: MediaQuery.of(context).size.width / 1.1,
                                 decoration: BoxDecoration(
                                   color: Colors.blueAccent,
                                   borderRadius: BorderRadius.circular(10),
@@ -419,9 +419,9 @@ class _ProfileMakerState extends State<ProfileMaker> {
                               GestureDetector(
                                 onTap: selectImageBg,
                                 child: Container(
-                                  height: 140,
+                                  height: 160,
                                   width:
-                                      MediaQuery.of(context).size.width / 1.3,
+                                      MediaQuery.of(context).size.width / 1.1,
                                   decoration: BoxDecoration(
                                     color: pickedfile != null
                                         ? Colors.transparent
@@ -481,13 +481,13 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                 ),
                               ),
                               Positioned(
-                                bottom: 10,
-                                right: 10,
+                                bottom: 15,
+                                right: 20,
                                 child: GestureDetector(
                                   onTap: selectImageDp,
                                   child: Container(
-                                    height: 70,
-                                    width: 70,
+                                    height: 90,
+                                    width: 90,
                                     decoration: BoxDecoration(
                                         image: DecorationImage(
                                             fit: BoxFit.cover,
@@ -1184,8 +1184,8 @@ class _ProfileMakerState extends State<ProfileMaker> {
                           Stack(
                             children: [
                               Container(
-                                height: 160,
-                                width: MediaQuery.of(context).size.width / 1.3,
+                                height: 190,
+                                width: MediaQuery.of(context).size.width / 1.1,
                                 decoration: BoxDecoration(
                                   color: Colors.blueAccent,
                                   borderRadius: BorderRadius.circular(10),
@@ -1194,9 +1194,9 @@ class _ProfileMakerState extends State<ProfileMaker> {
                               GestureDetector(
                                 onTap: selectImageBgService,
                                 child: Container(
-                                  height: 140,
+                                  height: 160,
                                   width:
-                                      MediaQuery.of(context).size.width / 1.3,
+                                      MediaQuery.of(context).size.width / 1.1,
                                   decoration: BoxDecoration(
                                     color: pickedFileServiceBg != null
                                         ? Colors.transparent
@@ -1211,7 +1211,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                           ),
                                           elevation: 10,
                                           child: Container(
-                                            height: 140,
+                                            height: 160,
                                             decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(10),
