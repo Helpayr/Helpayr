@@ -150,7 +150,6 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
   List<String> uploadedImageService = [];
   List<XFile> imageListService = [];
-
   Future selectImagesService() async {
     final selectedImages = await imgPicker.pickMultiImage();
 
@@ -239,7 +238,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
   bool isHelpersSelected = true;
   bool isServiceSelected = false;
   bool works = false;
-  bool prof = false;
+  bool prof = true;
 
   @override
   Widget build(BuildContext context) {
@@ -1259,13 +1258,13 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                 ),
                               ),
                               Positioned(
-                                bottom: 10,
-                                right: 10,
+                                bottom: 20,
+                                right: 20,
                                 child: GestureDetector(
                                   onTap: selectImageDpService,
                                   child: Container(
-                                    height: 70,
-                                    width: 70,
+                                    height: 90,
+                                    width: 90,
                                     decoration: BoxDecoration(
                                         image: DecorationImage(
                                             fit: BoxFit.cover,
