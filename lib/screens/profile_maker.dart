@@ -21,7 +21,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
   PlatformFile pickedFileDp;
   PlatformFile pickedFileServiceBg;
   PlatformFile pickedFileServiceDp;
-  UploadTask upload;
+
   final ImagePicker imgPicker = ImagePicker();
 
   String profile_picUrl = "";
@@ -46,6 +46,8 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
 //Store Methods!
 
+  UploadTask uploadProfile;
+  UploadTask uploadBg;
   bool store_loading = false;
   double val = 0;
   List<String> uploadedImage = [];
@@ -87,14 +89,6 @@ class _ProfileMakerState extends State<ProfileMaker> {
     }
   }
 
-  Future selectImageBg() async {
-    final res_image = await FilePicker.platform.pickFiles();
-
-    setState(() {
-      pickedfile = res_image.files.first;
-    });
-  }
-
   Future selectImageDp() async {
     final res_image = await FilePicker.platform.pickFiles();
 
@@ -104,13 +98,13 @@ class _ProfileMakerState extends State<ProfileMaker> {
   }
 
   Future uploadImageSingleProfile() async {
-    final name = FirebaseAuth.instance.currentUser;
-    final path = '${name}/ ${pickedfile.name}';
-    final file = File(pickedfile.path);
+    final name = FirebaseAuth.instance.currentUser.displayName;
+    final path = '${name}/ProfilePic/${pickedFileDp.name}';
+    final file = File(pickedFileDp.path);
 
     final ref = FirebaseStorage.instance.ref().child(path);
     setState(() {
-      upload = ref.putFile(file);
+      uploadProfile = ref.putFile(file);
     });
     await ref.getDownloadURL().then((value) {
       print(value);
@@ -118,19 +112,24 @@ class _ProfileMakerState extends State<ProfileMaker> {
         profile_picUrl = value;
       });
     });
+  }
+
+  Future selectImageBg() async {
+    final res_image = await FilePicker.platform.pickFiles();
+
     setState(() {
-      isSaved = true;
+      pickedfile = res_image.files.first;
     });
   }
 
   Future uploadImageSingleBg() async {
-    final name = FirebaseAuth.instance.currentUser;
-    final path = '${name}/ ${pickedfile.name}';
+    final name = FirebaseAuth.instance.currentUser.displayName;
+    final path = '${name}/Bg/${pickedfile.name}';
     final file = File(pickedfile.path);
 
     final ref = FirebaseStorage.instance.ref().child(path);
     setState(() {
-      upload = ref.putFile(file);
+      uploadBg = ref.putFile(file);
     });
     await ref.getDownloadURL().then((value) {
       print(value);
@@ -141,13 +140,15 @@ class _ProfileMakerState extends State<ProfileMaker> {
   }
 
   Future uploadWorks() async {
-    uploadImagesStore();
-    uploadImageSingleProfile();
-    uploadImageSingleBg();
+    await uploadImagesStore();
+    await uploadImageSingleProfile();
+    await uploadImageSingleBg();
   }
 
   //Service Methods!
 
+  UploadTask uploadProfileService;
+  UploadTask uploadBgService;
   List<String> uploadedImageService = [];
   List<XFile> imageListService = [];
   Future selectImagesService() async {
@@ -202,7 +203,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
     final ref = FirebaseStorage.instance.ref().child(path);
     setState(() {
-      upload = ref.putFile(file);
+      uploadProfileService = ref.putFile(file);
     });
     await ref.getDownloadURL().then((value) {
       print(value);
@@ -222,7 +223,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
     final ref = FirebaseStorage.instance.ref().child(path);
     setState(() {
-      upload = ref.putFile(file);
+      uploadBgService = ref.putFile(file);
     });
     await ref.getDownloadURL().then((value) {
       print(value);
@@ -992,7 +993,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                         setState(() {
                                                           store_loading = true;
                                                         });
-                                                        uploadImagesStore()
+                                                        uploadWorks()
                                                             .whenComplete(
                                                           () => Navigator.push(
                                                             context,
@@ -1258,14 +1259,16 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                 ),
                               ),
                               Positioned(
-                                bottom: 20,
-                                right: 20,
+                                bottom: 10,
+                                right: 10,
                                 child: GestureDetector(
                                   onTap: selectImageDpService,
                                   child: Container(
                                     height: 90,
                                     width: 90,
                                     decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.white, width: 4),
                                         image: DecorationImage(
                                             fit: BoxFit.cover,
                                             image: pickedFileServiceDp != null
@@ -1274,8 +1277,8 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                 : AssetImage('')),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black26,
-                                            offset: Offset(3, 0),
+                                            color: Colors.grey,
+                                            offset: Offset(2, 3),
                                             blurRadius: 6,
                                           ),
                                         ],
