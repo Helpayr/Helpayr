@@ -533,7 +533,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                 ),
                               ),
                               Positioned(
-                                bottom: 5,
+                                bottom: 10,
                                 left: 10,
                                 child: Text(
                                   user.displayName,
