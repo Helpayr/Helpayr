@@ -100,11 +100,11 @@ class _ProfileMakerState extends State<ProfileMaker> {
   Future uploadImageSingleProfile() async {
     final name = FirebaseAuth.instance.currentUser.displayName;
     final path = '${name}/ProfilePic/${pickedFileDp.name}';
-    final file = File(pickedFileDp.path);
+    final file_dp = File(pickedFileDp.path);
 
     final ref = FirebaseStorage.instance.ref().child(path);
     setState(() {
-      uploadProfile = ref.putFile(file);
+      uploadProfile = ref.putFile(file_dp);
     });
     await ref.getDownloadURL().then((value) {
       print(value);
@@ -125,11 +125,10 @@ class _ProfileMakerState extends State<ProfileMaker> {
   Future uploadImageSingleBg() async {
     final name = FirebaseAuth.instance.currentUser.displayName;
     final path = '${name}/Bg/${pickedfile.name}';
-    final file = File(pickedfile.path);
-
+    final file_bg = File(pickedfile.path);
     final ref = FirebaseStorage.instance.ref().child(path);
     setState(() {
-      uploadBg = ref.putFile(file);
+      uploadBg = ref.putFile(file_bg);
     });
     await ref.getDownloadURL().then((value) {
       print(value);
