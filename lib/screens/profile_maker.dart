@@ -116,7 +116,6 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
   Future selectImageBg() async {
     final res_image = await FilePicker.platform.pickFiles();
-
     setState(() {
       pickedfile = res_image.files.first;
     });
@@ -124,7 +123,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
   Future uploadImageSingleBg() async {
     final name = FirebaseAuth.instance.currentUser.displayName;
-    final path = '${name}/Bg/${pickedfile.name}';
+    final path = '${name}/ProfilePic/${pickedfile.name}';
     final file_bg = File(pickedfile.path);
     final ref = FirebaseStorage.instance.ref().child(path);
     setState(() {
@@ -141,7 +140,6 @@ class _ProfileMakerState extends State<ProfileMaker> {
   Future uploadWorks() async {
     await uploadImagesStore();
     await uploadImageSingleProfile();
-    await uploadImageSingleBg();
   }
 
   //Service Methods!
@@ -150,6 +148,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
   UploadTask uploadBgService;
   List<String> uploadedImageService = [];
   List<XFile> imageListService = [];
+
   Future selectImagesService() async {
     final selectedImages = await imgPicker.pickMultiImage();
 
@@ -196,9 +195,9 @@ class _ProfileMakerState extends State<ProfileMaker> {
   }
 
   Future uploadImageSingleProfileService() async {
-    final name = FirebaseAuth.instance.currentUser;
-    final path = '${name}/ ${pickedfile.name}';
-    final file = File(pickedfile.path);
+    final name = FirebaseAuth.instance.currentUser.displayName;
+    final path = '${name}/ ${pickedFileServiceDp.name}';
+    final file = File(pickedFileServiceDp.path);
 
     final ref = FirebaseStorage.instance.ref().child(path);
     setState(() {
@@ -216,9 +215,9 @@ class _ProfileMakerState extends State<ProfileMaker> {
   }
 
   Future uploadImageSingleBgService() async {
-    final name = FirebaseAuth.instance.currentUser;
-    final path = '${name}/ ${pickedfile.name}';
-    final file = File(pickedfile.path);
+    final name = FirebaseAuth.instance.currentUser.displayName;
+    final path = '${name}/ ${pickedFileServiceBg.name}';
+    final file = File(pickedFileServiceBg.path);
 
     final ref = FirebaseStorage.instance.ref().child(path);
     setState(() {
@@ -333,7 +332,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                       )
                                     : Center(
                                         child: Text(
-                                          "Helper",
+                                          "Service",
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -974,10 +973,6 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                     Text("Saving..."),
                                                     CircularProgressIndicator(
                                                       value: val,
-                                                      valueColor:
-                                                          AlwaysStoppedAnimation<
-                                                                  Color>(
-                                                              Colors.blue),
                                                     )
                                                   ],
                                                 ),
@@ -992,6 +987,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                         setState(() {
                                                           store_loading = true;
                                                         });
+                                                        uploadImageSingleBg();
                                                         uploadWorks()
                                                             .whenComplete(
                                                           () => Navigator.push(
