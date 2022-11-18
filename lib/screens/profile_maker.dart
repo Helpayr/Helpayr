@@ -286,8 +286,8 @@ class _ProfileMakerState extends State<ProfileMaker> {
                 image: DecorationImage(
                   fit: BoxFit.cover,
                   image: isServiceSelected
-                      ? AssetImage('assets/onboarding new/bg_wavy_rotated.png')
-                      : AssetImage('assets/onboarding new/bg_wavy.png'),
+                      ? AssetImage('assets/onboarding new/bg_wavy.png')
+                      : AssetImage('assets/onboarding new/bg_wavy_rotated.png'),
                 ),
               ),
               child: Padding(
@@ -300,7 +300,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
                     Text(
                       "Register As",
                       style: TextStyle(
-                        color: isHelpersSelected ? Colors.black : Colors.white,
+                        color: isHelpersSelected ? Colors.white : Colors.black,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
