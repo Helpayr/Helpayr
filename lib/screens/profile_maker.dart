@@ -78,7 +78,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
       File file = File(img.path);
       final ref = firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('${name}/Products/ ${img.name}');
+          .child('Store/${name}/Products/ ${img.name}');
       await ref.putFile(file).whenComplete(() async {
         await ref.getDownloadURL().then((value) {
           uploadedImage.add(value);
@@ -99,7 +99,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
   Future uploadImageSingleProfile() async {
     final name = FirebaseAuth.instance.currentUser.displayName;
-    final path = '${name}/ProfilePic/${pickedFileDp.name}';
+    final path = 'Store/${name}/Profile/${pickedFileDp.name}';
     final file_dp = File(pickedFileDp.path);
 
     final ref = FirebaseStorage.instance.ref().child(path);
@@ -123,7 +123,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
   Future uploadImageSingleBg() async {
     final name = FirebaseAuth.instance.currentUser.displayName;
-    final path = '${name}/ProfilePic/${pickedfile.name}';
+    final path = 'Store/${name}/Profile/${pickedfile.name}';
     final file_bg = File(pickedfile.path);
     final ref = FirebaseStorage.instance.ref().child(path);
     setState(() {
@@ -169,7 +169,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
       File file = File(img.path);
       final ref = firebase_storage.FirebaseStorage.instance
           .ref()
-          .child('${name}/Products/ ${img.name}');
+          .child('Service/${name}/Products/ ${img.name}');
       await ref.putFile(file).whenComplete(() async {
         await ref.getDownloadURL().then((value) {
           uploadedImageService.add(value);
@@ -196,7 +196,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
   Future uploadImageSingleProfileService() async {
     final name = FirebaseAuth.instance.currentUser.displayName;
-    final path = '${name}/ ${pickedFileServiceDp.name}';
+    final path = 'Service/${name}/ ${pickedFileServiceDp.name}';
     final file = File(pickedFileServiceDp.path);
 
     final ref = FirebaseStorage.instance.ref().child(path);
@@ -209,14 +209,16 @@ class _ProfileMakerState extends State<ProfileMaker> {
         profile_picUrl = value;
       });
     });
-    setState(() {
-      isSaved = true;
-    });
+  }
+
+  Future uploadWorks_Service() async {
+    await uploadImagesService();
+    await uploadImageSingleProfileService();
   }
 
   Future uploadImageSingleBgService() async {
     final name = FirebaseAuth.instance.currentUser.displayName;
-    final path = '${name}/ ${pickedFileServiceBg.name}';
+    final path = 'Service/${name}/ ${pickedFileServiceBg.name}';
     final file = File(pickedFileServiceBg.path);
 
     final ref = FirebaseStorage.instance.ref().child(path);
@@ -1739,6 +1741,70 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                   Expanded(
                                     child: Column(
                                       children: [
+                                        store_loading
+                                            ? Center(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text("Saving..."),
+                                                    CircularProgressIndicator(
+                                                      value: val,
+                                                    )
+                                                  ],
+                                                ),
+                                              )
+                                            : imageListService.length >= 1
+                                                ? Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            15.0),
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          store_loading = true;
+                                                        });
+                                                        uploadImageSingleBgService();
+                                                        uploadWorks_Service()
+                                                            .whenComplete(
+                                                          () => Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  ProfileMaker(),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: Container(
+                                                        width: 120,
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5),
+                                                            color:
+                                                                Colors.white),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          child: Center(
+                                                              child: Text(
+                                                            "Save Images!",
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                            ),
+                                                          )),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Container(),
                                         Expanded(
                                           child: Container(
                                             width: MediaQuery.of(context)
