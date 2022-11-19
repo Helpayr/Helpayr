@@ -182,6 +182,17 @@ class _ProfileMakerState extends State<ProfileMaker>
   Future uploadWorks_Service() async {
     await uploadImagesService();
     await uploadImageSingleProfileService();
+    await addServiceDetails(
+        fullNameEC.text.trim(),
+        dropValue,
+        service_ageEC.text.trim(),
+        service_addressEC.text.trim(),
+        service_descEC.text.trim(),
+        service_facebookEc.text.trim(),
+        service_priceEc.text.trim(),
+        dp_service,
+        bg_service,
+        uploadedImageService);
   }
 
   String dp_service = "";
@@ -252,21 +263,6 @@ class _ProfileMakerState extends State<ProfileMaker>
         dp_service = value;
       });
     });
-    await upload_service();
-  }
-
-  Future upload_service() async {
-    await addServiceDetails(
-        fullNameEC.text.trim(),
-        dropValue,
-        service_ageEC.text.trim(),
-        service_addressEC.text.trim(),
-        service_descEC.text.trim(),
-        service_facebookEc.text.trim(),
-        service_priceEc.text.trim(),
-        dp_service,
-        bg_service,
-        uploadedImageService);
   }
 
   Future uploadImageSingleBgService() async {
