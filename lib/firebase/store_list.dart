@@ -130,13 +130,11 @@ class ListData extends StatefulWidget {
     this.service,
     this.type,
     this.isService,
-    this.title,
   });
   final String userType;
   final String service;
   final String type;
   final bool isService;
-  final String title;
 
   @override
   State<ListData> createState() => _ListDataState();
@@ -148,6 +146,7 @@ class _ListDataState extends State<ListData> {
 
   final user = FirebaseAuth.instance.currentUser;
   List<String> helpers = [];
+  List<String> stores = [];
   Future getData() async {
     await FirebaseFirestore.instance
         .collection(widget.userType)
@@ -156,6 +155,13 @@ class _ListDataState extends State<ListData> {
         .get()
         .then((value) => value.docs.forEach((element) {
               helpers.add(element.reference.id);
+            }));
+
+    await FirebaseFirestore.instance
+        .collection("Store_Display")
+        .get()
+        .then((value) => value.docs.forEach((element) {
+              stores.add(element.reference.id);
             }));
   }
 
@@ -170,89 +176,34 @@ class _ListDataState extends State<ListData> {
     return FutureBuilder(
       future: getData(),
       builder: ((context, snapshot) {
-        return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image:
-                      AssetImage('assets/onboarding new/bg_wavy_rotated.png')),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            child: Column(
-              children: [
-                Container(
-                  width: 90,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(24),
-                      bottomRight: Radius.circular(24),
-                    ),
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          widget.title,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+        return ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: helpers.length,
+            itemBuilder: ((context, index) => GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      isSelected = index;
+                    });
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GetData(
+                          isService: false,
+                          DocId: helpers[isSelected],
+                          UserType: "Helpers",
+                          HelperType: "Store",
+                          StoreType: widget.type,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: helpers.length,
-                      itemBuilder: ((context, index) => SingleChildScrollView(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isSelected = index;
-                                });
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => GetData(
-                                      isService: widget.isService,
-                                      DocId: helpers[isSelected],
-                                      UserType: widget.userType,
-                                      HelperType: widget.service,
-                                      StoreType: widget.type,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: ListDataPage(
-                                UserType: widget.userType,
-                                HelperType: widget.service,
-                                Store_ServiceType: widget.type,
-                                DocId: helpers[index],
-                              ),
-                            ),
-                          ))),
-                ),
-              ],
-            ),
-          ),
-        );
+                    );
+                  },
+                  child: ListDataPage(
+                    UserType: widget.userType,
+                    HelperType: widget.service,
+                    Store_ServiceType: widget.type,
+                    DocId: helpers[index],
+                  ),
+                )));
       }),
     );
   }

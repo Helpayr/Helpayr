@@ -6,9 +6,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:helpayr/screens/when_complete.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lottie/lottie.dart';
 
 class ProfileMaker extends StatefulWidget {
   const ProfileMaker({key});
@@ -17,7 +20,8 @@ class ProfileMaker extends StatefulWidget {
   State<ProfileMaker> createState() => _ProfileMakerState();
 }
 
-class _ProfileMakerState extends State<ProfileMaker> {
+class _ProfileMakerState extends State<ProfileMaker>
+    with SingleTickerProviderStateMixin {
   PlatformFile pickedfile;
   PlatformFile pickedFileDp;
   PlatformFile pickedFileServiceBg;
@@ -50,6 +54,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
   UploadTask uploadProfile;
   UploadTask uploadBg;
   bool store_loading = false;
+  bool service_loading = false;
   double val = 0;
   List<String> uploadedImage = [];
   List<XFile> imageListStore = [];
@@ -265,6 +270,35 @@ class _ProfileMakerState extends State<ProfileMaker> {
 
   String dropValue;
 
+  AnimationController _animationctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationctrl = AnimationController(
+      vsync: this,
+      duration: Duration(
+        seconds: 20,
+      ),
+    );
+    _animationctrl.addStatusListener((status) async {
+      if (status == AnimationStatus.completed) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WhenCompleted(),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationctrl.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     PageController _pageController = PageController(initialPage: 0);
@@ -446,7 +480,9 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: selectImageBgService,
+                                  onTap: service_loading
+                                      ? () {}
+                                      : selectImageBgService,
                                   child: Container(
                                     height: 160,
                                     width:
@@ -515,7 +551,9 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                   bottom: 10,
                                   right: 10,
                                   child: GestureDetector(
-                                    onTap: selectImageDpService,
+                                    onTap: service_loading
+                                        ? () {}
+                                        : selectImageDpService,
                                     child: Container(
                                       height: 90,
                                       width: 90,
@@ -774,7 +812,11 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                                     15.0),
                                                         child: Row(
                                                           children: [
-                                                            Icon(Icons.work),
+                                                            Icon(Icons.work,
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        .6)),
                                                             SizedBox(
                                                               width: 10,
                                                             ),
@@ -782,8 +824,14 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                               flex: 1,
                                                               child:
                                                                   DropdownButton(
+                                                                iconEnabledColor:
+                                                                    Colors.blue,
                                                                 hint: Text(
-                                                                    "Select a Service"),
+                                                                    "Select a Service",
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .black
+                                                                            .withOpacity(.4))),
                                                                 value:
                                                                     dropValue,
                                                                 items: services
@@ -799,7 +847,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                                         color: Colors
                                                                             .black,
                                                                         fontWeight:
-                                                                            FontWeight.bold,
+                                                                            FontWeight.normal,
                                                                       ),
                                                                     ),
                                                                   );
@@ -1058,7 +1106,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                     Expanded(
                                       child: Column(
                                         children: [
-                                          store_loading
+                                          service_loading
                                               ? Center(
                                                   child: Column(
                                                     mainAxisSize:
@@ -1067,7 +1115,14 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                         MainAxisAlignment
                                                             .center,
                                                     children: [
-                                                      Text("Saving..."),
+                                                      Text(
+                                                        "Saving...",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
                                                       CircularProgressIndicator(
                                                         value: val,
                                                       )
@@ -1082,20 +1137,46 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                       child: GestureDetector(
                                                         onTap: () {
                                                           setState(() {
-                                                            store_loading =
+                                                            service_loading =
                                                                 true;
                                                           });
                                                           uploadImageSingleBgService();
                                                           uploadWorks_Service()
                                                               .whenComplete(
-                                                            () =>
-                                                                Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        ProfileMaker(),
-                                                              ),
+                                                            () => showDialog(
+                                                              context: context,
+                                                              builder:
+                                                                  ((context) =>
+                                                                      Dialog(
+                                                                        backgroundColor:
+                                                                            Colors.transparent,
+                                                                        child:
+                                                                            Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.all(8.0),
+                                                                          child:
+                                                                              Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.center,
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            mainAxisSize:
+                                                                                MainAxisSize.min,
+                                                                            children: [
+                                                                              LottieBuilder.network(
+                                                                                "https://assets3.lottiefiles.com/datafiles/Wv6eeBslW1APprw/data.json",
+                                                                                fit: BoxFit.fill,
+                                                                                repeat: false,
+                                                                                controller: _animationctrl,
+                                                                                onLoaded: ((p0) {
+                                                                                  _animationctrl.duration = p0.duration;
+                                                                                  return _animationctrl.forward();
+                                                                                }),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      )),
                                                             ),
                                                           );
                                                         },
@@ -1126,154 +1207,230 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                       ),
                                                     )
                                                   : Container(),
-                                          Expanded(
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              height: MediaQuery.of(context)
-                                                  .size
-                                                  .height,
-                                              child: GridView.builder(
-                                                  shrinkWrap: true,
-                                                  itemCount:
-                                                      imageListService.length +
-                                                          1,
-                                                  gridDelegate:
-                                                      SliverGridDelegateWithFixedCrossAxisCount(
-                                                          crossAxisCount: 2),
-                                                  itemBuilder:
-                                                      ((context, index) {
-                                                    return index == 0
-                                                        ? Card(
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          5),
-                                                            ),
-                                                            color: Colors
-                                                                .transparent,
-                                                            elevation: 10,
-                                                            child: Container(
-                                                              decoration:
-                                                                  BoxDecoration(
+                                          service_loading
+                                              ? Container(
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height /
+                                                      2.5,
+                                                  child: Stack(
+                                                    children: [
+                                                      Container(
+                                                        height: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .height /
+                                                            3,
+                                                        width: MediaQuery.of(
+                                                                context)
+                                                            .size
+                                                            .width,
+                                                        child: Swiper(
+                                                          itemBuilder: (context,
+                                                                  index) =>
+                                                              Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Card(
+                                                              shape:
+                                                                  RoundedRectangleBorder(
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
-                                                                            5),
-                                                                border: Border.all(
-                                                                    width: 3,
-                                                                    color: Colors
-                                                                        .white),
+                                                                            20),
                                                               ),
-                                                              child: Center(
-                                                                child: Column(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
-                                                                  children: [
-                                                                    imageListService.length ==
-                                                                                1 ||
-                                                                            imageListService.length ==
-                                                                                0
-                                                                        ? FittedBox(
-                                                                            fit:
-                                                                                BoxFit.fitWidth,
-                                                                            child:
-                                                                                Text(
-                                                                              '${imageListService.length} image is selected!',
-                                                                              style: TextStyle(
-                                                                                color: Colors.white,
-                                                                                fontWeight: FontWeight.bold,
-                                                                              ),
-                                                                            ),
-                                                                          )
-                                                                        : FittedBox(
-                                                                            fit:
-                                                                                BoxFit.fitWidth,
-                                                                            child:
-                                                                                Text(
-                                                                              '${imageListService.length} images are selected!',
-                                                                              style: TextStyle(
-                                                                                color: Colors.white,
-                                                                                fontWeight: FontWeight.bold,
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                    IconButton(
-                                                                      onPressed:
-                                                                          selectImagesService,
-                                                                      icon: Icon(
-                                                                          Icons
-                                                                              .add),
-                                                                      color: Colors
-                                                                          .white,
+                                                              elevation: 10,
+                                                              child: Container(
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                      .blue
+                                                                      .withOpacity(
+                                                                          .7),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              20),
+                                                                  image:
+                                                                      DecorationImage(
+                                                                    fit: BoxFit
+                                                                        .fill,
+                                                                    image:
+                                                                        FileImage(
+                                                                      File(imageListService[
+                                                                              index]
+                                                                          .path),
                                                                     ),
-                                                                  ],
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ),
-                                                          )
-                                                        : Card(
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          5),
-                                                            ),
-                                                            elevation: 10,
-                                                            child: Stack(
-                                                                children: [
-                                                                  Container(
-                                                                    decoration: BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(
-                                                                                5),
-                                                                        image: DecorationImage(
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                            image: FileImage(File(imageListService[index - 1].path)))),
+                                                          ),
+                                                          viewportFraction: 0.9,
+                                                          scale: 1,
+                                                          autoplay: true,
+                                                          itemCount:
+                                                              imageListService
+                                                                  .length,
+                                                        ),
+                                                      ),
+                                                      Align(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: LottieBuilder
+                                                            .network(
+                                                          "https://assets5.lottiefiles.com/packages/lf20_z7DhMX.json",
+                                                          animate: true,
+                                                          repeat: true,
+                                                          fit: BoxFit.contain,
+                                                          height: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .height /
+                                                              4,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              : Expanded(
+                                                  child: Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width,
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .height,
+                                                    child: GridView.builder(
+                                                        shrinkWrap: true,
+                                                        itemCount:
+                                                            imageListService
+                                                                    .length +
+                                                                1,
+                                                        gridDelegate:
+                                                            SliverGridDelegateWithFixedCrossAxisCount(
+                                                                crossAxisCount:
+                                                                    2),
+                                                        itemBuilder:
+                                                            ((context, index) {
+                                                          return index == 0
+                                                              ? Card(
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(5),
                                                                   ),
-                                                                  Positioned(
-                                                                    right: 5,
-                                                                    top: 5,
-                                                                    child:
-                                                                        GestureDetector(
-                                                                      onTap:
-                                                                          () {
-                                                                        setState(
-                                                                            () {
-                                                                          imageListService.removeAt(index -
-                                                                              1);
-                                                                        });
-                                                                      },
-                                                                      child:
-                                                                          Container(
-                                                                        decoration:
-                                                                            BoxDecoration(
+                                                                  color: Colors
+                                                                      .transparent,
+                                                                  elevation: 10,
+                                                                  child:
+                                                                      Container(
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              5),
+                                                                      border: Border.all(
+                                                                          width:
+                                                                              3,
                                                                           color:
-                                                                              Colors.white,
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(2),
-                                                                        ),
-                                                                        child:
-                                                                            Padding(
-                                                                          padding:
-                                                                              const EdgeInsets.all(2.0),
-                                                                          child:
-                                                                              Icon(Icons.remove),
-                                                                        ),
+                                                                              Colors.white),
+                                                                    ),
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Column(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          imageListService.length == 1 || imageListService.length == 0
+                                                                              ? FittedBox(
+                                                                                  fit: BoxFit.fitWidth,
+                                                                                  child: Text(
+                                                                                    '${imageListService.length} image is selected!',
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.white,
+                                                                                      fontWeight: FontWeight.bold,
+                                                                                    ),
+                                                                                  ),
+                                                                                )
+                                                                              : FittedBox(
+                                                                                  fit: BoxFit.fitWidth,
+                                                                                  child: Text(
+                                                                                    '${imageListService.length} images are selected!',
+                                                                                    style: TextStyle(
+                                                                                      color: Colors.white,
+                                                                                      fontWeight: FontWeight.bold,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                          IconButton(
+                                                                            onPressed: imageListService.length > 10 || service_loading
+                                                                                ? () {}
+                                                                                : selectImagesService,
+                                                                            icon:
+                                                                                Icon(Icons.add),
+                                                                            color:
+                                                                                Colors.white,
+                                                                          ),
+                                                                        ],
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                ]),
-                                                          );
-                                                  })),
-                                            ),
-                                          ),
+                                                                )
+                                                              : Card(
+                                                                  shape:
+                                                                      RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .circular(5),
+                                                                  ),
+                                                                  elevation: 10,
+                                                                  child: Stack(
+                                                                      children: [
+                                                                        Container(
+                                                                          decoration: BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(5),
+                                                                              image: DecorationImage(fit: BoxFit.cover, image: FileImage(File(imageListService[index - 1].path)))),
+                                                                        ),
+                                                                        Positioned(
+                                                                          right:
+                                                                              5,
+                                                                          top:
+                                                                              5,
+                                                                          child:
+                                                                              GestureDetector(
+                                                                            onTap:
+                                                                                () {
+                                                                              setState(() {
+                                                                                imageListService.removeAt(index - 1);
+                                                                              });
+                                                                            },
+                                                                            child:
+                                                                                Container(
+                                                                              decoration: BoxDecoration(
+                                                                                color: Colors.white,
+                                                                                borderRadius: BorderRadius.circular(2),
+                                                                              ),
+                                                                              child: Padding(
+                                                                                padding: const EdgeInsets.all(2.0),
+                                                                                child: Icon(Icons.remove),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ]),
+                                                                );
+                                                        })),
+                                                  ),
+                                                ),
                                         ],
                                       ),
                                     )
@@ -1296,7 +1453,8 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: selectImageBg,
+                                  onTap:
+                                      service_loading ? () {} : selectImageBg,
                                   child: Container(
                                     height: 160,
                                     width:
@@ -1364,7 +1522,8 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                   bottom: 15,
                                   right: 20,
                                   child: GestureDetector(
-                                    onTap: selectImageDp,
+                                    onTap:
+                                        store_loading ? () {} : selectImageDp,
                                     child: Container(
                                       height: 90,
                                       width: 90,
@@ -1915,7 +2074,7 @@ class _ProfileMakerState extends State<ProfileMaker> {
                                                               MaterialPageRoute(
                                                                 builder:
                                                                     (context) =>
-                                                                        ProfileMaker(),
+                                                                        WhenCompleted(),
                                                               ),
                                                             ),
                                                           );

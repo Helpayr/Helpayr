@@ -46,6 +46,7 @@ dependencies:
   google_sign_in: ^5.4.2
   hidable: ^1.0.3
   image_picker: ^0.8.6
+  lottie: ^1.4.3
   ndialog: ^4.2.0
   page_transition: ^2.0.9
   scroll_snap_list: ^0.9.1

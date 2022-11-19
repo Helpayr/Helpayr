@@ -137,16 +137,23 @@ class ServiceListCard extends StatelessWidget {
                         img_display_2: data['display'][1],
                         service_title: data['job'],
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ListData(
-                                  isService: widget.isService,
-                                  userType: "Helpers",
-                                  service: widget.helperType,
-                                  type: widget.services,
-                                ),
-                              ));
+                          showModalBottomSheet(
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (context) => DraggableScrollableSheet(
+                                    snap: false,
+                                    initialChildSize: .90,
+                                    minChildSize: .50,
+                                    maxChildSize: 1,
+                                    builder: (context, myScroll) => ListData(
+                                      title: data['job'],
+                                      isService: widget.isService,
+                                      userType: "Helpers",
+                                      service: widget.helperType,
+                                      type: widget.services,
+                                    ),
+                                  ));
+                          ;
                         },
                       )),
             );

@@ -50,7 +50,8 @@ class _ProfileState extends State<Profile> {
                   child: Container(
                       decoration: BoxDecoration(
                           image: DecorationImage(
-                              image: AssetImage("assets/imgs/bg-profile.png"),
+                              image: AssetImage(
+                                  "assets/onboarding new/bg_wavy_rotated.png"),
                               fit: BoxFit.cover)),
                       child: Stack(
                         children: <Widget>[
