@@ -1164,7 +1164,7 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                                                 MainAxisSize.min,
                                                                             children: [
                                                                               LottieBuilder.network(
-                                                                                "https://assets3.lottiefiles.com/datafiles/Wv6eeBslW1APprw/data.json",
+                                                                                "https://assets4.lottiefiles.com/packages/lf20_3juvcrdk.json",
                                                                                 fit: BoxFit.fill,
                                                                                 repeat: false,
                                                                                 controller: _animationctrl,

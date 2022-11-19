@@ -41,7 +41,7 @@ class _WhenCompletedState extends State<WhenCompleted> {
         Container(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          color: Color.fromARGB(255, 8, 62, 107).withOpacity(.7),
+          color: Color.fromARGB(255, 8, 62, 107).withOpacity(.9),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
