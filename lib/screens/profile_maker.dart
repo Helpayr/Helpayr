@@ -884,6 +884,8 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                         textInputAction:
                                                             TextInputAction
                                                                 .next,
+                                                        controller:
+                                                            service_ageEC,
                                                         decoration:
                                                             InputDecoration(
                                                           border:
@@ -915,6 +917,8 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                       child: TextField(
                                                         cursorColor:
                                                             Colors.blue,
+                                                        controller:
+                                                            service_addressEC,
                                                         textInputAction:
                                                             TextInputAction
                                                                 .next,
@@ -947,39 +951,8 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                         ),
                                                       ),
                                                       child: TextField(
-                                                        textInputAction:
-                                                            TextInputAction
-                                                                .next,
-                                                        decoration:
-                                                            InputDecoration(
-                                                          border:
-                                                              InputBorder.none,
-                                                          prefixIcon:
-                                                              const Icon(
-                                                                  Icons.work),
-                                                          hintText:
-                                                              "Job/Profession",
-                                                          hintStyle: TextStyle(
-                                                            color: Colors
-                                                                .grey[400],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      decoration:
-                                                          const BoxDecoration(
-                                                        border: Border(
-                                                          bottom: BorderSide(
-                                                              color:
-                                                                  Colors.grey,
-                                                              width: 2),
-                                                        ),
-                                                      ),
-                                                      child: TextField(
+                                                        controller:
+                                                            service_descEC,
                                                         textInputAction:
                                                             TextInputAction
                                                                 .next,
@@ -1013,6 +986,8 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                         ),
                                                       ),
                                                       child: TextField(
+                                                        controller:
+                                                            store_facebookEc,
                                                         textInputAction:
                                                             TextInputAction
                                                                 .next,
@@ -1038,6 +1013,8 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                       decoration:
                                                           const BoxDecoration(),
                                                       child: TextField(
+                                                        controller:
+                                                            store_priceEc,
                                                         textInputAction:
                                                             TextInputAction
                                                                 .next,
