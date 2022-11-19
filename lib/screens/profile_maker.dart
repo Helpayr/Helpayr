@@ -41,14 +41,6 @@ class _ProfileMakerState extends State<ProfileMaker>
   final store_facebookEc = TextEditingController();
   final store_priceEc = TextEditingController();
 
-  //ControlsService
-
-  final service_ageEC = TextEditingController();
-  final service_addressEC = TextEditingController();
-  final service_descEC = TextEditingController();
-  final service_facebookEc = TextEditingController();
-  final service_priceEc = TextEditingController();
-
 //Store Methods!
 
   UploadTask uploadProfile;
@@ -149,6 +141,51 @@ class _ProfileMakerState extends State<ProfileMaker>
   }
 
   //Service Methods!
+  //ControlsService
+
+  final service_ageEC = TextEditingController();
+  final fullNameEC = TextEditingController();
+  final service_addressEC = TextEditingController();
+  final service_descEC = TextEditingController();
+  final service_facebookEc = TextEditingController();
+  final service_priceEc = TextEditingController();
+
+  Future addServiceDetails(
+      String fullname,
+      String service,
+      String service_ageEC,
+      String service_addressEC,
+      String service_descEC,
+      String service_facebookEc,
+      String service_priceEc,
+      String dp_service,
+      String bg_service,
+      List<String> uploadedImageService) async {
+    await FirebaseFirestore.instance
+        .collection('Helpers')
+        .doc('Service')
+        .collection(dropValue)
+        .add({
+      'full_name': fullname,
+      'job_profession': service,
+      'Age': service_ageEC,
+      'Address': service_addressEC,
+      'Description': service_descEC,
+      'fb': service_facebookEc,
+      'price': service_priceEc,
+      'dp': dp_service,
+      'bg': bg_service,
+      'image': uploadedImageService,
+    });
+  }
+
+  Future uploadWorks_Service() async {
+    await uploadImagesService();
+    await uploadImageSingleProfileService();
+  }
+
+  String dp_service = "";
+  String bg_service = "";
 
   UploadTask uploadProfileService;
   UploadTask uploadBgService;
@@ -212,14 +249,24 @@ class _ProfileMakerState extends State<ProfileMaker>
     await ref.getDownloadURL().then((value) {
       print(value);
       setState(() {
-        profile_picUrl = value;
+        dp_service = value;
       });
     });
+    await upload_service();
   }
 
-  Future uploadWorks_Service() async {
-    await uploadImagesService();
-    await uploadImageSingleProfileService();
+  Future upload_service() async {
+    await addServiceDetails(
+        fullNameEC.text.trim(),
+        dropValue,
+        service_ageEC.text.trim(),
+        service_addressEC.text.trim(),
+        service_descEC.text.trim(),
+        service_facebookEc.text.trim(),
+        service_priceEc.text.trim(),
+        dp_service,
+        bg_service,
+        uploadedImageService);
   }
 
   Future uploadImageSingleBgService() async {
@@ -234,7 +281,7 @@ class _ProfileMakerState extends State<ProfileMaker>
     await ref.getDownloadURL().then((value) {
       print(value);
       setState(() {
-        bg = value;
+        bg_service = value;
       });
     });
     setState(() {
@@ -283,18 +330,20 @@ class _ProfileMakerState extends State<ProfileMaker>
     );
     _animationctrl.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => WhenCompleted(),
-          ),
-        );
+        Navigator.of(context).pop();
       }
     });
   }
 
   @override
   void dispose() {
+    service_ageEC.dispose();
+    fullNameEC.dispose();
+    service_addressEC.dispose();
+    service_descEC.dispose();
+    service_facebookEc.dispose();
+    service_priceEc.dispose();
+
     _animationctrl.dispose();
     super.dispose();
   }
@@ -804,6 +853,80 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                               width: 2),
                                                         ),
                                                       ),
+                                                      child: TextField(
+                                                        cursorColor:
+                                                            Colors.blue,
+                                                        textInputAction:
+                                                            TextInputAction
+                                                                .next,
+                                                        controller: fullNameEC,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          border:
+                                                              InputBorder.none,
+                                                          prefixIcon:
+                                                              const Icon(
+                                                                  Icons.person),
+                                                          hintText: "Full Name",
+                                                          hintStyle: TextStyle(
+                                                            color: Colors
+                                                                .grey[400],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        border: Border(
+                                                          bottom: BorderSide(
+                                                              color:
+                                                                  Colors.grey,
+                                                              width: 2),
+                                                        ),
+                                                      ),
+                                                      child: TextField(
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                        cursorColor:
+                                                            Colors.blue,
+                                                        textInputAction:
+                                                            TextInputAction
+                                                                .next,
+                                                        controller:
+                                                            service_ageEC,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          border:
+                                                              InputBorder.none,
+                                                          prefixIcon:
+                                                              const Icon(
+                                                                  Icons.person),
+                                                          hintText: "Age",
+                                                          hintStyle: TextStyle(
+                                                            color: Colors
+                                                                .grey[400],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        border: Border(
+                                                          bottom: BorderSide(
+                                                              color:
+                                                                  Colors.grey,
+                                                              width: 2),
+                                                        ),
+                                                      ),
                                                       child: Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -862,42 +985,6 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                               ),
                                                             ),
                                                           ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      decoration:
-                                                          const BoxDecoration(
-                                                        border: Border(
-                                                          bottom: BorderSide(
-                                                              color:
-                                                                  Colors.grey,
-                                                              width: 2),
-                                                        ),
-                                                      ),
-                                                      child: TextField(
-                                                        cursorColor:
-                                                            Colors.blue,
-                                                        textInputAction:
-                                                            TextInputAction
-                                                                .next,
-                                                        controller:
-                                                            service_ageEC,
-                                                        decoration:
-                                                            InputDecoration(
-                                                          border:
-                                                              InputBorder.none,
-                                                          prefixIcon:
-                                                              const Icon(
-                                                                  Icons.person),
-                                                          hintText: "Age",
-                                                          hintStyle: TextStyle(
-                                                            color: Colors
-                                                                .grey[400],
-                                                          ),
                                                         ),
                                                       ),
                                                     ),
@@ -987,7 +1074,7 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                       ),
                                                       child: TextField(
                                                         controller:
-                                                            store_facebookEc,
+                                                            service_facebookEc,
                                                         textInputAction:
                                                             TextInputAction
                                                                 .next,
@@ -1013,6 +1100,9 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                       decoration:
                                                           const BoxDecoration(),
                                                       child: TextField(
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
                                                         controller:
                                                             store_priceEc,
                                                         textInputAction:
@@ -1117,45 +1207,39 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                             service_loading =
                                                                 true;
                                                           });
+
                                                           uploadImageSingleBgService();
                                                           uploadWorks_Service()
-                                                              .whenComplete(
-                                                            () => showDialog(
-                                                              context: context,
-                                                              builder:
-                                                                  ((context) =>
-                                                                      Dialog(
-                                                                        backgroundColor:
-                                                                            Colors.transparent,
-                                                                        child:
-                                                                            Padding(
-                                                                          padding:
-                                                                              const EdgeInsets.all(8.0),
-                                                                          child:
-                                                                              Column(
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.center,
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.center,
-                                                                            mainAxisSize:
-                                                                                MainAxisSize.min,
-                                                                            children: [
-                                                                              LottieBuilder.network(
-                                                                                "https://assets4.lottiefiles.com/packages/lf20_3juvcrdk.json",
-                                                                                fit: BoxFit.fill,
-                                                                                repeat: false,
-                                                                                controller: _animationctrl,
-                                                                                onLoaded: ((p0) {
-                                                                                  _animationctrl.duration = p0.duration;
-                                                                                  return _animationctrl.forward();
-                                                                                }),
+                                                              .whenComplete(() =>
+                                                                  showDialog(
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        ((context) =>
+                                                                            Dialog(
+                                                                              backgroundColor: Colors.transparent,
+                                                                              child: Padding(
+                                                                                padding: const EdgeInsets.all(8.0),
+                                                                                child: Column(
+                                                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  mainAxisSize: MainAxisSize.min,
+                                                                                  children: [
+                                                                                    LottieBuilder.network(
+                                                                                      "https://assets4.lottiefiles.com/packages/lf20_3juvcrdk.json",
+                                                                                      fit: BoxFit.fill,
+                                                                                      repeat: false,
+                                                                                      controller: _animationctrl,
+                                                                                      onLoaded: ((p0) {
+                                                                                        _animationctrl.duration = p0.duration;
+                                                                                        return _animationctrl.forward();
+                                                                                      }),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
                                                                               ),
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      )),
-                                                            ),
-                                                          );
+                                                                            )),
+                                                                  ));
                                                         },
                                                         child: Container(
                                                           width: 120,

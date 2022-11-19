@@ -112,8 +112,12 @@ class _signUpContextState extends State<signUpContext> {
     }
   }
 
-  Future addUserDetails(String firstnameEC, String lastNameEC, String email,
-      String profilePic) async {
+  Future addUserDetails(
+    String firstnameEC,
+    String lastNameEC,
+    String email,
+    String profilePic,
+  ) async {
     await FirebaseFirestore.instance.collection('Users').add({
       'First Name': firstnameEC,
       'Last Name': lastNameEC,
