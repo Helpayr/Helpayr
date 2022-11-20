@@ -326,7 +326,12 @@ class _ProfileMakerState extends State<ProfileMaker>
     );
     _animationctrl.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
-        Navigator.of(context).pop();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WhenCompleted(),
+          ),
+        );
       }
     });
   }
@@ -849,80 +854,6 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                               width: 2),
                                                         ),
                                                       ),
-                                                      child: TextField(
-                                                        cursorColor:
-                                                            Colors.blue,
-                                                        textInputAction:
-                                                            TextInputAction
-                                                                .next,
-                                                        controller: fullNameEC,
-                                                        decoration:
-                                                            InputDecoration(
-                                                          border:
-                                                              InputBorder.none,
-                                                          prefixIcon:
-                                                              const Icon(
-                                                                  Icons.person),
-                                                          hintText: "Full Name",
-                                                          hintStyle: TextStyle(
-                                                            color: Colors
-                                                                .grey[400],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      decoration:
-                                                          const BoxDecoration(
-                                                        border: Border(
-                                                          bottom: BorderSide(
-                                                              color:
-                                                                  Colors.grey,
-                                                              width: 2),
-                                                        ),
-                                                      ),
-                                                      child: TextField(
-                                                        keyboardType:
-                                                            TextInputType
-                                                                .number,
-                                                        cursorColor:
-                                                            Colors.blue,
-                                                        textInputAction:
-                                                            TextInputAction
-                                                                .next,
-                                                        controller:
-                                                            service_ageEC,
-                                                        decoration:
-                                                            InputDecoration(
-                                                          border:
-                                                              InputBorder.none,
-                                                          prefixIcon:
-                                                              const Icon(
-                                                                  Icons.person),
-                                                          hintText: "Age",
-                                                          hintStyle: TextStyle(
-                                                            color: Colors
-                                                                .grey[400],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      decoration:
-                                                          const BoxDecoration(
-                                                        border: Border(
-                                                          bottom: BorderSide(
-                                                              color:
-                                                                  Colors.grey,
-                                                              width: 2),
-                                                        ),
-                                                      ),
                                                       child: Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -981,6 +912,80 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                               ),
                                                             ),
                                                           ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        border: Border(
+                                                          bottom: BorderSide(
+                                                              color:
+                                                                  Colors.grey,
+                                                              width: 2),
+                                                        ),
+                                                      ),
+                                                      child: TextField(
+                                                        cursorColor:
+                                                            Colors.blue,
+                                                        textInputAction:
+                                                            TextInputAction
+                                                                .next,
+                                                        controller: fullNameEC,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          border:
+                                                              InputBorder.none,
+                                                          prefixIcon:
+                                                              const Icon(
+                                                                  Icons.person),
+                                                          hintText: "Full Name",
+                                                          hintStyle: TextStyle(
+                                                            color: Colors
+                                                                .grey[400],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        border: Border(
+                                                          bottom: BorderSide(
+                                                              color:
+                                                                  Colors.grey,
+                                                              width: 2),
+                                                        ),
+                                                      ),
+                                                      child: TextField(
+                                                        keyboardType:
+                                                            TextInputType
+                                                                .number,
+                                                        cursorColor:
+                                                            Colors.blue,
+                                                        textInputAction:
+                                                            TextInputAction
+                                                                .next,
+                                                        controller:
+                                                            service_ageEC,
+                                                        decoration:
+                                                            InputDecoration(
+                                                          border:
+                                                              InputBorder.none,
+                                                          prefixIcon:
+                                                              const Icon(
+                                                                  Icons.person),
+                                                          hintText: "Age",
+                                                          hintStyle: TextStyle(
+                                                            color: Colors
+                                                                .grey[400],
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
