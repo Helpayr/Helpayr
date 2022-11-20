@@ -22,6 +22,7 @@ import '../firebase/List_data_page.dart';
 import '../services/designing/list_services.dart';
 import '../services/editing/editing_main.dart';
 import '../services/foodandother/foodAndOther.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // import 'package:helpayr/screens/product.dart';
 
@@ -105,6 +106,16 @@ class _HomeState extends State<Home> {
       Column(
         children: <Widget>[
           Carousel(pic: 'store_random_pic_service'),
+          Text("Featured Stores",
+              style: GoogleFonts.raleway(
+                  fontSize: 20, fontWeight: FontWeight.bold)),
+          HelperList(
+            isStore: true,
+            isService: false,
+            display_type: 'Store_Display',
+            helper_type: 'Store',
+            scrollController: listviewctrl,
+          ),
           Container(
             height: 67,
             width: MediaQuery.of(context).size.width,

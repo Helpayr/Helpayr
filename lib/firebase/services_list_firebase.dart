@@ -1,22 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/constants/services_tentative.dart';
 import 'package:helpayr/services/freelance/freelance.dart';
 import 'package:helpayr/widgets/card-horizontal.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 
 import 'List_data_page.dart';
 
 class HelperList extends StatefulWidget {
-  const HelperList(
-      {key,
-      this.scrollController,
-      this.display_type,
-      this.helper_type,
-      this.isService = false});
+  const HelperList({
+    key,
+    this.scrollController,
+    this.display_type,
+    this.helper_type,
+    this.isService = false,
+    this.isStore = false,
+  });
   final ScrollController scrollController;
   final String display_type;
   final String helper_type;
   final bool isService;
+  final bool isStore;
   State<HelperList> createState() => _HelperListState();
 }
 
@@ -36,15 +41,20 @@ class _HelperListState extends State<HelperList> {
     return FutureBuilder(
       future: getDocs(),
       builder: (context, snapshot) => Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height / 1.5,
+        width: widget.isStore
+            ? MediaQuery.of(context).size.width
+            : MediaQuery.of(context).size.width,
+        height: widget.isStore ? 230 : MediaQuery.of(context).size.height / 1.5,
         child: ListView.builder(
-          physics: NeverScrollableScrollPhysics(),
+          physics: widget.isStore
+              ? BouncingScrollPhysics()
+              : NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           controller: widget.scrollController,
-          scrollDirection: Axis.vertical,
+          scrollDirection: widget.isStore ? Axis.horizontal : Axis.vertical,
           itemCount: services.length,
           itemBuilder: ((context, index) => TypeImageDisplay(
+                isStore: widget.isStore,
                 isService: widget.isService,
                 display_type: widget.display_type,
                 services: services[index],
@@ -68,7 +78,8 @@ class TypeImageDisplay extends StatefulWidget {
       this.helperType,
       this.isService = false,
       this.colors,
-      this.service_title});
+      this.service_title,
+      this.isStore = false});
   final String display_type;
   final String DocId;
   final String services;
@@ -76,6 +87,8 @@ class TypeImageDisplay extends StatefulWidget {
   final bool isService;
   final Color colors;
   final List service_title;
+  final bool isStore;
+
   @override
   State<TypeImageDisplay> createState() => _TypeImageDisplayState();
 }
@@ -92,10 +105,188 @@ class _TypeImageDisplayState extends State<TypeImageDisplay> {
           Map<String, dynamic> data =
               snapshot.data.data() as Map<String, dynamic>;
 
-          return ServiceListCard(
-            widget: widget,
-            data: data,
-          );
+          return widget.isStore
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    elevation: 10,
+                    child: Container(
+                      height: 200,
+                      width: MediaQuery.of(context).size.width / 1.1,
+                      child: Stack(children: [
+                        Column(
+                          children: [
+                            Flexible(
+                              flex: 4,
+                              child: Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Swiper(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  viewportFraction: .9,
+                                  autoplay: true,
+                                  scrollDirection: Axis.horizontal,
+                                  itemBuilder: ((context, index) => Padding(
+                                        padding: const EdgeInsets.all(2.0),
+                                        child: Card(
+                                          elevation: 10,
+                                          child: Container(
+                                            height: 120,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                1.5,
+                                            decoration: BoxDecoration(
+                                                image: DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image: NetworkImage(
+                                                        data['display']
+                                                            [index]))),
+                                          ),
+                                        ),
+                                      )),
+                                  itemCount: data['display'].length,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Flexible(
+                              flex: 1,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 25.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${data['store_name']}',
+                                          style: GoogleFonts.raleway(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                          '${data['address']}',
+                                          style: GoogleFonts.raleway(
+                                              color: Colors.black,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        Positioned(
+                          right: 4,
+                          bottom: 23,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Container(
+                              height: 70,
+                              width: 70,
+                              decoration: BoxDecoration(
+                                  border:
+                                      Border.all(width: 3, color: Colors.white),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      offset: Offset(3, 0),
+                                      blurRadius: 6,
+                                    ),
+                                  ],
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                      image: NetworkImage(data['dp']))),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: 4,
+                          bottom: 40,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Card(
+                              elevation: 10,
+                              child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      '${data['job']}',
+                                      style: GoogleFonts.raleway(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )),
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FreeLanceHome(
+                                        img_display_1: data['display'][0],
+                                        img_display_2: data['display'][1],
+                                        service_title: data['job'],
+                                        onTap: () {
+                                          showModalBottomSheet(
+                                              isScrollControlled: true,
+                                              context: context,
+                                              builder: (context) =>
+                                                  DraggableScrollableSheet(
+                                                    snap: false,
+                                                    initialChildSize: .90,
+                                                    minChildSize: .50,
+                                                    maxChildSize: 1,
+                                                    builder:
+                                                        (context, myScroll) =>
+                                                            ListData(
+                                                      title: data['job'],
+                                                      isService:
+                                                          widget.isService,
+                                                      userType: "Helpers",
+                                                      service:
+                                                          widget.helperType,
+                                                      type: widget.services,
+                                                    ),
+                                                  ));
+                                          ;
+                                        },
+                                      )),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: Text(
+                                "See More",
+                                style: GoogleFonts.raleway(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ]),
+                    ),
+                  ),
+                )
+              : ServiceListCard(
+                  widget: widget,
+                  data: data,
+                );
         }
         return Container(
           child: Center(child: CircularProgressIndicator()),
@@ -120,7 +311,7 @@ class ServiceListCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
-        height: 150,
+        height: 170,
         width: MediaQuery.of(context).size.width,
         child: CardHorizontal(
           color: widget.colors,

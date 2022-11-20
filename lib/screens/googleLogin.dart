@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/screens/login.dart';
 import 'package:helpayr/screens/profile_maker.dart';
 import 'package:helpayr/screens/sign_up.dart';
+import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import '../constants/Theme.dart';
 import '../firebase/authenticate.dart';
@@ -104,7 +105,15 @@ class _ChooseLoginState extends State<ChooseLogin> {
                   ),
                 ),
                 SizedBox(
-                  height: 70,
+                  height: 20,
+                ),
+                Container(
+                  height: 100,
+                  width: MediaQuery.of(context).size.width / 2,
+                  child: LottieBuilder.network(
+                    "https://assets6.lottiefiles.com/packages/lf20_3vbOcw.json",
+                    fit: BoxFit.fill,
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),

@@ -47,12 +47,15 @@ class _ProfileState extends State<Profile> {
               children: [
                 Flexible(
                   flex: 2,
-                  child: Container(
+                  child: Stack(children: [
+                    Container(
                       decoration: BoxDecoration(
                           image: DecorationImage(
-                              image: AssetImage(
-                                  "assets/onboarding new/bg_wavy_rotated.png"),
+                              image: AssetImage("assets/imgs/bluescreen.png"),
                               fit: BoxFit.cover)),
+                    ),
+                    Container(
+                      color: Color.fromARGB(255, 6, 44, 75).withOpacity(.8),
                       child: Stack(
                         children: <Widget>[
                           SafeArea(
@@ -175,7 +178,9 @@ class _ProfileState extends State<Profile> {
                             ),
                           )
                         ],
-                      )),
+                      ),
+                    ),
+                  ]),
                 ),
                 Flexible(
                   flex: 1,

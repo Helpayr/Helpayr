@@ -11,7 +11,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/screens/when_complete.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
+
+import '../firebase/googleSignIn.dart';
+import '../main.dart';
+import 'googleLogin.dart';
 
 class ProfileMaker extends StatefulWidget {
   const ProfileMaker({key});
@@ -359,6 +364,8 @@ class _ProfileMakerState extends State<ProfileMaker>
     return FutureBuilder(
       future: getDocs(),
       builder: (context, snapshot) => Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
         body: SafeArea(
           child: SingleChildScrollView(
             child: AnimatedContainer(
@@ -381,13 +388,67 @@ class _ProfileMakerState extends State<ProfileMaker>
                     SizedBox(
                       height: 10,
                     ),
-                    Text(
-                      "Register As",
-                      style: TextStyle(
-                        color: isHelpersSelected ? Colors.white : Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          flex: 3,
+                          child: Text(
+                            "Register As",
+                            style: TextStyle(
+                              color: isHelpersSelected
+                                  ? Colors.white
+                                  : Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 40,
+                        ),
+                        Flexible(
+                          flex: 2,
+                          child: GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text(
+                                          "Are you sure you want to log-out?"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            final provider = Provider.of<
+                                                    GoogleSignUpProvider>(
+                                                context,
+                                                listen: false);
+                                            provider.logout().then((value) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => noback(
+                                                      wid: ChooseLogin()),
+                                                ),
+                                              );
+                                            });
+                                          },
+                                          child: Text("Yes"),
+                                        ),
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text("No"))
+                                      ],
+                                    );
+                                  });
+                            },
+                            child: Icon(Icons.exit_to_app, color: Colors.white),
+                          ),
+                        )
+                      ],
                     ),
                     SizedBox(
                       height: 5,
@@ -520,81 +581,94 @@ class _ProfileMakerState extends State<ProfileMaker>
                           children: [
                             Stack(
                               children: [
-                                Container(
-                                  height: 190,
-                                  width:
-                                      MediaQuery.of(context).size.width / 1.1,
-                                  decoration: BoxDecoration(
-                                    color: Colors.blueAccent,
-                                    borderRadius: BorderRadius.circular(10),
+                                Card(
+                                  elevation: 10,
+                                  child: Container(
+                                    height: 190,
+                                    width:
+                                        MediaQuery.of(context).size.width / 1.1,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
                                 ),
                                 GestureDetector(
                                   onTap: service_loading
                                       ? () {}
                                       : selectImageBgService,
-                                  child: Container(
-                                    height: 160,
-                                    width:
-                                        MediaQuery.of(context).size.width / 1.1,
-                                    decoration: BoxDecoration(
-                                      color: pickedFileServiceBg != null
-                                          ? Colors.transparent
-                                          : Colors.blue,
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                     ),
-                                    child: pickedFileServiceBg != null
-                                        ? Card(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            elevation: 10,
-                                            child: Container(
-                                              height: 160,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  color: Colors.transparent,
-                                                  image: DecorationImage(
-                                                      fit: BoxFit.cover,
-                                                      image: FileImage(
-                                                        File(pickedFileServiceBg
-                                                            .path),
-                                                      ))),
-                                            ),
-                                          )
-                                        : Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Icon(
-                                                    FontAwesomeIcons.image,
-                                                    color: Colors.white,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  Text(
-                                                    "Add Background Image",
-                                                    style: TextStyle(
+                                    elevation: 10,
+                                    child: Container(
+                                      height: 160,
+                                      width: MediaQuery.of(context).size.width /
+                                          1.1,
+                                      decoration: BoxDecoration(
+                                        color: pickedFileServiceBg != null
+                                            ? Colors.transparent
+                                            : Colors.blue,
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(10),
+                                          bottomRight: Radius.circular(10),
+                                        ),
+                                      ),
+                                      child: pickedFileServiceBg != null
+                                          ? Card(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              elevation: 10,
+                                              child: Container(
+                                                height: 160,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    color: Colors.transparent,
+                                                    image: DecorationImage(
+                                                        fit: BoxFit.cover,
+                                                        image: FileImage(
+                                                          File(
+                                                              pickedFileServiceBg
+                                                                  .path),
+                                                        ))),
+                                              ),
+                                            )
+                                          : Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      FontAwesomeIcons.image,
                                                       color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
                                                     ),
-                                                  )
-                                                ],
-                                              ),
-                                              Icon(
-                                                Icons.add,
-                                                color: Colors.white,
-                                              ),
-                                            ],
-                                          ),
+                                                    SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Text(
+                                                      "Add Background Image",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                                Icon(
+                                                  Icons.add,
+                                                  color: Colors.white,
+                                                ),
+                                              ],
+                                            ),
+                                    ),
                                   ),
                                 ),
                                 Positioned(
@@ -653,12 +727,12 @@ class _ProfileMakerState extends State<ProfileMaker>
                                   ),
                                 ),
                                 Positioned(
-                                  bottom: 5,
+                                  bottom: 10,
                                   left: 10,
                                   child: Text(
                                     user.displayName,
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -1434,9 +1508,13 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                                                   ),
                                                                                 ),
                                                                           IconButton(
-                                                                            onPressed: imageListService.length > 10 || service_loading
+                                                                            onPressed: imageListService.length > 10 || service_loading || pickedFileServiceBg == null && pickedFileServiceDp == null
                                                                                 ? () {}
-                                                                                : selectImagesService,
+                                                                                : () {
+                                                                                    selectImagesService();
+                                                                                    uploadImageSingleProfileService();
+                                                                                    uploadImageSingleBgService();
+                                                                                  },
                                                                             icon:
                                                                                 Icon(Icons.add),
                                                                             color:
