@@ -88,7 +88,6 @@ class TypeImageDisplay extends StatefulWidget {
   final Color colors;
   final List service_title;
   final bool isStore;
-
   @override
   State<TypeImageDisplay> createState() => _TypeImageDisplayState();
 }
@@ -164,7 +163,8 @@ class _TypeImageDisplayState extends State<TypeImageDisplay> {
                                         Text(
                                           '${data['store_name']}',
                                           style: GoogleFonts.raleway(
-                                              color: Colors.black,
+                                              color: Color.fromARGB(
+                                                  255, 5, 26, 43),
                                               fontWeight: FontWeight.bold),
                                         ),
                                         Text(
@@ -188,11 +188,11 @@ class _TypeImageDisplayState extends State<TypeImageDisplay> {
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
                             child: Container(
-                              height: 70,
-                              width: 70,
+                              height: 100,
+                              width: 100,
                               decoration: BoxDecoration(
                                   border:
-                                      Border.all(width: 3, color: Colors.white),
+                                      Border.all(width: 5, color: Colors.white),
                                   boxShadow: [
                                     BoxShadow(
                                       color: Colors.black26,
