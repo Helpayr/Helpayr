@@ -121,7 +121,7 @@ class _CardHorizontalState extends State<CardHorizontal> {
                                   style: GoogleFonts.raleway(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
-                                    fontSize: 22,
+                                    fontSize: 20,
                                   ),
                                 ),
                               ),

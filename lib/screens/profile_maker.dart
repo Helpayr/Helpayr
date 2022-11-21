@@ -326,7 +326,7 @@ class _ProfileMakerState extends State<ProfileMaker>
     _animationctrl = AnimationController(
       vsync: this,
       duration: Duration(
-        seconds: 20,
+        seconds: 10,
       ),
     );
     _animationctrl.addStatusListener((status) async {
@@ -1285,36 +1285,43 @@ class _ProfileMakerState extends State<ProfileMaker>
 
                                                           uploadImageSingleBgService();
                                                           uploadWorks_Service()
-                                                              .whenComplete(() =>
-                                                                  showDialog(
-                                                                    context:
-                                                                        context,
-                                                                    builder:
-                                                                        ((context) =>
-                                                                            Dialog(
-                                                                              backgroundColor: Colors.transparent,
-                                                                              child: Padding(
-                                                                                padding: const EdgeInsets.all(8.0),
-                                                                                child: Column(
-                                                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                                                  mainAxisSize: MainAxisSize.min,
-                                                                                  children: [
-                                                                                    LottieBuilder.network(
-                                                                                      "https://assets4.lottiefiles.com/packages/lf20_3juvcrdk.json",
-                                                                                      fit: BoxFit.fill,
-                                                                                      repeat: false,
-                                                                                      controller: _animationctrl,
-                                                                                      onLoaded: ((p0) {
-                                                                                        _animationctrl.duration = p0.duration;
-                                                                                        return _animationctrl.forward();
-                                                                                      }),
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
+                                                              .whenComplete(
+                                                            () => showDialog(
+                                                              context: context,
+                                                              builder:
+                                                                  ((context) =>
+                                                                      Dialog(
+                                                                        backgroundColor:
+                                                                            Colors.transparent,
+                                                                        child:
+                                                                            Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.all(8.0),
+                                                                          child:
+                                                                              Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.center,
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            mainAxisSize:
+                                                                                MainAxisSize.min,
+                                                                            children: [
+                                                                              LottieBuilder.network(
+                                                                                "https://assets4.lottiefiles.com/packages/lf20_3juvcrdk.json",
+                                                                                fit: BoxFit.fill,
+                                                                                repeat: false,
+                                                                                controller: _animationctrl,
+                                                                                onLoaded: ((p0) {
+                                                                                  _animationctrl.duration = p0.duration;
+                                                                                  return _animationctrl.forward();
+                                                                                }),
                                                                               ),
-                                                                            )),
-                                                                  ));
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      )),
+                                                            ),
+                                                          );
                                                         },
                                                         child: Container(
                                                           width: 120,

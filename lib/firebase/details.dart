@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:helpayr/firebase/appointments.dart';
 
 import 'getData.dart';
 
@@ -86,10 +87,22 @@ class DetailsHelper extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                ElevatedButtonStore(
-                  width: MediaQuery.of(context).size.width / 2,
-                  icon: FontAwesomeIcons.check,
-                  title: "Set Appointments",
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Appointment(
+                          widget: widget,
+                        ),
+                      ),
+                    );
+                  },
+                  child: ElevatedButtonStore(
+                    width: MediaQuery.of(context).size.width / 2,
+                    icon: FontAwesomeIcons.check,
+                    title: "Set Appointments",
+                  ),
                 ),
                 ElevatedButtonStore(
                   width: MediaQuery.of(context).size.width / 4,
