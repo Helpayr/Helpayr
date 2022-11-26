@@ -24,6 +24,7 @@ class GoogleSignUpProvider extends ChangeNotifier {
     await FirebaseFirestore.instance.collection("Users").add({
       "uid": FirebaseAuth.instance.currentUser.uid,
       "email": FirebaseAuth.instance.currentUser.email,
+      "dp": FirebaseAuth.instance.currentUser.photoURL,
     });
     notifyListeners();
   }
@@ -46,6 +47,26 @@ class GoogleSignUpProvider extends ChangeNotifier {
         .add({
       "uid": FirebaseAuth.instance.currentUser.uid,
       "email": FirebaseAuth.instance.currentUser.email,
+      "dp": FirebaseAuth.instance.currentUser.photoURL,
+    });
+    notifyListeners();
+  }
+
+  Future googleLoginAdmin() async {
+    final googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) return;
+    _user = googleUser;
+    final googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    await FirebaseAuth.instance.signInWithCredential(credential);
+    await FirebaseFirestore.instance.collection("Admin").add({
+      "uid": FirebaseAuth.instance.currentUser.uid,
+      "email": FirebaseAuth.instance.currentUser.email,
+      "dp": FirebaseAuth.instance.currentUser.photoURL,
     });
     notifyListeners();
   }
