@@ -55,6 +55,7 @@ dependencies:
   smooth_page_indicator: ^1.0.0+2
   stacked_page_view: ^1.1.2
   stream_chat_flutter: ^4.6.0
+  syncfusion_flutter_charts: ^20.3.58
 
 dev_dependencies:
   flutter_launcher_icons: ^0.10.0

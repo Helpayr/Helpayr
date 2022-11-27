@@ -42,6 +42,8 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
                 fontFamily: 'Montserrat',
+                bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                    backgroundColor: Colors.black.withOpacity(0)),
                 bottomSheetTheme: BottomSheetThemeData(
                     backgroundColor: Colors.black.withOpacity(0))),
             home: SlideOnboarding(),
