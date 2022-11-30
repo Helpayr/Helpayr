@@ -8,6 +8,7 @@ class GoogleSignUpProvider extends ChangeNotifier {
   GoogleSignInAccount _user;
 
   GoogleSignInAccount get user => _user;
+  List<String> users = [];
 
   Future googleLoginUser() async {
     final googleUser = await GoogleSignIn().signIn();
@@ -21,11 +22,14 @@ class GoogleSignUpProvider extends ChangeNotifier {
     );
     await FirebaseAuth.instance.signInWithCredential(credential);
 
-    await FirebaseFirestore.instance.collection("Users").add({
+    final uid_docs = FirebaseAuth.instance.currentUser.uid;
+
+    await FirebaseFirestore.instance.collection("Users").doc(uid_docs).set({
       "uid": FirebaseAuth.instance.currentUser.uid,
       "email": FirebaseAuth.instance.currentUser.email,
       "dp": FirebaseAuth.instance.currentUser.photoURL,
       "last_login": FirebaseAuth.instance.currentUser.metadata.lastSignInTime,
+      "name": FirebaseAuth.instance.currentUser.displayName,
     });
     notifyListeners();
   }
@@ -41,15 +45,18 @@ class GoogleSignUpProvider extends ChangeNotifier {
       idToken: googleAuth.idToken,
     );
     await FirebaseAuth.instance.signInWithCredential(credential);
+    final uid_docs = FirebaseAuth.instance.currentUser.uid;
     await FirebaseFirestore.instance
         .collection("Helpers")
         .doc("People")
         .collection('Servicers')
-        .add({
+        .doc(uid_docs)
+        .set({
       "uid": FirebaseAuth.instance.currentUser.uid,
       "email": FirebaseAuth.instance.currentUser.email,
       "dp": FirebaseAuth.instance.currentUser.photoURL,
       "last_login": FirebaseAuth.instance.currentUser.metadata.lastSignInTime,
+      "name": FirebaseAuth.instance.currentUser.displayName,
     });
     notifyListeners();
   }
@@ -70,6 +77,7 @@ class GoogleSignUpProvider extends ChangeNotifier {
       "email": FirebaseAuth.instance.currentUser.email,
       "dp": FirebaseAuth.instance.currentUser.photoURL,
       "last_login": FirebaseAuth.instance.currentUser.metadata.lastSignInTime,
+      "name": FirebaseAuth.instance.currentUser.displayName,
     });
     notifyListeners();
   }
