@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:helpayr/admin/getData_admin.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:anim_search_bar/anim_search_bar.dart';
 
 import '../screens/home.dart';
 
@@ -17,6 +19,7 @@ class Admin_Dashboard extends StatefulWidget {
 }
 
 class _Admin_DashboardState extends State<Admin_Dashboard> {
+  TextEditingController textController = TextEditingController();
   List<AdminData> admin_data_pass;
   TooltipBehavior _tooltipBehavior;
   final user = FirebaseAuth.instance.currentUser;
@@ -262,173 +265,78 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                   Container(
                     child: Column(
                       children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width / 1.2,
-                          height: 100,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 10,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 35.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${users.length}',
-                                        style: GoogleFonts.raleway(
-                                            fontSize: 50,
-                                            color: Colors.blueAccent,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        'Users Registered',
-                                        style: GoogleFonts.raleway(
-                                            fontSize: 15,
-                                            color: Colors.blueAccent,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                  Container(
-                                    height: 70,
-                                    width: 70,
-                                    child: Center(
-                                      child: Icon(
-                                        FontAwesomeIcons.user,
-                                        color: Colors.blueAccent,
-                                      ),
-                                    ),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            width: 4, color: Colors.blueAccent),
-                                        color: Colors.blue.withOpacity(.4),
-                                        shape: BoxShape.circle),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: MediaQuery.of(context).size.width / 1.2,
-                          height: 100,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 10,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 35.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    height: 70,
-                                    width: 70,
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.work,
-                                        color: Colors.deepPurple,
-                                      ),
-                                    ),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                          width: 4,
-                                          color: Colors.deepPurple,
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              isScrollControlled: true,
+                              context: context,
+                              builder: (context) => DraggableScrollableSheet(
+                                  snap: false,
+                                  initialChildSize: .90,
+                                  minChildSize: .50,
+                                  maxChildSize: 1,
+                                  builder: (context, myScroll) => Scaffold(
+                                        backgroundColor: Colors.transparent,
+                                        body: Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(24),
+                                              topRight: Radius.circular(24),
+                                            ),
+                                          ),
+                                          height: MediaQuery.of(context)
+                                              .size
+                                              .height,
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                width: 90,
+                                                height: 10,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    bottomLeft:
+                                                        Radius.circular(24),
+                                                    bottomRight:
+                                                        Radius.circular(24),
+                                                  ),
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              AnimSearchBar(
+                                                width: 400,
+                                                textController: textController,
+                                                onSuffixTap: () {
+                                                  setState(() {
+                                                    textController.clear();
+                                                  });
+                                                },
+                                              ),
+                                              Expanded(
+                                                child: ListView.builder(
+                                                    controller:
+                                                        _scrollController,
+                                                    itemCount: users.length,
+                                                    itemBuilder:
+                                                        ((context, index) {
+                                                      return GetUsers_Info(
+                                                        docId: users[index],
+                                                      );
+                                                    })),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        color:
-                                            Colors.deepPurple.withOpacity(.4),
-                                        shape: BoxShape.circle),
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${services.length}',
-                                        style: GoogleFonts.raleway(
-                                            fontSize: 50,
-                                            color: Colors.deepPurple,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        'Services Registered',
-                                        style: GoogleFonts.raleway(
-                                            fontSize: 15,
-                                            color: Colors.deepPurple,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                      )),
+                            );
+                          },
+                          child: User(users: users),
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width / 1.2,
-                          height: 100,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 10,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 35.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${stores.length}',
-                                        style: GoogleFonts.raleway(
-                                            fontSize: 50,
-                                            color: Colors.orange,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        'Stores Registered',
-                                        style: GoogleFonts.raleway(
-                                            fontSize: 15,
-                                            color: Colors.orange,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                  Container(
-                                    height: 70,
-                                    width: 70,
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.store,
-                                        color: Colors.orange,
-                                      ),
-                                    ),
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            width: 4,
-                                            color: Colors.orangeAccent),
-                                        color:
-                                            Colors.orangeAccent.withOpacity(.4),
-                                        shape: BoxShape.circle),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+                        Services(services: services),
+                        Stores(stores: stores),
                         SizedBox(
                           height: 20,
                         ),
@@ -652,6 +560,201 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
         letIndexChange: (index) => true,
       ),
     ));
+  }
+}
+
+class Stores extends StatelessWidget {
+  const Stores({
+    Key key,
+    @required this.stores,
+  }) : super(key: key);
+
+  final List<String> stores;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width / 1.2,
+      height: 100,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        elevation: 10,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 35.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${stores.length}',
+                    style: GoogleFonts.raleway(
+                        fontSize: 50,
+                        color: Colors.orange,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Stores Registered',
+                    style: GoogleFonts.raleway(
+                        fontSize: 15,
+                        color: Colors.orange,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              Container(
+                height: 70,
+                width: 70,
+                child: Center(
+                  child: Icon(
+                    Icons.store,
+                    color: Colors.orange,
+                  ),
+                ),
+                decoration: BoxDecoration(
+                    border: Border.all(width: 4, color: Colors.orangeAccent),
+                    color: Colors.orangeAccent.withOpacity(.4),
+                    shape: BoxShape.circle),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Services extends StatelessWidget {
+  const Services({
+    Key key,
+    @required this.services,
+  }) : super(key: key);
+
+  final List<String> services;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width / 1.2,
+      height: 100,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        elevation: 10,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 35.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                height: 70,
+                width: 70,
+                child: Center(
+                  child: Icon(
+                    Icons.work,
+                    color: Colors.deepPurple,
+                  ),
+                ),
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 4,
+                      color: Colors.deepPurple,
+                    ),
+                    color: Colors.deepPurple.withOpacity(.4),
+                    shape: BoxShape.circle),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${services.length}',
+                    style: GoogleFonts.raleway(
+                        fontSize: 50,
+                        color: Colors.deepPurple,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Services Registered',
+                    style: GoogleFonts.raleway(
+                        fontSize: 15,
+                        color: Colors.deepPurple,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class User extends StatelessWidget {
+  const User({
+    Key key,
+    @required this.users,
+  }) : super(key: key);
+
+  final List<String> users;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width / 1.2,
+      height: 100,
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        elevation: 10,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 35.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${users.length}',
+                    style: GoogleFonts.raleway(
+                        fontSize: 50,
+                        color: Colors.blueAccent,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Users Registered',
+                    style: GoogleFonts.raleway(
+                        fontSize: 15,
+                        color: Colors.blueAccent,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              Container(
+                height: 70,
+                width: 70,
+                child: Center(
+                  child: Icon(
+                    FontAwesomeIcons.user,
+                    color: Colors.blueAccent,
+                  ),
+                ),
+                decoration: BoxDecoration(
+                    border: Border.all(width: 4, color: Colors.blueAccent),
+                    color: Colors.blue.withOpacity(.4),
+                    shape: BoxShape.circle),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
