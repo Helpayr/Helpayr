@@ -9,6 +9,7 @@ class GoogleSignUpProvider extends ChangeNotifier {
 
   GoogleSignInAccount get user => _user;
   List<String> users = [];
+  List lis_login = [];
 
   Future googleLoginUser() async {
     final googleUser = await GoogleSignIn().signIn();
@@ -72,13 +73,19 @@ class GoogleSignUpProvider extends ChangeNotifier {
       idToken: googleAuth.idToken,
     );
     await FirebaseAuth.instance.signInWithCredential(credential);
-    await FirebaseFirestore.instance.collection("Admin").add({
-      "uid": FirebaseAuth.instance.currentUser.uid,
-      "email": FirebaseAuth.instance.currentUser.email,
-      "dp": FirebaseAuth.instance.currentUser.photoURL,
-      "last_login": FirebaseAuth.instance.currentUser.metadata.lastSignInTime,
-      "name": FirebaseAuth.instance.currentUser.displayName,
-    });
+    await FirebaseFirestore.instance
+        .collection("Admin")
+        .doc(FirebaseAuth.instance.currentUser.uid)
+        .set(
+      {
+        "uid": FirebaseAuth.instance.currentUser.uid,
+        "email": FirebaseAuth.instance.currentUser.email,
+        "dp": FirebaseAuth.instance.currentUser.photoURL,
+        "last_login": FirebaseAuth.instance.currentUser.metadata.lastSignInTime,
+        "name": FirebaseAuth.instance.currentUser.displayName,
+      },
+    );
+
     notifyListeners();
   }
 

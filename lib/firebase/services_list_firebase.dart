@@ -36,6 +36,14 @@ class _HelperListState extends State<HelperList> {
             }));
   }
 
+  Future _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = getDocs();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -288,9 +296,7 @@ class _TypeImageDisplayState extends State<TypeImageDisplay> {
                   data: data,
                 );
         }
-        return Container(
-          child: Center(child: CircularProgressIndicator()),
-        );
+        return Container();
       }),
     );
   }

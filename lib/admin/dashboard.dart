@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:helpayr/admin/getData_admin.dart';
+import 'package:lottie/lottie.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
 
+import '../main.dart';
 import '../screens/home.dart';
+import 'admin_profile.dart';
+import 'getUser_Info_admin.dart';
 
 class Admin_Dashboard extends StatefulWidget {
   const Admin_Dashboard({key});
@@ -19,7 +22,7 @@ class Admin_Dashboard extends StatefulWidget {
 }
 
 class _Admin_DashboardState extends State<Admin_Dashboard> {
-  TextEditingController textController = TextEditingController();
+  TextEditingController name_search_controller = TextEditingController();
   List<AdminData> admin_data_pass;
   TooltipBehavior _tooltipBehavior;
   final user = FirebaseAuth.instance.currentUser;
@@ -27,7 +30,15 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
   List<String> services = [];
   List<String> stores = [];
 
-  Future getUsers() async {
+  List<String> users_updated = [];
+  Stream _future;
+  bool isNameSort = false;
+  bool isLastLog = false;
+  PageController _pageController = PageController(initialPage: 0);
+  int selected_header = 0;
+  bool onSearch_loading = false;
+
+  Stream getcredentials() async* {
     await FirebaseFirestore.instance
         .collection("Users")
         .orderBy("last_login", descending: true)
@@ -41,9 +52,7 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
         .then((value) => value.docs.forEach((element) {
               services.add(element.reference.id);
             }));
-  }
 
-  Future getStores() async {
     await FirebaseFirestore.instance
         .collection("Store_Display")
         .get()
@@ -54,11 +63,38 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
 
   @override
   void initState() {
-    getUsers();
-    getStores();
     _tooltipBehavior = TooltipBehavior(enable: true, elevation: 5);
-
+    _future = getcredentials();
     super.initState();
+  }
+
+  Map<String, dynamic> userInfo;
+  bool isloading = false;
+  List doc_idToDelete = [];
+
+  bool search_isClicked = false;
+
+  void onSearch() async {
+    setState(() {
+      isloading = true;
+    });
+
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .where("name", isEqualTo: name_search_controller.text)
+        .get()
+        .then((value) {
+      setState(() {
+        userInfo = value.docs[0].data();
+        isloading = false;
+        onSearch_loading = false;
+      });
+      value.docs.forEach((element) {
+        doc_idToDelete.add(element.reference.id);
+      });
+      print(userInfo);
+      print(doc_idToDelete);
+    });
   }
 
   List<String> header = [
@@ -77,13 +113,24 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
   void dispose() {
     pagectrl.dispose();
     _scrollController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
   int currentPage = 0;
   bool isClicked = false;
+  bool isDeleted = false;
+  ScrollController scrl = ScrollController();
+  int account_deleted = 0;
+
   @override
   Widget build(BuildContext context) {
+    List<String> header_inside = [
+      "Name",
+      "Active",
+      "Last Log-in",
+    ];
+
     List<AdminData> getUserdata() {
       final List<AdminData> admin_data = [
         AdminData("Initial", 0),
@@ -111,455 +158,886 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
       return admin_data;
     }
 
-    return SafeArea(
-        child: Scaffold(
-      extendBody: true,
-      appBar: AppBar(
-        elevation: 0,
-        title: Column(
-          children: [
-            Text(
-              "Dashboard",
-              style: GoogleFonts.raleway(
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            Text(
-              header_appBar,
-              style: GoogleFonts.raleway(
-                fontWeight: FontWeight.normal,
-                color: Colors.black,
-                fontSize: 12,
-              ),
-            )
-          ],
-        ),
-        backgroundColor: Colors.transparent,
-        leading: Icon(
-          Icons.menu,
-          color: Colors.black,
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15.0),
-            child: Column(
-              children: [
-                Text(
-                  user.displayName,
-                  style: GoogleFonts.raleway(
-                    color: Colors.black,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+    return noback(
+      wid: StreamBuilder(
+          stream: _future,
+          builder: ((context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Scaffold(
+                body: Container(
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.white,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LottieBuilder.network(
+                        "https://assets10.lottiefiles.com/private_files/lf30_uilaciwr.json",
+                        repeat: true,
+                        animate: true,
+                      ),
+                      Text("Fetching data from the database..",
+                          style: GoogleFonts.raleway(
+                            fontWeight: FontWeight.bold,
+                          )),
+                    ],
                   ),
                 ),
-                Text(
-                  user.email,
-                  style: GoogleFonts.raleway(
-                    color: Colors.black,
-                    fontSize: 5,
-                    fontWeight: FontWeight.bold,
+              );
+            } else if (snapshot.hasError) {
+              return Center(child: Text(snapshot.error.toString()));
+            } else if (snapshot.connectionState == ConnectionState.active) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.connectionState == ConnectionState.done) {
+              return SafeArea(
+                  child: Scaffold(
+                extendBody: true,
+                appBar: AppBar(
+                  elevation: 0,
+                  title: Column(
+                    children: [
+                      Text(
+                        "Dashboard",
+                        style: GoogleFonts.raleway(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        header_appBar,
+                        style: GoogleFonts.raleway(
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                          fontSize: 12,
+                        ),
+                      )
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundImage: NetworkImage(user.photoURL),
-            ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 50,
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: header.length,
-                    itemBuilder: ((context, int) => GestureDetector(
-                          onTap: (() {
-                            setState(() {
-                              header_selected = int;
-                              header_appBar = header[int];
-                            });
-                            return pagectrl.animateToPage(int,
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.easeInOut);
-                          }),
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 15.0),
-                            child: AnimatedContainer(
-                              width: header_selected == int
-                                  ? MediaQuery.of(context).size.width / 2.8
-                                  : MediaQuery.of(context).size.width / 3,
-                              duration: Duration(milliseconds: 200),
-                              child: Card(
-                                elevation: header_selected == int ? 5 : 2,
-                                shadowColor: header_selected == int
-                                    ? Colors.blueAccent
-                                    : Colors.white,
-                                color: header_selected == int
-                                    ? Colors.blueAccent
-                                    : Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SvgPicture.asset(
-                                          "assets/designing/graphic",
-                                          fit: BoxFit.fill,
-                                          width: 20,
-                                          height: 20,
-                                        ),
-                                        SizedBox(
-                                          width: 15,
-                                        ),
-                                        Text(
-                                          header[int],
-                                          style: GoogleFonts.raleway(
-                                            fontWeight: header_selected == int
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                            color: header_selected == int
-                                                ? Colors.white
-                                                : Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
+                  backgroundColor: Colors.transparent,
+                  leading: Icon(
+                    Icons.menu,
+                    color: Colors.black,
+                  ),
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 15.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            user.displayName,
+                            style: GoogleFonts.raleway(
+                              color: Colors.black,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ))),
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: PageView(
-                onPageChanged: (int) {
-                  setState(() {
-                    header_selected = int;
-                  });
-                },
-                controller: pagectrl,
-                children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            showModalBottomSheet(
-                              isScrollControlled: true,
-                              context: context,
-                              builder: (context) => DraggableScrollableSheet(
-                                  snap: false,
-                                  initialChildSize: .90,
-                                  minChildSize: .50,
-                                  maxChildSize: 1,
-                                  builder: (context, myScroll) => Scaffold(
-                                        backgroundColor: Colors.transparent,
-                                        body: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(24),
-                                              topRight: Radius.circular(24),
+                          Text(
+                            user.email,
+                            style: GoogleFonts.raleway(
+                              color: Colors.black,
+                              fontSize: 5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                            isScrollControlled: true,
+                            context: context,
+                            builder: (context) => DraggableScrollableSheet(
+                                snap: false,
+                                initialChildSize: .90,
+                                minChildSize: .50,
+                                maxChildSize: 1,
+                                builder: (context, myScroll) =>
+                                    Admin_Profile()));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(user.photoURL),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                body: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      /*HelperList(
+                        isStore: true,
+                        isService: false,
+                        display_type: 'Store_Display',
+                        helper_type: 'Store',
+                        scrollController: scrl,
+                      ),*/
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 50,
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: header.length,
+                              itemBuilder: ((context, int) => GestureDetector(
+                                    onTap: (() {
+                                      setState(() {
+                                        header_selected = int;
+                                        header_appBar = header[int];
+                                      });
+                                      return pagectrl.animateToPage(int,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.easeInOut);
+                                    }),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15.0),
+                                      child: AnimatedContainer(
+                                        width: header_selected == int
+                                            ? MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2.8
+                                            : MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                3,
+                                        duration: Duration(milliseconds: 200),
+                                        child: Card(
+                                          elevation:
+                                              header_selected == int ? 5 : 2,
+                                          shadowColor: header_selected == int
+                                              ? Colors.blueAccent
+                                              : Colors.white,
+                                          color: header_selected == int
+                                              ? Colors.blueAccent
+                                              : Colors.white,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: FittedBox(
+                                              fit: BoxFit.fitWidth,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  SvgPicture.asset(
+                                                    "assets/designing/graphic",
+                                                    fit: BoxFit.fill,
+                                                    width: 20,
+                                                    height: 20,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 15,
+                                                  ),
+                                                  Text(
+                                                    header[int],
+                                                    style: GoogleFonts.raleway(
+                                                      fontWeight:
+                                                          header_selected == int
+                                                              ? FontWeight.bold
+                                                              : FontWeight
+                                                                  .normal,
+                                                      color:
+                                                          header_selected == int
+                                                              ? Colors.white
+                                                              : Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                          height: MediaQuery.of(context)
-                                              .size
-                                              .height,
-                                          width:
-                                              MediaQuery.of(context).size.width,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                width: 90,
-                                                height: 10,
-                                                decoration: BoxDecoration(
+                                        ),
+                                      ),
+                                    ),
+                                  ))),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        child: PageView(
+                          onPageChanged: (int) {
+                            setState(() {
+                              header_selected = int;
+                            });
+                          },
+                          controller: pagectrl,
+                          children: [
+                            Container(
+                              child: Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () async {
+                                      await modal_admin(context, header_inside);
+                                    },
+                                    child: User(
+                                      users: users,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          context: context,
+                                          builder: (context) =>
+                                              DraggableScrollableSheet(
+                                                  snap: false,
+                                                  initialChildSize: .90,
+                                                  minChildSize: .50,
+                                                  maxChildSize: 1,
+                                                  builder:
+                                                      (context, myScroll) =>
+                                                          Scaffold(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            body:
+                                                                SingleChildScrollView(
+                                                              physics:
+                                                                  AlwaysScrollableScrollPhysics(),
+                                                              child:
+                                                                  RefreshIndicator(
+                                                                onRefresh: () {
+                                                                  return Future.delayed(
+                                                                      Duration(
+                                                                          seconds:
+                                                                              1));
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          color:
+                                                                              Colors.white,
+                                                                          borderRadius:
+                                                                              BorderRadius.only(
+                                                                            topLeft:
+                                                                                Radius.circular(24),
+                                                                            topRight:
+                                                                                Radius.circular(24),
+                                                                          ),
+                                                                        ),
+                                                                        height: MediaQuery.of(context)
+                                                                            .size
+                                                                            .height,
+                                                                        width: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width,
+                                                                        child:
+                                                                            Column(
+                                                                          children: [
+                                                                            Container(
+                                                                              width: 90,
+                                                                              height: 10,
+                                                                              decoration: BoxDecoration(
+                                                                                borderRadius: BorderRadius.only(
+                                                                                  bottomLeft: Radius.circular(24),
+                                                                                  bottomRight: Radius.circular(24),
+                                                                                ),
+                                                                                color: Colors.black,
+                                                                              ),
+                                                                            ),
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                                                              child: AnimSearchBar(
+                                                                                width: 400,
+                                                                                textController: name_search_controller,
+                                                                                onSuffixTap: () {
+                                                                                  setState(() {
+                                                                                    name_search_controller.clear();
+                                                                                  });
+                                                                                },
+                                                                              ),
+                                                                            ),
+                                                                            Expanded(
+                                                                              child: ListView.builder(
+                                                                                physics: AlwaysScrollableScrollPhysics(),
+                                                                                controller: _scrollController,
+                                                                                itemCount: users.length,
+                                                                                itemBuilder: ((context, index) {
+                                                                                  return Container();
+                                                                                }),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        )),
+                                                              ),
+                                                            ),
+                                                          )),
+                                        );
+                                      },
+                                      child: Services(services: services)),
+                                  Stores(stores: stores),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        isClicked = !isClicked;
+                                      });
+                                      isClicked
+                                          ? pagectrl_graph.animateTo(1,
+                                              duration:
+                                                  Duration(milliseconds: 500),
+                                              curve: Curves.ease)
+                                          : pagectrl_graph.nextPage(
+                                              duration:
+                                                  Duration(milliseconds: 500),
+                                              curve: Curves.ease);
+                                    },
+                                    child: Container(
+                                      width: 130,
+                                      height: 45,
+                                      child: Card(
+                                        child: Row(
+                                          mainAxisAlignment: isClicked
+                                              ? MainAxisAlignment.start
+                                              : MainAxisAlignment.end,
+                                          children: [
+                                            AnimatedContainer(
+                                              duration:
+                                                  Duration(milliseconds: 200),
+                                              curve: Curves.easeInOut,
+                                              width: 70,
+                                              height: 40,
+                                              child: Card(
+                                                child: Center(
+                                                  child: isClicked
+                                                      ? Text(
+                                                          "Area",
+                                                          style: GoogleFonts
+                                                              .raleway(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .white),
+                                                        )
+                                                      : Text(
+                                                          "Line",
+                                                          style: GoogleFonts
+                                                              .raleway(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .white),
+                                                        ),
+                                                ),
+                                                elevation: 4,
+                                                color: Colors.blue,
+                                                shape: RoundedRectangleBorder(
                                                   borderRadius:
-                                                      BorderRadius.only(
-                                                    bottomLeft:
-                                                        Radius.circular(24),
-                                                    bottomRight:
-                                                        Radius.circular(24),
-                                                  ),
-                                                  color: Colors.black,
+                                                      BorderRadius.circular(
+                                                          100),
                                                 ),
                                               ),
-                                              AnimSearchBar(
-                                                width: 400,
-                                                textController: textController,
-                                                onSuffixTap: () {
-                                                  setState(() {
-                                                    textController.clear();
-                                                  });
-                                                },
-                                              ),
-                                              Expanded(
-                                                child: ListView.builder(
-                                                    controller:
-                                                        _scrollController,
-                                                    itemCount: users.length,
-                                                    itemBuilder:
-                                                        ((context, index) {
-                                                      return GetUsers_Info(
-                                                        docId: users[index],
-                                                      );
-                                                    })),
-                                              ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
                                         ),
-                                      )),
-                            );
-                          },
-                          child: User(users: users),
-                        ),
-                        Services(services: services),
-                        Stores(stores: stores),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isClicked = !isClicked;
-                            });
-                            isClicked
-                                ? pagectrl_graph.animateTo(1,
-                                    duration: Duration(milliseconds: 500),
-                                    curve: Curves.ease)
-                                : pagectrl_graph.nextPage(
-                                    duration: Duration(milliseconds: 500),
-                                    curve: Curves.ease);
-                          },
-                          child: Container(
-                            width: 130,
-                            height: 45,
-                            child: Card(
-                              child: Row(
-                                mainAxisAlignment: isClicked
-                                    ? MainAxisAlignment.start
-                                    : MainAxisAlignment.end,
-                                children: [
-                                  AnimatedContainer(
-                                    duration: Duration(milliseconds: 200),
-                                    curve: Curves.easeInOut,
-                                    width: 70,
-                                    height: 40,
-                                    child: Card(
-                                      child: Center(
-                                        child: isClicked
-                                            ? Text(
-                                                "Area",
-                                                style: GoogleFonts.raleway(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white),
-                                              )
-                                            : Text(
-                                                "Line",
-                                                style: GoogleFonts.raleway(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white),
-                                              ),
+                                        elevation: 5,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
                                       ),
-                                      elevation: 4,
-                                      color: Colors.blue,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(100),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text("Data Visualization",
+                                      style: GoogleFonts.raleway(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Card(
+                                        elevation: 10,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 12.0,
+                                              left: 12.0,
+                                              right: 20.0,
+                                              top: 20),
+                                          child: PageView(
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              controller: pagectrl_graph,
+                                              children: [
+                                                SfCartesianChart(
+                                                  tooltipBehavior:
+                                                      _tooltipBehavior,
+                                                  legend: Legend(
+                                                      isVisible: true,
+                                                      textStyle:
+                                                          GoogleFonts.raleway(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                      position:
+                                                          LegendPosition.bottom,
+                                                      alignment: ChartAlignment
+                                                          .center),
+                                                  series: <ChartSeries>[
+                                                    StackedAreaSeries<AdminData,
+                                                        String>(
+                                                      name: "Users",
+                                                      dataSource: getUserdata(),
+                                                      xValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.category;
+                                                      },
+                                                      yValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.updated;
+                                                      },
+                                                    ),
+                                                    StackedAreaSeries<AdminData,
+                                                        String>(
+                                                      name: "Services",
+                                                      dataSource:
+                                                          getServicedata(),
+                                                      xValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.category;
+                                                      },
+                                                      yValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.updated;
+                                                      },
+                                                    ),
+                                                    StackedAreaSeries<AdminData,
+                                                        String>(
+                                                      name: "Stores",
+                                                      dataSource:
+                                                          getstorecedata(),
+                                                      xValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.category;
+                                                      },
+                                                      yValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.updated;
+                                                      },
+                                                    ),
+                                                  ],
+                                                  primaryXAxis: CategoryAxis(),
+                                                ),
+                                                SfCartesianChart(
+                                                  tooltipBehavior:
+                                                      _tooltipBehavior,
+                                                  legend: Legend(
+                                                      textStyle:
+                                                          GoogleFonts.raleway(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                      isVisible: true,
+                                                      position:
+                                                          LegendPosition.bottom,
+                                                      alignment: ChartAlignment
+                                                          .center),
+                                                  series: <ChartSeries>[
+                                                    StackedLineSeries<AdminData,
+                                                        String>(
+                                                      name: "Users",
+                                                      dataSource: getUserdata(),
+                                                      xValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.category;
+                                                      },
+                                                      yValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.updated;
+                                                      },
+                                                    ),
+                                                    StackedLineSeries<AdminData,
+                                                        String>(
+                                                      name: "Services",
+                                                      dataSource:
+                                                          getServicedata(),
+                                                      xValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.category;
+                                                      },
+                                                      yValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.updated;
+                                                      },
+                                                    ),
+                                                    StackedLineSeries<AdminData,
+                                                        String>(
+                                                      name: "Stores",
+                                                      dataSource:
+                                                          getstorecedata(),
+                                                      xValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.category;
+                                                      },
+                                                      yValueMapper:
+                                                          (AdminData data, _) {
+                                                        return data.updated;
+                                                      },
+                                                    ),
+                                                  ],
+                                                  primaryXAxis: CategoryAxis(),
+                                                ),
+                                              ]),
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                            ),
+                            Container(
+                              color: Colors.red,
+                            ),
+                            Container(
+                              color: Colors.green,
+                            ),
+                            Container(
+                              color: Colors.pink,
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        height: 60,
+                      ),
+                    ],
+                  ),
+                ),
+                bottomNavigationBar: CurvedNavigationBar(
+                  onTap: (index) {
+                    setState(() {
+                      currentPage = index;
+                    });
+                  },
+                  key: _bottomNavigationKey,
+                  index: 0,
+                  height: 55.0,
+                  items: [
+                    bottomNavTiles(
+                      tileTitle: "Home",
+                      icon: Icons.home,
+                    ),
+                    bottomNavTiles(
+                      tileTitle: "Message",
+                      icon: Icons.message,
+                    ),
+                  ],
+                  color: Color.fromARGB(255, 12, 50, 68),
+                  buttonBackgroundColor: Color.fromARGB(255, 12, 50, 68),
+                  backgroundColor: Colors.transparent,
+                  animationCurve: Curves.easeInToLinear,
+                  animationDuration: const Duration(milliseconds: 600),
+                  letIndexChange: (index) => true,
+                ),
+              ));
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          })),
+    );
+  }
+
+  modal_admin(BuildContext context, List<String> header_inside) async {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) => DraggableScrollableSheet(
+          snap: false,
+          initialChildSize: .90,
+          minChildSize: .50,
+          maxChildSize: 1,
+          builder: (context, myScroll) => Scaffold(
+                backgroundColor: Colors.transparent,
+                body: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
+                  child: RefreshIndicator(
+                    onRefresh: () {
+                      return Future.delayed(Duration(seconds: 1));
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: AssetImage(
+                                "assets/onboarding new/bg_wavy_rotated.png")),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
+                        ),
+                      ),
+                      height: MediaQuery.of(context).size.height,
+                      width: MediaQuery.of(context).size.width,
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 90,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(24),
+                                bottomRight: Radius.circular(24),
                               ),
+                              color: Colors.white,
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text("Data Visualization",
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 40.0),
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: AnimSearchBar(
+                                    autoFocus: true,
+                                    closeSearchOnSuffixTap: false,
+                                    suffixIcon: Icon(Icons.search_rounded),
+                                    width: 250,
+                                    textController: name_search_controller,
+                                    onSuffixTap: () {},
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor: search_isClicked
+                                          ? MaterialStateProperty.all(
+                                              Colors.blueAccent,
+                                            )
+                                          : MaterialStateProperty.all(
+                                              Colors.white,
+                                            ),
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        search_isClicked = true;
+                                      });
+                                      onSearch();
+                                    },
+                                    child: Text(
+                                      "Search",
+                                      style: GoogleFonts.raleway(
+                                          color: search_isClicked
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontWeight: FontWeight.bold),
+                                    )),
+                              ],
+                            ),
+                          ),
+                          Text(
+                            "Sorted by",
                             style: GoogleFonts.raleway(
-                              color: Colors.black,
+                              color: Colors.white,
                               fontWeight: FontWeight.bold,
-                            )),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Card(
-                              elevation: 10,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                    bottom: 12.0,
-                                    left: 12.0,
-                                    right: 20.0,
-                                    top: 20),
-                                child: PageView(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    controller: pagectrl_graph,
-                                    children: [
-                                      SfCartesianChart(
-                                        tooltipBehavior: _tooltipBehavior,
-                                        legend: Legend(
-                                            isVisible: true,
-                                            textStyle: GoogleFonts.raleway(
-                                                fontWeight: FontWeight.bold),
-                                            position: LegendPosition.bottom,
-                                            alignment: ChartAlignment.center),
-                                        series: <ChartSeries>[
-                                          StackedAreaSeries<AdminData, String>(
-                                            name: "Users",
-                                            dataSource: getUserdata(),
-                                            xValueMapper: (AdminData data, _) {
-                                              return data.category;
-                                            },
-                                            yValueMapper: (AdminData data, _) {
-                                              return data.updated;
-                                            },
-                                          ),
-                                          StackedAreaSeries<AdminData, String>(
-                                            name: "Services",
-                                            dataSource: getServicedata(),
-                                            xValueMapper: (AdminData data, _) {
-                                              return data.category;
-                                            },
-                                            yValueMapper: (AdminData data, _) {
-                                              return data.updated;
-                                            },
-                                          ),
-                                          StackedAreaSeries<AdminData, String>(
-                                            name: "Stores",
-                                            dataSource: getstorecedata(),
-                                            xValueMapper: (AdminData data, _) {
-                                              return data.category;
-                                            },
-                                            yValueMapper: (AdminData data, _) {
-                                              return data.updated;
-                                            },
-                                          ),
-                                        ],
-                                        primaryXAxis: CategoryAxis(),
-                                      ),
-                                      SfCartesianChart(
-                                        tooltipBehavior: _tooltipBehavior,
-                                        legend: Legend(
-                                            textStyle: GoogleFonts.raleway(
-                                                fontWeight: FontWeight.bold),
-                                            isVisible: true,
-                                            position: LegendPosition.bottom,
-                                            alignment: ChartAlignment.center),
-                                        series: <ChartSeries>[
-                                          StackedLineSeries<AdminData, String>(
-                                            name: "Users",
-                                            dataSource: getUserdata(),
-                                            xValueMapper: (AdminData data, _) {
-                                              return data.category;
-                                            },
-                                            yValueMapper: (AdminData data, _) {
-                                              return data.updated;
-                                            },
-                                          ),
-                                          StackedLineSeries<AdminData, String>(
-                                            name: "Services",
-                                            dataSource: getServicedata(),
-                                            xValueMapper: (AdminData data, _) {
-                                              return data.category;
-                                            },
-                                            yValueMapper: (AdminData data, _) {
-                                              return data.updated;
-                                            },
-                                          ),
-                                          StackedLineSeries<AdminData, String>(
-                                            name: "Stores",
-                                            dataSource: getstorecedata(),
-                                            xValueMapper: (AdminData data, _) {
-                                              return data.category;
-                                            },
-                                            yValueMapper: (AdminData data, _) {
-                                              return data.updated;
-                                            },
-                                          ),
-                                        ],
-                                        primaryXAxis: CategoryAxis(),
-                                      ),
-                                    ]),
-                              ),
+                              fontSize: 17,
                             ),
                           ),
-                        ),
-                      ],
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Expanded(
+                            child: PageView(
+                                onPageChanged: ((value) {
+                                  setState(() {
+                                    selected_header = value;
+                                  });
+                                }),
+                                controller: _pageController,
+                                children: [
+                                  userInfo != null
+                                      ? Column(
+                                          children: [
+                                            User_info_onSearch(
+                                              data: userInfo,
+                                              onDelete: () async {
+                                                showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        ((context) =>
+                                                            AlertDialog(
+                                                              actions: [
+                                                                TextButton.icon(
+                                                                    onPressed:
+                                                                        () async {
+                                                                      await FirebaseFirestore
+                                                                          .instance
+                                                                          .collection(
+                                                                              "Users")
+                                                                          .doc(doc_idToDelete[
+                                                                              0])
+                                                                          .delete()
+                                                                          .whenComplete(
+                                                                              () async {
+                                                                        setState(
+                                                                            () {
+                                                                          account_deleted++;
+                                                                        });
+                                                                        await FirebaseFirestore
+                                                                            .instance
+                                                                            .collection("Admin")
+                                                                            .doc(FirebaseAuth.instance.currentUser.uid)
+                                                                            .update({
+                                                                          "deleted":
+                                                                              account_deleted,
+                                                                        });
+
+                                                                        Navigator
+                                                                            .push(
+                                                                          context,
+                                                                          MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                Admin_Dashboard(),
+                                                                          ),
+                                                                        );
+                                                                      });
+                                                                    },
+                                                                    icon: Icon(Icons
+                                                                        .check),
+                                                                    label: Text(
+                                                                        "Yes")),
+                                                                TextButton.icon(
+                                                                    onPressed:
+                                                                        () async {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                    },
+                                                                    icon: Icon(Icons
+                                                                        .deselect),
+                                                                    label: Text(
+                                                                        "No"))
+                                                              ],
+                                                              title: Text(
+                                                                "Delete Confirmation",
+                                                                style: GoogleFonts.raleway(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                              content: Text(
+                                                                "The selected account will be permanently deleted. Proceed?",
+                                                                style: GoogleFonts.raleway(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal),
+                                                              ),
+                                                            )));
+                                              },
+                                            ),
+                                          ],
+                                        )
+                                      : ListView.builder(
+                                          physics:
+                                              AlwaysScrollableScrollPhysics(),
+                                          controller: _scrollController,
+                                          itemCount: users.length,
+                                          itemBuilder: ((context, index) {
+                                            return GetUsers_Info(
+                                              docId: users[index],
+                                              onDelete: () async {
+                                                showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        ((context) =>
+                                                            AlertDialog(
+                                                              actions: [
+                                                                TextButton.icon(
+                                                                    onPressed:
+                                                                        () async {
+                                                                      await FirebaseFirestore
+                                                                          .instance
+                                                                          .collection(
+                                                                              "Users")
+                                                                          .doc(users[
+                                                                              index])
+                                                                          .delete()
+                                                                          .whenComplete(
+                                                                              () async {
+                                                                        setState(
+                                                                            () {
+                                                                          account_deleted++;
+                                                                        });
+                                                                        await FirebaseFirestore
+                                                                            .instance
+                                                                            .collection("Admin")
+                                                                            .doc(FirebaseAuth.instance.currentUser.uid)
+                                                                            .update({
+                                                                          "deleted":
+                                                                              account_deleted,
+                                                                        });
+
+                                                                        Navigator
+                                                                            .push(
+                                                                          context,
+                                                                          MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                Admin_Dashboard(),
+                                                                          ),
+                                                                        );
+                                                                      });
+                                                                    },
+                                                                    icon: Icon(Icons
+                                                                        .check),
+                                                                    label: Text(
+                                                                        "Yes")),
+                                                                TextButton.icon(
+                                                                    onPressed:
+                                                                        () async {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                    },
+                                                                    icon: Icon(Icons
+                                                                        .deselect),
+                                                                    label: Text(
+                                                                        "No"))
+                                                              ],
+                                                              title: Text(
+                                                                "Delete Confirmation",
+                                                                style: GoogleFonts.raleway(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                              content: Text(
+                                                                "The selected account will be permanently deleted. Proceed?",
+                                                                style: GoogleFonts.raleway(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .normal),
+                                                              ),
+                                                            )));
+                                              },
+                                            );
+                                          }),
+                                        ),
+                                  Container(color: Colors.red),
+                                  Container(color: Colors.blue),
+                                ]),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Container(
-                    color: Colors.red,
-                  ),
-                  Container(
-                    color: Colors.green,
-                  ),
-                  Container(
-                    color: Colors.pink,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 60,
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: CurvedNavigationBar(
-        onTap: (index) {
-          setState(() {
-            currentPage = index;
-          });
-        },
-        key: _bottomNavigationKey,
-        index: 0,
-        height: 55.0,
-        items: [
-          bottomNavTiles(
-            tileTitle: "Home",
-            icon: Icons.home,
-          ),
-          bottomNavTiles(
-            tileTitle: "Message",
-            icon: Icons.message,
-          ),
-        ],
-        color: Color.fromARGB(255, 12, 50, 68),
-        buttonBackgroundColor: Color.fromARGB(255, 12, 50, 68),
-        backgroundColor: Colors.transparent,
-        animationCurve: Curves.easeInToLinear,
-        animationDuration: const Duration(milliseconds: 600),
-        letIndexChange: (index) => true,
-      ),
-    ));
+                ),
+              )),
+    );
   }
 }
 
