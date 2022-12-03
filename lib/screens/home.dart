@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,31 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    setStatus_user("Online");
+  }
+
+  void setStatus_user(String status) {
+    FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser.uid)
+        .update({
+      "status": status,
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setStatus_user("Online");
+    } else {
+      setStatus_user("Offline");
+    }
+  }
+
   int currentPage = 0;
   bool selected = false;
   int isSelected = 0;
@@ -228,7 +254,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Settings(
+          child: Settings_Home(
             isHome: false,
           ),
         ),

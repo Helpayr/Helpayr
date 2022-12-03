@@ -9,14 +9,14 @@ import 'package:helpayr/widgets/table-cell.dart';
 
 import 'package:helpayr/widgets/drawer.dart';
 
-class Settings extends StatefulWidget {
+class Settings_Home extends StatefulWidget {
   @override
-  const Settings({key, this.isHome = false});
+  const Settings_Home({key, this.isHome = false});
   final bool isHome;
-  _SettingsState createState() => _SettingsState();
+  _Settings_HomeState createState() => _Settings_HomeState();
 }
 
-class _SettingsState extends State<Settings> {
+class _Settings_HomeState extends State<Settings_Home> {
   final user = FirebaseAuth.instance.currentUser;
   bool switchValueOne;
   bool switchValueTwo;

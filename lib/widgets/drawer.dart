@@ -105,7 +105,7 @@ class NowDrawer extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Settings(
+                          builder: (context) => Settings_Home(
                             isHome: true,
                           ),
                         ),

@@ -31,6 +31,7 @@ class GoogleSignUpProvider extends ChangeNotifier {
       "dp": FirebaseAuth.instance.currentUser.photoURL,
       "last_login": FirebaseAuth.instance.currentUser.metadata.lastSignInTime,
       "name": FirebaseAuth.instance.currentUser.displayName,
+      "status_log": "Online",
     });
     notifyListeners();
   }
@@ -58,6 +59,7 @@ class GoogleSignUpProvider extends ChangeNotifier {
       "dp": FirebaseAuth.instance.currentUser.photoURL,
       "last_login": FirebaseAuth.instance.currentUser.metadata.lastSignInTime,
       "name": FirebaseAuth.instance.currentUser.displayName,
+      "status_log": "Online",
     });
     notifyListeners();
   }
@@ -83,6 +85,7 @@ class GoogleSignUpProvider extends ChangeNotifier {
         "dp": FirebaseAuth.instance.currentUser.photoURL,
         "last_login": FirebaseAuth.instance.currentUser.metadata.lastSignInTime,
         "name": FirebaseAuth.instance.currentUser.displayName,
+        "status_log": "Online",
       },
     );
 

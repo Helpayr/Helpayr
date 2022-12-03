@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
                     wid: new Stores(),
                   ),
               '/settings': (BuildContext context) => noback(
-                    wid: new Settings(
+                    wid: new Settings_Home(
                       isHome: false,
                     ),
                   ),
