@@ -17,7 +17,6 @@ import 'package:helpayr/widgets/card-horizontal.dart';
 import 'package:helpayr/widgets/drawer.dart';
 import 'package:hidable/hidable.dart';
 
-import '../Message/widgets/carousel.dart';
 import '../firebase/List_data_page.dart';
 import '../services/designing/list_services.dart';
 import '../services/editing/editing_main.dart';
@@ -31,10 +30,9 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with WidgetsBindingObserver {
   int currentPage = 0;
   bool selected = false;
-
   int isSelected = 0;
 
   final user = FirebaseAuth.instance.currentUser;
@@ -105,10 +103,20 @@ class _HomeState extends State<Home> {
     List<Widget> service_screen = [
       Column(
         children: <Widget>[
-          Carousel(pic: 'store_random_pic_service'),
-          Text("Featured Stores",
-              style: GoogleFonts.raleway(
-                  fontSize: 20, fontWeight: FontWeight.bold)),
+          SizedBox(
+            height: 15,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text("Featured Stores",
+                    style: GoogleFonts.raleway(
+                        fontSize: 20, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
           HelperList(
             isStore: true,
             isService: false,
@@ -231,6 +239,7 @@ class _HomeState extends State<Home> {
         return false;
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: false,
         appBar: currentPage == 4
             ? null
