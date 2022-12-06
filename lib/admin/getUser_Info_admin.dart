@@ -65,7 +65,7 @@ class User_info extends StatelessWidget {
             Align(
               alignment: Alignment.topRight,
               child: Container(
-                width: MediaQuery.of(context).size.width / 1.3,
+                width: MediaQuery.of(context).size.width / 1.35,
                 height: 110,
                 child: Card(
                   shadowColor: Colors.grey,
@@ -77,42 +77,49 @@ class User_info extends StatelessWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 40,
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  data['name'],
-                                  style: GoogleFonts.raleway(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  data['email'],
-                                  style: GoogleFonts.raleway(
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.normal),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  'Last sign in: ${lastLog_new} ',
-                                  style: GoogleFonts.raleway(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 5,
+                        FittedBox(
+                          fit: BoxFit.fitWidth,
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 40,
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        data['name'],
+                                        style: GoogleFonts.raleway(
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(
+                                        data['email'],
+                                        style: GoogleFonts.raleway(
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.normal),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        'Last sign in: ${lastLog_new} ',
+                                        style: GoogleFonts.raleway(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                            ],
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -144,9 +151,39 @@ class User_info extends StatelessWidget {
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.bottomLeft,
+            Positioned(
+              left: 1,
+              top: 30,
               child: Container(
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        right: 15,
+                        bottom: 5,
+                        child: Container(
+                          height: 20,
+                          width: 20,
+                          decoration: BoxDecoration(
+                            border: Border.all(width: 1.5, color: Colors.white),
+                            shape: BoxShape.circle,
+                            color: data['status'] == "Online" &&
+                                    data['status_log'] == "Online"
+                                ? Colors.green
+                                : data['status'] == "Online" &&
+                                        data['status_log'] == "Offline"
+                                    ? Colors.orange
+                                    : data['status'] == "Offline" &&
+                                            data['status_log'] == "Online"
+                                        ? Colors.yellow
+                                        : data['status'] == "Offline" &&
+                                                data['status_log'] == "Offline"
+                                            ? Colors.grey
+                                            : Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   width: 120,
                   height: 90,
                   decoration: BoxDecoration(
@@ -175,8 +212,6 @@ class User_info_onSearch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DateTime lastLog = (data['last_login'].toDate());
-
     return Container(
       width: MediaQuery.of(context).size.width / 1.1,
       height: 150,

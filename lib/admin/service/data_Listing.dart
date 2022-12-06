@@ -2,31 +2,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:helpayr/firebase/getData.dart';
+import 'package:helpayr/admin/service/service_per_list.dart';
 import 'package:lottie/lottie.dart';
 
-class ListDataPage extends StatefulWidget {
-  const ListDataPage({
+class ListDataPageAdmin extends StatefulWidget {
+  const ListDataPageAdmin({
     key,
     this.DocId,
     this.HelperType,
     this.UserType,
     this.Store_ServiceType,
-    this.isAdmin = false,
-    this.onDelete,
   });
   final String DocId;
   final String HelperType;
   final String Store_ServiceType;
   final String UserType;
-  final Function onDelete;
 
-  final bool isAdmin;
   @override
-  State<ListDataPage> createState() => _ListDataPageState();
+  State<ListDataPageAdmin> createState() => _ListDataPageAdminState();
 }
 
-class _ListDataPageState extends State<ListDataPage> {
+class _ListDataPageAdminState extends State<ListDataPageAdmin> {
   @override
   Widget build(BuildContext context) {
     CollectionReference users = FirebaseFirestore.instance
@@ -55,32 +51,6 @@ class _ListDataPageState extends State<ListDataPage> {
                         Expanded(
                           flex: 4,
                           child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            child: widget.isAdmin
-                                ? Stack(children: [
-                                    Positioned(
-                                      right: 10,
-                                      child: ElevatedButton.icon(
-                                          style: ButtonStyle(
-                                            elevation:
-                                                MaterialStateProperty.all(10),
-                                            backgroundColor:
-                                                MaterialStateProperty.all(
-                                                    Colors.white),
-                                          ),
-                                          onPressed: widget.onDelete,
-                                          icon: Icon(
-                                              Icons.delete_forever_rounded,
-                                              color: Colors.red),
-                                          label: Text(
-                                            "Delete",
-                                            style: GoogleFonts.raleway(
-                                                color: Colors.redAccent,
-                                                fontWeight: FontWeight.bold),
-                                          )),
-                                    ),
-                                  ])
-                                : Container(),
                             decoration: BoxDecoration(
                               boxShadow: [
                                 BoxShadow(
@@ -119,8 +89,8 @@ class _ListDataPageState extends State<ListDataPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: Container(
-                          height: 90,
-                          width: 90,
+                          height: 100,
+                          width: 100,
                           decoration: BoxDecoration(
                             border: Border.all(width: 4, color: Colors.white),
                             boxShadow: [
@@ -153,31 +123,26 @@ class _ListDataPageState extends State<ListDataPage> {
   }
 }
 
-class ListData extends StatefulWidget {
-  const ListData({
+class ListDataAdmin extends StatefulWidget {
+  const ListDataAdmin({
     Key key,
     this.userType,
     this.service,
     this.type,
     this.isService,
     this.title,
-    this.isAdmin = false,
-    this.onDelete,
   });
   final String userType;
   final String service;
   final String type;
   final bool isService;
   final String title;
-  final bool isAdmin;
-  final Function onDelete;
 
   @override
-  State<ListData> createState() => _ListDataState();
+  State<ListDataAdmin> createState() => _ListDataAdminState();
 }
 
-class _ListDataState extends State<ListData> {
-  ScrollController _scrollController;
+class _ListDataAdminState extends State<ListDataAdmin> {
   int isSelected = 0;
 
   final user = FirebaseAuth.instance.currentUser;
@@ -195,6 +160,7 @@ class _ListDataState extends State<ListData> {
 
   @override
   void dispose() {
+    getData();
     super.dispose();
   }
 
@@ -260,64 +226,20 @@ class _ListDataState extends State<ListData> {
                                 setState(() {
                                   isSelected = index;
                                 });
-
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => GetData(
+                                    builder: (context) => Get_Service(
                                       isService: widget.isService,
                                       DocId: helpers[isSelected],
                                       UserType: widget.userType,
                                       HelperType: widget.service,
-                                      StoreType: widget.type,
+                                      Store_ServiceType: widget.type,
                                     ),
                                   ),
                                 );
                               },
-                              child: ListDataPage(
-                                onDelete: () async {
-                                  showDialog(
-                                      context: context,
-                                      builder: ((context) => AlertDialog(
-                                            actions: [
-                                              TextButton.icon(
-                                                  onPressed: () async {
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection(
-                                                            widget.userType)
-                                                        .doc(widget.service)
-                                                        .collection(widget.type)
-                                                        .doc(helpers[index])
-                                                        .delete()
-                                                        .whenComplete(() {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    });
-                                                  },
-                                                  icon: Icon(Icons.check),
-                                                  label: Text("Yes")),
-                                              TextButton.icon(
-                                                  onPressed: () async {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  icon: Icon(Icons.deselect),
-                                                  label: Text("No"))
-                                            ],
-                                            title: Text(
-                                              "Delete Confirmation",
-                                              style: GoogleFonts.raleway(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            content: Text(
-                                              "The selected account will be permanently deleted. Proceed?",
-                                              style: GoogleFonts.raleway(
-                                                  fontWeight:
-                                                      FontWeight.normal),
-                                            ),
-                                          )));
-                                },
-                                isAdmin: widget.isAdmin,
+                              child: ListDataPageAdmin(
                                 UserType: widget.userType,
                                 HelperType: widget.service,
                                 Store_ServiceType: widget.type,

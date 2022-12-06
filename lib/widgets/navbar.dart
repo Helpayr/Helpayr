@@ -193,7 +193,15 @@ class _NavbarState extends State<Navbar> {
                                                 "Are you sure you want to log-out?"),
                                             actions: [
                                               TextButton(
-                                                onPressed: () {
+                                                onPressed: () async {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection("Users")
+                                                      .doc(FirebaseAuth.instance
+                                                          .currentUser.uid)
+                                                      .update({
+                                                    "status_log": "Offline"
+                                                  });
                                                   final provider = Provider.of<
                                                           GoogleSignUpProvider>(
                                                       context,
@@ -210,13 +218,6 @@ class _NavbarState extends State<Navbar> {
                                                                     ChooseLogin()),
                                                       ),
                                                     );
-                                                  });
-                                                  FirebaseFirestore.instance
-                                                      .collection("Users")
-                                                      .doc(FirebaseAuth.instance
-                                                          .currentUser.uid)
-                                                      .update({
-                                                    "status_log": "Offline"
                                                   });
                                                 },
                                                 child: Text("Yes"),

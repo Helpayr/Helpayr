@@ -156,16 +156,18 @@ class _ProfileMakerState extends State<ProfileMaker>
   final service_priceEc = TextEditingController();
 
   Future addServiceDetails(
-      String fullname,
-      String service,
-      String service_ageEC,
-      String service_addressEC,
-      String service_descEC,
-      String service_facebookEc,
-      String service_priceEc,
-      String dp_service,
-      String bg_service,
-      List<String> uploadedImageService) async {
+    String fullname,
+    String service,
+    String service_ageEC,
+    String service_addressEC,
+    String service_descEC,
+    String service_facebookEc,
+    String service_priceEc,
+    String dp_service,
+    String bg_service,
+    List<String> uploadedImageService,
+    String uid,
+  ) async {
     await FirebaseFirestore.instance
         .collection('Helpers')
         .doc('Service')
@@ -181,6 +183,7 @@ class _ProfileMakerState extends State<ProfileMaker>
       'dp': dp_service,
       'bg': bg_service,
       'image': uploadedImageService,
+      'uid': uid,
     });
   }
 
@@ -197,7 +200,8 @@ class _ProfileMakerState extends State<ProfileMaker>
         service_priceEc.text.trim(),
         dp_service,
         bg_service,
-        uploadedImageService);
+        uploadedImageService,
+        FirebaseAuth.instance.currentUser.uid);
   }
 
   String dp_service = "";

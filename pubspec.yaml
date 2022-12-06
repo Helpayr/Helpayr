@@ -21,6 +21,8 @@ environment:
   sdk: ">=2.7.0 <3.0.5"
 
 dependencies:
+  auto_size_text_field: ^2.1.0
+
   anim_search_bar: ^2.0.2
   animated_text_kit: ^4.2.2
   bottom_navy_bar: ^6.0.0

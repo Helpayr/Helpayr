@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:helpayr/screens/settings.dart';
+import 'package:helpayr/screens/when_complete.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -9,8 +10,9 @@ import 'package:helpayr/widgets/drawer-tile.dart';
 
 class NowDrawer extends StatelessWidget {
   final String currentPage;
+  final bool isHelper;
 
-  NowDrawer({this.currentPage});
+  NowDrawer({this.currentPage, this.isHelper = false});
 
   _launchURL() async {
     const url = 'pornhub.com';
@@ -59,63 +61,94 @@ class NowDrawer extends StatelessWidget {
             )),
         Expanded(
           flex: 2,
-          child: ListView(
-            padding: EdgeInsets.only(top: 36, left: 8, right: 16),
-            children: [
-              DrawerTile(
-                  icon: FontAwesomeIcons.home,
-                  onTap: () {
-                    if (currentPage != "Home")
-                      Navigator.pushReplacementNamed(context, '/home');
-                  },
-                  iconColor: HelpayrColors.info,
-                  title: "Home",
-                  isSelected: currentPage == "Home" ? true : false),
-              DrawerTile(
-                  icon: FontAwesomeIcons.store,
-                  onTap: () {
-                    if (currentPage != "Stores")
-                      Navigator.pushReplacementNamed(context, '/stores');
-                  },
-                  iconColor: HelpayrColors.info,
-                  title: "Stores",
-                  isSelected: currentPage == "Stores" ? true : false),
-              DrawerTile(
-                  icon: Icons.message,
-                  onTap: () {
-                    if (currentPage != "Messaging")
-                      Navigator.pushReplacementNamed(context, '/messaging');
-                  },
-                  iconColor: HelpayrColors.info,
-                  title: "Messaging",
-                  isSelected: currentPage == "Messaging" ? true : false),
-              DrawerTile(
-                  icon: FontAwesomeIcons.user,
-                  onTap: () {
-                    if (currentPage != "Profile")
-                      Navigator.pushReplacementNamed(context, '/profile');
-                  },
-                  iconColor: HelpayrColors.warning,
-                  title: "Profile",
-                  isSelected: currentPage == "Profile" ? true : false),
-              DrawerTile(
-                  icon: FontAwesomeIcons.cog,
-                  onTap: () {
-                    if (currentPage != "Settings")
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Settings_Home(
-                            isHome: true,
-                          ),
-                        ),
-                      );
-                  },
-                  iconColor: HelpayrColors.success,
-                  title: "Settings",
-                  isSelected: currentPage == "Settings" ? true : false),
-            ],
-          ),
+          child: isHelper
+              ? ListView(
+                  padding: EdgeInsets.only(top: 36, left: 8, right: 16),
+                  children: [
+                    DrawerTile(
+                        icon: FontAwesomeIcons.home,
+                        onTap: () {
+                          if (currentPage != "Home")
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WhenCompleted(),
+                              ),
+                            );
+                        },
+                        iconColor: HelpayrColors.info,
+                        title: "Home",
+                        isSelected: currentPage == "Home" ? true : false),
+                    DrawerTile(
+                        icon: Icons.message,
+                        onTap: () {
+                          if (currentPage != "Messaging")
+                            Navigator.pushReplacementNamed(
+                                context, '/messaging');
+                        },
+                        iconColor: HelpayrColors.info,
+                        title: "Messaging",
+                        isSelected: currentPage == "Messaging" ? true : false),
+                  ],
+                )
+              : ListView(
+                  padding: EdgeInsets.only(top: 36, left: 8, right: 16),
+                  children: [
+                    DrawerTile(
+                        icon: FontAwesomeIcons.home,
+                        onTap: () {
+                          if (currentPage != "Home")
+                            Navigator.pushReplacementNamed(context, '/home');
+                        },
+                        iconColor: HelpayrColors.info,
+                        title: "Home",
+                        isSelected: currentPage == "Home" ? true : false),
+                    DrawerTile(
+                        icon: FontAwesomeIcons.store,
+                        onTap: () {
+                          if (currentPage != "Stores")
+                            Navigator.pushReplacementNamed(context, '/stores');
+                        },
+                        iconColor: HelpayrColors.info,
+                        title: "Stores",
+                        isSelected: currentPage == "Stores" ? true : false),
+                    DrawerTile(
+                        icon: Icons.message,
+                        onTap: () {
+                          if (currentPage != "Messaging")
+                            Navigator.pushReplacementNamed(
+                                context, '/messaging');
+                        },
+                        iconColor: HelpayrColors.info,
+                        title: "Messaging",
+                        isSelected: currentPage == "Messaging" ? true : false),
+                    DrawerTile(
+                        icon: FontAwesomeIcons.user,
+                        onTap: () {
+                          if (currentPage != "Profile")
+                            Navigator.pushReplacementNamed(context, '/profile');
+                        },
+                        iconColor: HelpayrColors.warning,
+                        title: "Profile",
+                        isSelected: currentPage == "Profile" ? true : false),
+                    DrawerTile(
+                        icon: FontAwesomeIcons.cog,
+                        onTap: () {
+                          if (currentPage != "Settings")
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Settings_Home(
+                                  isHome: true,
+                                ),
+                              ),
+                            );
+                        },
+                        iconColor: HelpayrColors.success,
+                        title: "Settings",
+                        isSelected: currentPage == "Settings" ? true : false),
+                  ],
+                ),
         ),
         Expanded(
           flex: 1,

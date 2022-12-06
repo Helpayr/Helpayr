@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:helpayr/firebase/services_list_firebase.dart';
 import 'package:lottie/lottie.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
@@ -39,13 +40,22 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
   bool onSearch_loading = false;
 
   Stream getcredentials() async* {
-    await FirebaseFirestore.instance
-        .collection("Users")
-        .orderBy("last_login", descending: true)
-        .get()
-        .then((value) => value.docs.forEach((element) {
-              users.add(element.reference.id);
-            }));
+    isNameSort
+        ? await FirebaseFirestore.instance
+            .collection("Users")
+            .orderBy("last_login", descending: false)
+            .get()
+            .then((value) => value.docs.forEach((element) {
+                  users.add(element.reference.id);
+                }))
+        : await FirebaseFirestore.instance
+            .collection("Users")
+            .orderBy("last_login", descending: true)
+            .get()
+            .then((value) => value.docs.forEach((element) {
+                  users.add(element.reference.id);
+                }));
+
     await FirebaseFirestore.instance
         .collection("Service_Display")
         .get()
@@ -414,8 +424,13 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                                                                     Container(
                                                                         decoration:
                                                                             BoxDecoration(
-                                                                          color:
-                                                                              Colors.white,
+                                                                          image:
+                                                                              DecorationImage(
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                            image:
+                                                                                AssetImage("assets/onboarding new/bg_wavy_rotated.png"),
+                                                                          ),
                                                                           borderRadius:
                                                                               BorderRadius.only(
                                                                             topLeft:
@@ -457,15 +472,37 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                                                                               ),
                                                                             ),
                                                                             Expanded(
-                                                                              child: ListView.builder(
-                                                                                physics: AlwaysScrollableScrollPhysics(),
-                                                                                controller: _scrollController,
-                                                                                itemCount: users.length,
-                                                                                itemBuilder: ((context, index) {
-                                                                                  return Container();
-                                                                                }),
-                                                                              ),
-                                                                            ),
+                                                                                child: Column(
+                                                                              children: [
+                                                                                Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: [
+                                                                                    Text(
+                                                                                      "Services",
+                                                                                      style: GoogleFonts.raleway(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 30),
+                                                                                    ),
+                                                                                    Text(
+                                                                                      '${services.length}',
+                                                                                      style: GoogleFonts.raleway(
+                                                                                        color: Colors.white,
+                                                                                        fontWeight: FontWeight.bold,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                                Expanded(
+                                                                                  child: HelperList(
+                                                                                    isService_dp: true,
+                                                                                    isAdmin: true,
+                                                                                    isStore: true,
+                                                                                    isService: false,
+                                                                                    display_type: 'Service_Display',
+                                                                                    helper_type: 'Service',
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            )),
                                                                           ],
                                                                         )),
                                                               ),
@@ -474,7 +511,126 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                                         );
                                       },
                                       child: Services(services: services)),
-                                  Stores(stores: stores),
+                                  GestureDetector(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          context: context,
+                                          builder: (context) =>
+                                              DraggableScrollableSheet(
+                                                  snap: false,
+                                                  initialChildSize: .90,
+                                                  minChildSize: .50,
+                                                  maxChildSize: 1,
+                                                  builder:
+                                                      (context, myScroll) =>
+                                                          Scaffold(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            body:
+                                                                SingleChildScrollView(
+                                                              physics:
+                                                                  AlwaysScrollableScrollPhysics(),
+                                                              child:
+                                                                  RefreshIndicator(
+                                                                onRefresh: () {
+                                                                  return Future.delayed(
+                                                                      Duration(
+                                                                          seconds:
+                                                                              1));
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          image:
+                                                                              DecorationImage(
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                            image:
+                                                                                AssetImage("assets/onboarding new/bg_wavy_users.png"),
+                                                                          ),
+                                                                          borderRadius:
+                                                                              BorderRadius.only(
+                                                                            topLeft:
+                                                                                Radius.circular(24),
+                                                                            topRight:
+                                                                                Radius.circular(24),
+                                                                          ),
+                                                                        ),
+                                                                        height: MediaQuery.of(context)
+                                                                            .size
+                                                                            .height,
+                                                                        width: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width,
+                                                                        child:
+                                                                            Column(
+                                                                          children: [
+                                                                            Container(
+                                                                              width: 90,
+                                                                              height: 10,
+                                                                              decoration: BoxDecoration(
+                                                                                borderRadius: BorderRadius.only(
+                                                                                  bottomLeft: Radius.circular(24),
+                                                                                  bottomRight: Radius.circular(24),
+                                                                                ),
+                                                                                color: Colors.black,
+                                                                              ),
+                                                                            ),
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                                                              child: AnimSearchBar(
+                                                                                width: 400,
+                                                                                textController: name_search_controller,
+                                                                                onSuffixTap: () {
+                                                                                  setState(() {
+                                                                                    name_search_controller.clear();
+                                                                                  });
+                                                                                },
+                                                                              ),
+                                                                            ),
+                                                                            Expanded(
+                                                                                child: Column(
+                                                                              children: [
+                                                                                Row(
+                                                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                  children: [
+                                                                                    Text(
+                                                                                      "Stores",
+                                                                                      style: GoogleFonts.raleway(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30),
+                                                                                    ),
+                                                                                    Text(
+                                                                                      '${stores.length}',
+                                                                                      style: GoogleFonts.raleway(
+                                                                                        color: Colors.black,
+                                                                                        fontWeight: FontWeight.bold,
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                                Expanded(
+                                                                                  child: HelperList(
+                                                                                    isService_dp: false,
+                                                                                    isAdmin: true,
+                                                                                    isStore: true,
+                                                                                    isService: false,
+                                                                                    display_type: 'Store_Display',
+                                                                                    helper_type: 'Store',
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            )),
+                                                                          ],
+                                                                        )),
+                                                              ),
+                                                            ),
+                                                          )),
+                                        );
+                                      },
+                                      child: Stores(stores: stores)),
                                   SizedBox(
                                     height: 20,
                                   ),
@@ -840,9 +996,65 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                               ],
                             ),
                           ),
+                          Container(
+                            width: MediaQuery.of(context).size.width / 1.4,
+                            height: 80,
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Status Legend",
+                                  style: GoogleFonts.raleway(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          status_quo(
+                                            color: Colors.green,
+                                            stat: "Online and in-app",
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          status_quo(
+                                            color: Colors.yellow,
+                                            stat: "Logged-in but offline",
+                                          ),
+                                        ]),
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        status_quo(
+                                          color: Colors.orange,
+                                          stat: "Logged-out but in-app",
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        status_quo(
+                                          color: Colors.grey,
+                                          stat: "Logged-out and offline",
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                           Text(
                             "Sorted by",
-                            style: GoogleFonts.raleway(
+                            style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 17,
@@ -853,9 +1065,11 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                           ),
                           Expanded(
                             child: PageView(
+                                physics: const BouncingScrollPhysics(),
                                 onPageChanged: ((value) {
                                   setState(() {
-                                    selected_header = value;
+                                    isLastLog = value == 1;
+                                    isNameSort = value == 2;
                                   });
                                 }),
                                 controller: _pageController,
@@ -942,14 +1156,94 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                                             ),
                                           ],
                                         )
-                                      : ListView.builder(
-                                          physics:
-                                              AlwaysScrollableScrollPhysics(),
-                                          controller: _scrollController,
-                                          itemCount: users.length,
-                                          itemBuilder: ((context, index) {
-                                            return GetUsers_Info(
-                                              docId: users[index],
+                                      : Column(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 40.0),
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    "Frequent Users",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: ListView.builder(
+                                                physics:
+                                                    AlwaysScrollableScrollPhysics(),
+                                                controller: _scrollController,
+                                                itemCount: users.length,
+                                                itemBuilder: ((context, index) {
+                                                  return GetUsers_Info(
+                                                    docId: users[index],
+                                                    onDelete: () async {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder:
+                                                              ((context) =>
+                                                                  AlertDialog(
+                                                                    actions: [
+                                                                      TextButton.icon(
+                                                                          onPressed: () async {
+                                                                            await FirebaseFirestore.instance.collection("Users").doc(users[index]).delete().whenComplete(() async {
+                                                                              setState(() {
+                                                                                account_deleted++;
+                                                                              });
+                                                                              await FirebaseFirestore.instance.collection("Admin").doc(FirebaseAuth.instance.currentUser.uid).update({
+                                                                                "deleted": account_deleted,
+                                                                              });
+
+                                                                              Navigator.push(
+                                                                                context,
+                                                                                MaterialPageRoute(
+                                                                                  builder: (context) => Admin_Dashboard(),
+                                                                                ),
+                                                                              );
+                                                                            });
+                                                                          },
+                                                                          icon: Icon(Icons.check),
+                                                                          label: Text("Yes")),
+                                                                      TextButton.icon(
+                                                                          onPressed: () async {
+                                                                            Navigator.of(context).pop();
+                                                                          },
+                                                                          icon: Icon(Icons.deselect),
+                                                                          label: Text("No"))
+                                                                    ],
+                                                                    title: Text(
+                                                                      "Delete Confirmation",
+                                                                      style: GoogleFonts.raleway(
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                    content:
+                                                                        Text(
+                                                                      "The selected account will be permanently deleted. Proceed?",
+                                                                      style: GoogleFonts.raleway(
+                                                                          fontWeight:
+                                                                              FontWeight.normal),
+                                                                    ),
+                                                                  )));
+                                                    },
+                                                  );
+                                                }),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                  userInfo != null
+                                      ? Column(
+                                          children: [
+                                            User_info_onSearch(
+                                              data: userInfo,
                                               onDelete: () async {
                                                 showDialog(
                                                     context: context,
@@ -964,8 +1258,8 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                                                                           .instance
                                                                           .collection(
                                                                               "Users")
-                                                                          .doc(users[
-                                                                              index])
+                                                                          .doc(doc_idToDelete[
+                                                                              0])
                                                                           .delete()
                                                                           .whenComplete(
                                                                               () async {
@@ -1024,11 +1318,92 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                                                               ),
                                                             )));
                                               },
-                                            );
-                                          }),
+                                            ),
+                                          ],
+                                        )
+                                      : Column(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 40.0),
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    "Name",
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: ListView.builder(
+                                                physics:
+                                                    AlwaysScrollableScrollPhysics(),
+                                                controller: _scrollController,
+                                                itemCount: users.length,
+                                                itemBuilder: ((context, index) {
+                                                  return GetUsers_Info(
+                                                    docId: users[index],
+                                                    onDelete: () async {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder:
+                                                              ((context) =>
+                                                                  AlertDialog(
+                                                                    actions: [
+                                                                      TextButton.icon(
+                                                                          onPressed: () async {
+                                                                            await FirebaseFirestore.instance.collection("Users").doc(users[index]).delete().whenComplete(() async {
+                                                                              setState(() {
+                                                                                account_deleted++;
+                                                                              });
+                                                                              await FirebaseFirestore.instance.collection("Admin").doc(FirebaseAuth.instance.currentUser.uid).update({
+                                                                                "deleted": account_deleted,
+                                                                              });
+
+                                                                              Navigator.push(
+                                                                                context,
+                                                                                MaterialPageRoute(
+                                                                                  builder: (context) => Admin_Dashboard(),
+                                                                                ),
+                                                                              );
+                                                                            });
+                                                                          },
+                                                                          icon: Icon(Icons.check),
+                                                                          label: Text("Yes")),
+                                                                      TextButton.icon(
+                                                                          onPressed: () async {
+                                                                            Navigator.of(context).pop();
+                                                                          },
+                                                                          icon: Icon(Icons.deselect),
+                                                                          label: Text("No"))
+                                                                    ],
+                                                                    title: Text(
+                                                                      "Delete Confirmation",
+                                                                      style: GoogleFonts.raleway(
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                    content:
+                                                                        Text(
+                                                                      "The selected account will be permanently deleted. Proceed?",
+                                                                      style: GoogleFonts.raleway(
+                                                                          fontWeight:
+                                                                              FontWeight.normal),
+                                                                    ),
+                                                                  )));
+                                                    },
+                                                  );
+                                                }),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                  Container(color: Colors.red),
-                                  Container(color: Colors.blue),
                                 ]),
                           ),
                         ],
@@ -1037,6 +1412,39 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                   ),
                 ),
               )),
+    );
+  }
+}
+
+class status_quo extends StatelessWidget {
+  const status_quo({
+    Key key,
+    this.color,
+    this.stat = "",
+  }) : super(key: key);
+
+  final Color color;
+  final String stat;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Container(
+          height: 10,
+          width: 10,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+        ),
+        SizedBox(
+          width: 10,
+        ),
+        Text(
+          stat,
+          style: GoogleFonts.raleway(
+              fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      ],
     );
   }
 }

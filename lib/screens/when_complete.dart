@@ -1,12 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:helpayr/screens/home.dart';
-import 'package:helpayr/screens/messaging.dart';
+import 'package:helpayr/Message/pages/messages_page.dart';
 import 'package:helpayr/screens/profile_maker.dart';
 import 'package:helpayr/widgets/navbar.dart';
 import 'package:lottie/lottie.dart';
+
+import '../widgets/drawer.dart';
 
 class WhenCompleted extends StatefulWidget {
   const WhenCompleted({key});
@@ -16,13 +18,35 @@ class WhenCompleted extends StatefulWidget {
 }
 
 class _WhenCompletedState extends State<WhenCompleted>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
+  void setStatus_user(String status) {
+    FirebaseFirestore.instance
+        .collection("Helpers")
+        .doc("People")
+        .collection("Servicers")
+        .doc(FirebaseAuth.instance.currentUser.uid)
+        .update({
+      "status": status,
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setStatus_user("Online");
+    } else {
+      setStatus_user("Offline");
+    }
+  }
+
   AnimationController _animationctrl;
   AnimationController _yes;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    setStatus_user("Online");
     _yes = AnimationController(
       vsync: this,
       duration: Duration(
@@ -434,7 +458,11 @@ class _WhenCompletedState extends State<WhenCompleted>
               ),
             )),
       ]),
-      Messaging(),
+      Column(
+        children: [
+          MessagePage(),
+        ],
+      ),
     ];
 
     return isIntro
@@ -503,34 +531,12 @@ class _WhenCompletedState extends State<WhenCompleted>
               greetings: true,
               isProfile: false,
             ),
+            drawer: NowDrawer(
+              currentPage: "Home",
+              isHelper: true,
+            ),
             body: SingleChildScrollView(
               child: screens[currentPage],
-            ),
-            bottomSheet: CurvedNavigationBar(
-              onTap: (index) {
-                setState(() {
-                  currentPage = index;
-                });
-              },
-              key: _bottomNavigationKey,
-              index: 0,
-              height: 55.0,
-              items: [
-                bottomNavTiles(
-                  tileTitle: "Home",
-                  icon: Icons.home,
-                ),
-                bottomNavTiles(
-                  tileTitle: "Message",
-                  icon: Icons.message,
-                ),
-              ],
-              color: Color.fromARGB(255, 12, 50, 68),
-              buttonBackgroundColor: Color.fromARGB(255, 12, 50, 68),
-              backgroundColor: Colors.transparent,
-              animationCurve: Curves.easeInToLinear,
-              animationDuration: const Duration(milliseconds: 600),
-              letIndexChange: (index) => true,
             ),
           );
   }

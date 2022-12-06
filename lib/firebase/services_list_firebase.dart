@@ -16,12 +16,17 @@ class HelperList extends StatefulWidget {
     this.helper_type,
     this.isService = false,
     this.isStore = false,
+    this.isAdmin = false,
+    this.isService_dp = false,
   });
   final ScrollController scrollController;
   final String display_type;
   final String helper_type;
   final bool isService;
   final bool isStore;
+  final bool isAdmin;
+  final bool isService_dp;
+
   State<HelperList> createState() => _HelperListState();
 }
 
@@ -47,7 +52,7 @@ class _HelperListState extends State<HelperList> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: getDocs(),
+      future: _future,
       builder: (context, snapshot) => Container(
         width: widget.isStore
             ? MediaQuery.of(context).size.width
@@ -59,9 +64,15 @@ class _HelperListState extends State<HelperList> {
               : NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           controller: widget.scrollController,
-          scrollDirection: widget.isStore ? Axis.horizontal : Axis.vertical,
+          scrollDirection: widget.isAdmin
+              ? Axis.vertical
+              : widget.isStore
+                  ? Axis.horizontal
+                  : Axis.vertical,
           itemCount: services.length,
           itemBuilder: ((context, index) => TypeImageDisplay(
+                isAdmin: widget.isAdmin,
+                isService_dp: widget.isService_dp,
                 isStore: widget.isStore,
                 isService: widget.isService,
                 display_type: widget.display_type,
@@ -87,7 +98,9 @@ class TypeImageDisplay extends StatefulWidget {
       this.isService = false,
       this.colors,
       this.service_title,
-      this.isStore = false});
+      this.isStore = false,
+      this.isService_dp = false,
+      this.isAdmin = false});
   final String display_type;
   final String DocId;
   final String services;
@@ -96,6 +109,8 @@ class TypeImageDisplay extends StatefulWidget {
   final Color colors;
   final List service_title;
   final bool isStore;
+  final bool isService_dp;
+  final bool isAdmin;
   @override
   State<TypeImageDisplay> createState() => _TypeImageDisplayState();
 }
@@ -195,23 +210,58 @@ class _TypeImageDisplayState extends State<TypeImageDisplay> {
                           bottom: 23,
                           child: Padding(
                             padding: const EdgeInsets.all(10.0),
-                            child: Container(
-                              height: 100,
-                              width: 100,
-                              decoration: BoxDecoration(
-                                  border:
-                                      Border.all(width: 5, color: Colors.white),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      offset: Offset(3, 0),
-                                      blurRadius: 6,
+                            child: widget.isService_dp
+                                ? Container(
+                                    height: 100,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 5, color: Colors.white),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          offset: Offset(3, 0),
+                                          blurRadius: 6,
+                                        ),
+                                      ],
+                                      shape: BoxShape.circle,
                                     ),
-                                  ],
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                      image: NetworkImage(data['dp']))),
-                            ),
+                                    child: Swiper(
+                                        autoplay: true,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: data['dp'].length,
+                                        itemBuilder: ((context, index) {
+                                          return Container(
+                                            height: 100,
+                                            width: 100,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                fit: BoxFit.cover,
+                                                image: NetworkImage(
+                                                    data['dp'][index]),
+                                              ),
+                                            ),
+                                          );
+                                        })),
+                                  )
+                                : Container(
+                                    height: 100,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 5, color: Colors.white),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black26,
+                                            offset: Offset(3, 0),
+                                            blurRadius: 6,
+                                          ),
+                                        ],
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            image: NetworkImage(data['dp']))),
+                                  ),
                           ),
                         ),
                         Positioned(
@@ -239,46 +289,67 @@ class _TypeImageDisplayState extends State<TypeImageDisplay> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => FreeLanceHome(
-                                        img_display_1: data['display'][0],
-                                        img_display_2: data['display'][1],
-                                        service_title: data['job'],
-                                        onTap: () {
-                                          showModalBottomSheet(
-                                              isScrollControlled: true,
-                                              context: context,
-                                              builder: (context) =>
-                                                  DraggableScrollableSheet(
-                                                    snap: false,
-                                                    initialChildSize: .90,
-                                                    minChildSize: .50,
-                                                    maxChildSize: 1,
-                                                    builder:
-                                                        (context, myScroll) =>
-                                                            ListData(
-                                                      title: data['job'],
-                                                      isService:
-                                                          widget.isService,
-                                                      userType: "Helpers",
-                                                      service:
-                                                          widget.helperType,
-                                                      type: widget.services,
-                                                    ),
-                                                  ));
-                                          ;
-                                        },
-                                      )),
-                            );
+                            widget.isAdmin
+                                ? showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    context: context,
+                                    builder: (context) =>
+                                        DraggableScrollableSheet(
+                                          snap: false,
+                                          initialChildSize: .70,
+                                          minChildSize: .50,
+                                          maxChildSize: .80,
+                                          builder: (context, myScroll) =>
+                                              ListData(
+                                            isAdmin: true,
+                                            title: data['job'],
+                                            isService: widget.isService,
+                                            userType: "Helpers",
+                                            service: widget.helperType,
+                                            type: widget.services,
+                                          ),
+                                        ))
+                                : Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => FreeLanceHome(
+                                              img_display_1: data['display'][0],
+                                              img_display_2: data['display'][1],
+                                              service_title: data['job'],
+                                              onTap: () {
+                                                showModalBottomSheet(
+                                                    isScrollControlled: true,
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        DraggableScrollableSheet(
+                                                          snap: false,
+                                                          initialChildSize: .90,
+                                                          minChildSize: .50,
+                                                          maxChildSize: 1,
+                                                          builder: (context,
+                                                                  myScroll) =>
+                                                              ListData(
+                                                            title: data['job'],
+                                                            isService: widget
+                                                                .isService,
+                                                            userType: "Helpers",
+                                                            service: widget
+                                                                .helperType,
+                                                            type:
+                                                                widget.services,
+                                                          ),
+                                                        ));
+                                                ;
+                                              },
+                                            )),
+                                  );
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Align(
                               alignment: Alignment.bottomRight,
                               child: Text(
-                                "See More",
+                                widget.isAdmin ? "Manage" : "See More",
                                 style: GoogleFonts.raleway(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
