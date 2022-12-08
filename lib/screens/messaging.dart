@@ -8,6 +8,8 @@ import 'package:helpayr/screens/profile.dart';
 import 'package:helpayr/widgets/drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../Message/pages/contacts.dart';
+
 class Messaging extends StatefulWidget {
   @override
   State<Messaging> createState() => _MessagingState();
@@ -18,17 +20,11 @@ class _MessagingState extends State<Messaging> {
   int currentPage = 0;
   List<Widget> pages = [
     MessagePage(),
-    Center(
-      child: Text("Namo"),
-    ),
-    Center(
-      child: Text("Ka"),
-    ),
+    Contacts(),
   ];
   List<String> appBarTitle = [
     "Message",
-    "Add",
-    "Settings",
+    "Contacts",
   ];
   bool colorSelect = false;
 
@@ -105,13 +101,6 @@ class _MessagingState extends State<Messaging> {
             fontSize: 10,
             fontWeight: FontWeight.bold,
           ),
-          TabData(
-            icon: FontAwesomeIcons.bell,
-            iconSize: 20,
-            title: "Notifications",
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
-          )
         ],
         onTabChangedListener: (index) => setState(() => currentPage = index),
       ),

@@ -21,10 +21,9 @@ environment:
   sdk: ">=2.7.0 <3.0.5"
 
 dependencies:
-  auto_size_text_field: ^2.1.0
-
   anim_search_bar: ^2.0.2
   animated_text_kit: ^4.2.2
+  auto_size_text_field: ^2.1.0
   bottom_navy_bar: ^6.0.0
   carousel_slider: ^2.2.1
   circle_bottom_navigation_bar: ^1.0.0
@@ -47,6 +46,7 @@ dependencies:
   flutter_swiper: ^1.1.6
   font_awesome_flutter: ^8.8.1
   google_fonts: ^3.0.1
+  google_maps_flutter: ^2.2.1
   google_sign_in: ^5.4.2
   hidable: ^1.0.3
   image_picker: ^0.8.6

@@ -34,6 +34,23 @@ class _MessagePageState extends State<MessagePage> {
 
   TextEditingController name_search_controller = TextEditingController();
   Map<String, dynamic> userInfo;
+  Future _future;
+
+  Future _lastchat() async {
+    await FirebaseFirestore.instance
+        .collection('chatroom')
+        .doc(chatRoomId(
+            FirebaseAuth.instance.currentUser.displayName, userInfo['name']))
+        .collection("chats")
+        .orderBy("time", descending: false)
+        .get();
+  }
+
+  @override
+  void initState() {
+    _future = _lastchat();
+    super.initState();
+  }
 
   void onSearch() async {
     await FirebaseFirestore.instance
@@ -89,7 +106,7 @@ class _MessagePageState extends State<MessagePage> {
             ),
             _Stories(),
             SizedBox(
-              height: 30,
+              height: 10,
             ),
             userInfo != null
                 ? GestureDetector(
@@ -111,35 +128,69 @@ class _MessagePageState extends State<MessagePage> {
                                 ),
                               ));
                     },
-                    child: Container(
-                        height: 80,
-                        width: MediaQuery.of(context).size.width,
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                  border:
-                                      Border.all(width: 3, color: Colors.black),
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                      image: NetworkImage(userInfo['dp']))),
-                            ),
-                            Column(
-                              children: [
-                                Text(
-                                  '${userInfo['name']}',
-                                  style: GoogleFonts.raleway(
-                                    fontWeight: FontWeight.bold,
+                    child: StreamBuilder(
+                      stream: FirebaseFirestore.instance
+                          .collection('chatroom')
+                          .doc(chatRoomId(
+                              FirebaseAuth.instance.currentUser.displayName,
+                              userInfo['name']))
+                          .collection("chats")
+                          .orderBy("time", descending: false)
+                          .snapshots(),
+                      builder: (context, snapshot) => Card(
+                        elevation: 5,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Container(
+                              height: 80,
+                              width: MediaQuery.of(context).size.width,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            width: 3, color: Colors.black),
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            image:
+                                                NetworkImage(userInfo['dp']))),
                                   ),
-                                ),
-                              ],
-                            )
-                          ],
-                        )),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '${userInfo['name']}',
+                                        style: GoogleFonts.raleway(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        '${snapshot.data.docs[snapshot.data.docs.length - 1]['message']}',
+                                        style: GoogleFonts.raleway(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              )),
+                        ),
+                      ),
+                    ),
                   )
-                : Container()
+                : Container(
+                    child: Center(
+                      child: Text("No Messages yet!"),
+                    ),
+                  )
           ],
         ),
       ),
@@ -303,9 +354,11 @@ class _StoriesState extends State<_Stories> {
         .doc("People")
         .collection("Servicers")
         .get()
-        .then((value) => value.docs.forEach((element) {
-              artsDocs.add(element.reference.id);
-            }));
+        .then((value) {
+      value.docs.forEach((element) {
+        artsDocs.add(element.reference.id);
+      });
+    });
   }
 
   Future _future;
@@ -313,6 +366,15 @@ class _StoriesState extends State<_Stories> {
   void initState() {
     _future = getDocsArt();
     super.initState();
+  }
+
+  int isChat_selected = 0;
+  String chatRoomId(String user1, String user2) {
+    if (user1[0].toLowerCase().codeUnits[0] >
+        user2[0].toLowerCase().codeUnits[0]) {
+      return "$user1$user2";
+    }
+    return "$user2$user1";
   }
 
   @override
@@ -327,7 +389,7 @@ class _StoriesState extends State<_Stories> {
               elevation: 0,
               shadowColor: Colors.grey.withOpacity(.7),
               child: SizedBox(
-                height: 140,
+                height: 170,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -336,30 +398,58 @@ class _StoriesState extends State<_Stories> {
                       child: Text(
                         'Stories',
                         style: TextStyle(
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w600,
                           fontSize: 15,
                           color: HelpayrColors.black.withOpacity(.5),
                         ),
                       ),
                     ),
                     Expanded(
-                      child: ListView.builder(
-                        itemCount: artsDocs.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: SizedBox(
-                              width: 60,
-                              child: GestureDetector(
-                                onTap: () {},
-                                child: _StoryCard(
-                                  artsDocs[index],
+                      child: StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection("Helpers")
+                            .doc("People")
+                            .collection("Servicers")
+                            .snapshots(),
+                        builder: (context, snapshot) => ListView.builder(
+                          itemCount: artsDocs.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: SizedBox(
+                                width: 60,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      isChat_selected = index;
+                                    });
+                                    Map<String, dynamic> map =
+                                        snapshot.data.docs[index].data();
+
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => Chatroom(
+                                                  recipient: snapshot.data
+                                                      .docs[isChat_selected]
+                                                      .data(),
+                                                  chatroomId: mod_chat(
+                                                      FirebaseAuth
+                                                          .instance
+                                                          .currentUser
+                                                          .displayName,
+                                                      map),
+                                                )));
+                                  },
+                                  child: _StoryCard(
+                                    artsDocs[index],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     )
                   ],
@@ -368,6 +458,15 @@ class _StoriesState extends State<_Stories> {
             ),
           );
         }));
+  }
+
+  String mod_chat(String currentUser, Map<String, dynamic> data) {
+    String sendTo = data['name'];
+    if (currentUser[0].toLowerCase().codeUnits[0] >
+        sendTo[0].toLowerCase().codeUnits[0]) {
+      return "$currentUser$sendTo";
+    }
+    return "$sendTo$currentUser";
   }
 }
 
@@ -399,7 +498,21 @@ class _StoryCardState extends State<_StoryCard> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Avatar.medium(url: data['dp']),
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        offset: Offset(3, 0),
+                        blurRadius: 6,
+                      ),
+                    ],
+                    shape: BoxShape.circle,
+                    border: Border.all(width: 4, color: Colors.white),
+                    image: DecorationImage(image: NetworkImage(data['dp']))),
+              ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16.0),

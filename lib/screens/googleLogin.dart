@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/admin/dashboard.dart';
 import 'package:helpayr/screens/login.dart';
+import 'package:helpayr/screens/profile_maker.dart';
 import 'package:helpayr/screens/sign_up.dart';
 import 'package:helpayr/screens/when_complete.dart';
 import 'package:lottie/lottie.dart';

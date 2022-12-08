@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/firebase/getData.dart';
@@ -98,6 +100,34 @@ class _AppointmentState extends State<Appointment>
           ),
         );
       }
+    });
+  }
+
+  String Appointment_Id(String user1, String user2) {
+    if (user1[0].toLowerCase().codeUnits[0] >
+        user2[0].toLowerCase().codeUnits[0]) {
+      return "$user1$user2";
+    }
+    return "$user2$user1";
+  }
+
+  void set_appointment(String service, String name) async {
+    await FirebaseFirestore.instance
+        .collection("Helpers")
+        .doc("Service")
+        .collection(service)
+        .doc(name)
+        .collection("Bookings")
+        .doc()
+        .set({
+      "date": selected_date,
+      "day": selected_halfDay,
+      "hour": selected_hour,
+      "servicer": widget.widget.data['full_name'],
+      "user": FirebaseAuth.instance.currentUser.displayName,
+      "time": FieldValue.serverTimestamp(),
+      "servicer_dp": widget.widget.data['dp'],
+      "user_dp": FirebaseAuth.instance.currentUser.photoURL,
     });
   }
 
@@ -555,30 +585,15 @@ class _AppointmentState extends State<Appointment>
               ),
               GestureDetector(
                 onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: ((context) => Dialog(
-                          backgroundColor: Colors.transparent,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                LottieBuilder.network(
-                                  "https://assets4.lottiefiles.com/packages/lf20_3juvcrdk.json",
-                                  fit: BoxFit.fill,
-                                  repeat: false,
-                                  controller: _animationctrl,
-                                  onLoaded: ((p0) {
-                                    return _animationctrl.forward();
-                                  }),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )),
+                  set_appointment(widget.widget.data['job_profession'],
+                      widget.widget.data['full_name']);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailsBooking(
+                        details: widget.widget.data,
+                      ),
+                    ),
                   );
                 },
                 child: Container(

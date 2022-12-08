@@ -172,7 +172,8 @@ class _ProfileMakerState extends State<ProfileMaker>
         .collection('Helpers')
         .doc('Service')
         .collection(dropValue)
-        .add({
+        .doc(FirebaseAuth.instance.currentUser.displayName)
+        .set({
       'full_name': fullname,
       'job_profession': service,
       'Age': service_ageEC,

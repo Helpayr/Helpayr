@@ -21,6 +21,7 @@ class _ChatroomState extends State<Chatroom> {
   void onSend() async {
     if (message_send.text.isNotEmpty) {
       await _firebase
+      
           .collection('chatroom')
           .doc(widget.chatroomId)
           .collection("chats")
@@ -33,12 +34,16 @@ class _ChatroomState extends State<Chatroom> {
     message_send.clear();
   }
 
+  List<String> chat_sorted = [];
+
   final FirebaseFirestore _firebase = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
+      extendBodyBehindAppBar: false,
       extendBody: true,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         elevation: 0,
         actions: [
@@ -63,8 +68,14 @@ class _ChatroomState extends State<Chatroom> {
           child: Column(
         children: [
           Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(24),
+                bottomRight: Radius.circular(24),
+              ),
+            ),
             width: size.width,
-            height: MediaQuery.of(context).size.height / 1.38,
+            height: MediaQuery.of(context).size.height / 1.25,
             child: StreamBuilder<QuerySnapshot>(
               stream: _firebase
                   .collection("chatroom")
@@ -79,7 +90,28 @@ class _ChatroomState extends State<Chatroom> {
                       itemBuilder: ((context, index) {
                         Map<String, dynamic> map =
                             snapshot.data.docs[index].data();
-                        return messages_bubble(size, map);
+
+                        delete() async {
+                          await FirebaseFirestore.instance
+                              .collection("chatroom")
+                              .doc(widget.chatroomId)
+                              .collection("chats")
+                              .orderBy("time", descending: false)
+                              .get()
+                              .then((value) {
+                            value.docs.forEach((element) {
+                              chat_sorted.add(element.reference.id);
+                            });
+                          });
+                          await FirebaseFirestore.instance
+                              .collection("chatroom")
+                              .doc(widget.chatroomId)
+                              .collection("chats")
+                              .doc(chat_sorted[index])
+                              .delete();
+                        }
+
+                        return messages_bubble(size, map, delete);
                       }));
                 } else {
                   return Container();
@@ -87,115 +119,206 @@ class _ChatroomState extends State<Chatroom> {
               },
             ),
           ),
-        ],
-      )),
-      bottomSheet: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-        ),
-        height: size.height / 10,
-        width: size.width,
-        alignment: Alignment.center,
-        child: Container(
-          height: size.height / 14,
-          width: size.width / 1.1,
-          child: Container(
+          Container(
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  offset: Offset(3, 0),
-                  blurRadius: 6,
-                ),
-              ],
+              color: Colors.transparent,
             ),
-            height: size.height / 14,
-            width: size.width / 1.1,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Stack(children: [
-                AutoSizeTextField(
-                  maxLines: 4,
-                  textAlign: TextAlign.start,
-                  controller: message_send,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: "Enter message",
+            height: size.height / 10,
+            width: size.width,
+            alignment: Alignment.center,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(3, 0),
+                    blurRadius: 6,
                   ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: GestureDetector(
-                    onTap: () {
-                      onSend();
-                    },
-                    child: LottieBuilder.network(
-                      "https://assets6.lottiefiles.com/packages/lf20_txpagpud.json",
-                      fit: BoxFit.fitHeight,
+                ],
+              ),
+              height: size.height / 14,
+              width: size.width / 1.1,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Stack(children: [
+                  AutoSizeTextField(
+                    maxLines: 4,
+                    textAlign: TextAlign.start,
+                    controller: message_send,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Enter message",
                     ),
                   ),
-                ),
-              ]),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: GestureDetector(
+                      onTap: () {
+                        onSend();
+                      },
+                      child: LottieBuilder.network(
+                        "https://assets6.lottiefiles.com/packages/lf20_txpagpud.json",
+                        fit: BoxFit.fitHeight,
+                      ),
+                    ),
+                  ),
+                ]),
+              ),
             ),
           ),
-        ),
-      ),
+        ],
+      )),
     );
   }
 
-  Widget messages_bubble(Size size, Map<String, dynamic> data) {
-    return Container(
-      width: size.width,
-      alignment: data['sendby'] == FirebaseAuth.instance.currentUser.displayName
-          ? Alignment.centerRight
-          : Alignment.centerLeft,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-          margin: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-          decoration: BoxDecoration(
-              borderRadius: data['sendby'] ==
+  Widget messages_bubble(
+      Size size, Map<String, dynamic> data, Function onDelete) {
+    return GestureDetector(
+      onLongPress: () {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Row(
+          children: [
+            TextButton.icon(
+                onPressed: onDelete,
+                icon: Icon(Icons.delete_forever),
+                label: Text("Delete"))
+          ],
+        )));
+      },
+      child: Container(
+        width: size.width,
+        alignment:
+            data['sendby'] == FirebaseAuth.instance.currentUser.displayName
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: data['sendby'] ==
                       FirebaseAuth.instance.currentUser.displayName
-                  ? BorderRadius.only(
-                      topLeft: Radius.circular(25),
-                      topRight: Radius.circular(25),
-                      bottomLeft: Radius.circular(25),
-                    )
-                  : BorderRadius.only(
-                      topLeft: Radius.circular(25),
-                      topRight: Radius.circular(25),
-                      bottomRight: Radius.circular(25),
-                    ),
-              color: data['sendby'] ==
-                      FirebaseAuth.instance.currentUser.displayName
-                  ? Colors.blue
-                  : Colors.white,
-              boxShadow: data['sendby'] ==
+                  ? MainAxisAlignment.end
+                  : MainAxisAlignment.start,
+              children: data['sendby'] ==
                       FirebaseAuth.instance.currentUser.displayName
                   ? [
-                      BoxShadow(
-                        color: Colors.lightBlue,
-                        offset: Offset(2, 3),
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                        margin:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                        decoration: BoxDecoration(
+                            borderRadius: data['sendby'] ==
+                                    FirebaseAuth
+                                        .instance.currentUser.displayName
+                                ? BorderRadius.only(
+                                    topLeft: Radius.circular(25),
+                                    topRight: Radius.circular(25),
+                                    bottomLeft: Radius.circular(25),
+                                  )
+                                : BorderRadius.only(
+                                    topLeft: Radius.circular(25),
+                                    topRight: Radius.circular(25),
+                                    bottomRight: Radius.circular(25),
+                                  ),
+                            color: data['sendby'] ==
+                                    FirebaseAuth
+                                        .instance.currentUser.displayName
+                                ? Colors.blue
+                                : Colors.white,
+                            boxShadow: data['sendby'] ==
+                                    FirebaseAuth
+                                        .instance.currentUser.displayName
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.lightBlue,
+                                      offset: Offset(2, 3),
+                                    ),
+                                  ]
+                                : [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      offset: Offset(3, 0),
+                                      blurRadius: 6,
+                                    ),
+                                  ]),
+                        child: Text(
+                          data['message'],
+                          style: GoogleFonts.raleway(
+                            color: data['sendby'] ==
+                                    FirebaseAuth
+                                        .instance.currentUser.displayName
+                                ? Colors.white
+                                : Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Avatar.small(
+                        url: FirebaseAuth.instance.currentUser.photoURL,
                       ),
                     ]
                   : [
-                      BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(3, 0),
-                        blurRadius: 6,
+                      Avatar.small(
+                        url: widget.recipient['dp'],
                       ),
-                    ]),
-          child: Text(
-            data['message'],
-            style: GoogleFonts.raleway(
-              color: data['sendby'] ==
-                      FirebaseAuth.instance.currentUser.displayName
-                  ? Colors.white
-                  : Colors.black,
-              fontWeight: FontWeight.bold,
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                        margin:
+                            EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                        decoration: BoxDecoration(
+                            borderRadius: data['sendby'] ==
+                                    FirebaseAuth
+                                        .instance.currentUser.displayName
+                                ? BorderRadius.only(
+                                    topLeft: Radius.circular(25),
+                                    topRight: Radius.circular(25),
+                                    bottomLeft: Radius.circular(25),
+                                  )
+                                : BorderRadius.only(
+                                    topLeft: Radius.circular(25),
+                                    topRight: Radius.circular(25),
+                                    bottomRight: Radius.circular(25),
+                                  ),
+                            color: data['sendby'] ==
+                                    FirebaseAuth
+                                        .instance.currentUser.displayName
+                                ? Colors.blue
+                                : Colors.white,
+                            boxShadow: data['sendby'] ==
+                                    FirebaseAuth
+                                        .instance.currentUser.displayName
+                                ? [
+                                    BoxShadow(
+                                      color: Colors.lightBlue,
+                                      offset: Offset(2, 3),
+                                    ),
+                                  ]
+                                : [
+                                    BoxShadow(
+                                      color: Colors.grey,
+                                      offset: Offset(3, 0),
+                                      blurRadius: 6,
+                                    ),
+                                  ]),
+                        child: Text(
+                          data['message'],
+                          style: GoogleFonts.raleway(
+                            color: data['sendby'] ==
+                                    FirebaseAuth
+                                        .instance.currentUser.displayName
+                                ? Colors.white
+                                : Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
             ),
           ),
         ),
