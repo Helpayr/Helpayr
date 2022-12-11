@@ -7,7 +7,11 @@ import 'package:helpayr/Message/widgets/widget.dart';
 import 'package:lottie/lottie.dart';
 
 class Chatroom extends StatefulWidget {
-  const Chatroom({key, this.recipient, this.chatroomId});
+  const Chatroom({
+    key,
+    this.recipient,
+    this.chatroomId,
+  });
   final Map<String, dynamic> recipient;
   final String chatroomId;
 
@@ -21,7 +25,6 @@ class _ChatroomState extends State<Chatroom> {
   void onSend() async {
     if (message_send.text.isNotEmpty) {
       await _firebase
-      
           .collection('chatroom')
           .doc(widget.chatroomId)
           .collection("chats")
@@ -43,7 +46,7 @@ class _ChatroomState extends State<Chatroom> {
     return Scaffold(
       extendBodyBehindAppBar: false,
       extendBody: true,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 0,
         actions: [
@@ -57,7 +60,7 @@ class _ChatroomState extends State<Chatroom> {
         centerTitle: true,
         backgroundColor: Colors.white,
         title: Text(
-          widget.recipient['name'],
+          widget.recipient['full_name'],
           style: GoogleFonts.raleway(
             color: Colors.black,
             fontWeight: FontWeight.bold,

@@ -128,6 +128,7 @@ class _AppointmentState extends State<Appointment>
       "time": FieldValue.serverTimestamp(),
       "servicer_dp": widget.widget.data['dp'],
       "user_dp": FirebaseAuth.instance.currentUser.photoURL,
+      "is_accepted": true,
     });
   }
 

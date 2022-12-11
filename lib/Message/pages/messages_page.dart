@@ -57,7 +57,7 @@ class _MessagePageState extends State<MessagePage> {
         .collection("Helpers")
         .doc("People")
         .collection("Servicers")
-        .where("name", isEqualTo: name_search_controller.text)
+        .where("full_name", isEqualTo: name_search_controller.text)
         .get()
         .then((value) {
       setState(() {
@@ -113,27 +113,22 @@ class _MessagePageState extends State<MessagePage> {
                     onTap: () {
                       String roomId = chatRoomId(
                           FirebaseAuth.instance.currentUser.displayName,
-                          userInfo['name']);
-                      showModalBottomSheet(
-                          isScrollControlled: true,
-                          context: context,
-                          builder: (context) => DraggableScrollableSheet(
-                                snap: false,
-                                initialChildSize: .90,
-                                minChildSize: .50,
-                                maxChildSize: .90,
-                                builder: (context, myScroll) => Chatroom(
+                          userInfo['full_name']);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Chatroom(
                                   recipient: userInfo,
                                   chatroomId: roomId,
-                                ),
-                              ));
+                                )),
+                      );
                     },
                     child: StreamBuilder(
                       stream: FirebaseFirestore.instance
                           .collection('chatroom')
                           .doc(chatRoomId(
                               FirebaseAuth.instance.currentUser.displayName,
-                              userInfo['name']))
+                              userInfo['full_name']))
                           .collection("chats")
                           .orderBy("time", descending: false)
                           .snapshots(),
@@ -164,7 +159,7 @@ class _MessagePageState extends State<MessagePage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        '${userInfo['name']}',
+                                        '${userInfo['full_name']}',
                                         style: GoogleFonts.raleway(
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -186,10 +181,32 @@ class _MessagePageState extends State<MessagePage> {
                       ),
                     ),
                   )
-                : Container(
-                    child: Center(
-                      child: Text("No Messages yet!"),
-                    ),
+                : Expanded(
+                    child: StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('Helpers')
+                            .doc('People')
+                            .collection("Servicers")
+                            .orderBy("time", descending: false)
+                            .snapshots(),
+                        builder: ((context, snapshot) {
+                          if (snapshot.hasData) {
+                            return ListView.builder(
+                              itemCount: snapshot.data.docs.length,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  height: 30,
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.2,
+                                  child: Card(),
+                                );
+                              },
+                            );
+                          }
+                          return Container(
+                            color: Colors.blue,
+                          );
+                        })),
                   )
           ],
         ),
@@ -430,17 +447,15 @@ class _StoriesState extends State<_Stories> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => Chatroom(
-                                                  recipient: snapshot.data
-                                                      .docs[isChat_selected]
-                                                      .data(),
-                                                  chatroomId: mod_chat(
-                                                      FirebaseAuth
-                                                          .instance
-                                                          .currentUser
-                                                          .displayName,
-                                                      map),
-                                                )));
+                                          builder: (context) => Chatroom(
+                                              recipient: snapshot
+                                                  .data.docs[isChat_selected]
+                                                  .data(),
+                                              chatroomId: mod_chat(
+                                                  FirebaseAuth.instance
+                                                      .currentUser.displayName,
+                                                  map)),
+                                        ));
                                   },
                                   child: _StoryCard(
                                     artsDocs[index],
@@ -461,7 +476,7 @@ class _StoriesState extends State<_Stories> {
   }
 
   String mod_chat(String currentUser, Map<String, dynamic> data) {
-    String sendTo = data['name'];
+    String sendTo = data['full_name'];
     if (currentUser[0].toLowerCase().codeUnits[0] >
         sendTo[0].toLowerCase().codeUnits[0]) {
       return "$currentUser$sendTo";
@@ -517,7 +532,7 @@ class _StoryCardState extends State<_StoryCard> {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: Text(
-                    '${data['name']}'.trimRight(),
+                    '${data['full_name']}'.trimRight(),
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 13,

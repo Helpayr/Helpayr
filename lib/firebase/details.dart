@@ -1,12 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:helpayr/firebase/appointments.dart';
 
+import '../Message/pages/chatroom.dart';
 import 'getData.dart';
 
 class DetailsHelper extends StatelessWidget {
   const DetailsHelper({key, this.widget});
   final ServicePage widget;
+  String chatRoomId(String user1, String user2) {
+    if (user1[0].toLowerCase().codeUnits[0] >
+        user2[0].toLowerCase().codeUnits[0]) {
+      return "$user1$user2";
+    }
+    return "$user2$user1";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -104,10 +114,25 @@ class DetailsHelper extends StatelessWidget {
                     title: "Set Appointments",
                   ),
                 ),
-                ElevatedButtonStore(
-                  width: MediaQuery.of(context).size.width / 4,
-                  icon: Icons.message,
-                  title: "Chat",
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Chatroom(
+                          recipient: widget.data,
+                          chatroomId: chatRoomId(
+                              FirebaseAuth.instance.currentUser.displayName,
+                              widget.data['full_name']),
+                        ),
+                      ),
+                    );
+                  },
+                  child: ElevatedButtonStore(
+                    width: MediaQuery.of(context).size.width / 4,
+                    icon: Icons.message,
+                    title: "Chat",
+                  ),
                 ),
                 ElevatedButtonStore(
                   width: MediaQuery.of(context).size.width / 8,

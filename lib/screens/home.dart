@@ -220,7 +220,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           ),
           Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 1.8,
+            height: MediaQuery.of(context).size.height * 3,
             child: PageView(
               physics: NeverScrollableScrollPhysics(),
               controller: _pageController,

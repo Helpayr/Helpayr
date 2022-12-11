@@ -1,10 +1,19 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:helpayr/Message/pages/chatroom.dart';
+import 'package:helpayr/Message/widgets/widget.dart';
 import 'package:helpayr/firebase/details.dart';
 import 'package:helpayr/firebase/products.dart';
+import 'package:hidable/hidable.dart';
+import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
 import '../constants/Theme.dart';
 import '../screens/home.dart';
@@ -79,11 +88,11 @@ class ServicePage extends StatefulWidget {
 
 List<String> title = [
   "Works",
-  "Credentials",
+  "Ratings",
 ];
 List<String> title_selected = [
   "Works and Products",
-  "Credentials and Proofs",
+  "Ratings and Reviews",
 ];
 
 List<IconData> icons = [
@@ -91,11 +100,43 @@ List<IconData> icons = [
   Icons.message,
   Icons.person,
 ];
+final reviewEC = TextEditingController();
+ScrollController _scroll = ScrollController();
 
 class _ServicePageState extends State<ServicePage> {
-  int selected = 0;
-  PageController _pagectrller = PageController(initialPage: 0);
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   bool isPressed = false;
+  int selected = 0;
+
+  PageController _pagectrller = PageController(initialPage: 0);
+  TextEditingController controller = TextEditingController();
+  TextEditingController rating_number = TextEditingController();
+
+  Future addReview(String service, String name) async {
+    await FirebaseFirestore.instance
+        .collection("Helpers")
+        .doc("Service")
+        .collection(service)
+        .doc(name)
+        .collection("Ratings")
+        .add({
+      "review": controller.text,
+      "time": FieldValue.serverTimestamp(),
+      "user": FirebaseAuth.instance.currentUser.displayName,
+      "user_rating": double.parse(rating_number.text),
+      "user_pic": FirebaseAuth.instance.currentUser.photoURL,
+    });
+  }
+
+  @override
+  void dispose() {
+    controller;
+    _pagectrller;
+    rating_number;
+    scaffoldKey;
+    reviewEC;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,6 +145,7 @@ class _ServicePageState extends State<ServicePage> {
         return false;
       },
       child: Scaffold(
+        key: scaffoldKey,
         extendBody: true,
         extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -493,8 +535,63 @@ class _ServicePageState extends State<ServicePage> {
                                     ),
                                   ],
                                 ),
-                                Container(
-                                  color: Colors.blue,
+                                Column(
+                                  children: [
+                                    /* RatingBar.builder(
+                                      initialRating: 3,
+                                      minRating: 1,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: true,
+                                      itemCount: 5,
+                                      itemPadding:
+                                          EdgeInsets.symmetric(horizontal: 4.0),
+                                      itemBuilder: (context, _) => Icon(
+                                        Icons.star,
+                                        color: Colors.amber,
+                                      ),
+                                      onRatingUpdate: (rating) {
+                                        print(rating);
+                                      },
+                                    ),
+                                    */
+                                    GestureDetector(
+                                      onTap: () {
+                                        /*Write_review();*/
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                Show_reviews(context),
+                                          ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              1.5,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(
+                                                width: 2, color: Colors.blue),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              "Write and Read Real-time Reviews!",
+                                              style: GoogleFonts.raleway(
+                                                  color: Colors.blueAccent,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    LottieBuilder.network(
+                                        "https://assets4.lottiefiles.com/packages/lf20_ao823ilv.json"),
+                                  ],
                                 ),
                               ],
                               physics: NeverScrollableScrollPhysics(),
@@ -512,6 +609,479 @@ class _ServicePageState extends State<ServicePage> {
       ),
     );
   }
+
+  Scaffold Show_reviews(BuildContext context) {
+    ScrollController _scroll = ScrollController();
+    double total_review = 0;
+    return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: false,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        centerTitle: true,
+        title: Text(
+          "Ratings and Reviews",
+          style: GoogleFonts.raleway(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(3, 0),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
+              curve: Curves.easeInOut,
+              duration: Duration(milliseconds: 400),
+              height: 150,
+              width: MediaQuery.of(context).size.width / 1.3,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                elevation: 15,
+                child: Row(
+                  children: [
+                    Flexible(
+                        flex: 2,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                bottomLeft: Radius.circular(10),
+                              ),
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: NetworkImage(widget.data['dp']))),
+                        )),
+                    Flexible(
+                      flex: 3,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FittedBox(
+                              child: Text(
+                                '${widget.data['full_name']}',
+                                style: GoogleFonts.raleway(
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              fit: BoxFit.fitWidth,
+                            ),
+                            Text('${widget.data['job_profession']}'),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Expanded(
+              child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection("Helpers")
+                      .doc("Service")
+                      .collection(widget.data['job_profession'])
+                      .doc(widget.data['full_name'])
+                      .collection("Ratings")
+                      .orderBy("time", descending: true)
+                      .snapshots(),
+                  builder: ((context, snapshot) {
+                    return ListView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      controller: _scroll,
+                      scrollDirection: Axis.vertical,
+                      itemCount: snapshot.data.docs.length,
+                      itemBuilder: ((context, index) {
+                        total_review +=
+                            snapshot.data.docs[index]['user_rating'];
+
+                        DateTime lastLog =
+                            (snapshot.data.docs[index]['time'].toDate());
+                        String time_review =
+                            DateFormat.yMMMd().add_jm().format(lastLog);
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            child: Card(
+                                elevation: 10,
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Flexible(
+                                            child: Avatar.medium(
+                                                url: snapshot.data.docs[index]
+                                                    ['user_pic']),
+                                          ),
+                                          SizedBox(
+                                            width: 20,
+                                          ),
+                                          Flexible(
+                                            flex: 2,
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  '${snapshot.data.docs[index]['user']}',
+                                                  style: GoogleFonts.raleway(
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                RatingBarIndicator(
+                                                  rating:
+                                                      snapshot.data.docs[index]
+                                                          ['user_rating'],
+                                                  itemBuilder:
+                                                      (context, index) => Icon(
+                                                    Icons.star,
+                                                    color: Colors.blue,
+                                                  ),
+                                                  itemCount: 5,
+                                                  itemSize: 20.0,
+                                                  direction: Axis.horizontal,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Flexible(
+                                            child: Text(
+                                              '${time_review}',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 10),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 15.0, vertical: 15),
+                                      child: Text(
+                                        '${snapshot.data.docs[index]['review']}',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )),
+                          ),
+                        );
+                      }),
+                    );
+                  })),
+            ),
+          ],
+        ),
+      ),
+      bottomSheet: Hidable(
+        controller: _scroll,
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: 50,
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                offset: Offset(3, 0),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+              onPressed: () {
+                Write_review().whenComplete(() {
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text(
+                "Write a review",
+                style: GoogleFonts.raleway(
+                    color: Colors.white, fontWeight: FontWeight.bold),
+              )),
+        ),
+      ),
+    );
+  }
+
+  Future<dynamic> Write_review() {
+    return showModalBottomSheet(
+      isScrollControlled: true,
+      context: scaffoldKey.currentContext,
+      builder: (context) => DraggableScrollableSheet(
+        snap: false,
+        initialChildSize: .90,
+        minChildSize: .30,
+        maxChildSize: .90,
+        builder: (context, myScroll) => Scaffold(
+          resizeToAvoidBottomInset: false,
+          backgroundColor: Colors.transparent,
+          body: SingleChildScrollView(
+            child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                ),
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(14),
+                          bottomRight: Radius.circular(14),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Write Reviews",
+                      style: GoogleFonts.raleway(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    AnimatedContainer(
+                      curve: Curves.easeInOut,
+                      duration: Duration(milliseconds: 400),
+                      height: 120,
+                      width: MediaQuery.of(context).size.width / 1.3,
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 15,
+                        child: Row(
+                          children: [
+                            Flexible(
+                                flex: 2,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        bottomLeft: Radius.circular(10),
+                                      ),
+                                      image: DecorationImage(
+                                          fit: BoxFit.fill,
+                                          image:
+                                              NetworkImage(widget.data['dp']))),
+                                )),
+                            Flexible(
+                              flex: 3,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    FittedBox(
+                                      child: Text(
+                                        '${widget.data['full_name']}',
+                                        style: GoogleFonts.raleway(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      fit: BoxFit.fitWidth,
+                                    ),
+                                    Text('${widget.data['job_profession']}'),
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 35.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            "Write your Review",
+                            style: GoogleFonts.raleway(
+                                fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      height: 130,
+                      width: MediaQuery.of(context).size.width / 1.2,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(3, 0),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        style: GoogleFonts.raleway(
+                            color: Colors.black,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 18),
+                        maxLines: 4,
+                        textAlign: TextAlign.center,
+                        controller: controller,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "   Write a review for this service :)"),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    RatingBarIndicator(
+                      rating: 5,
+                      itemBuilder: (context, index) => Icon(
+                        Icons.star,
+                        color: Colors.blue,
+                      ),
+                      itemCount: 5,
+                      itemSize: 30.0,
+                      direction: Axis.horizontal,
+                    ),
+                    Container(
+                      height: 40,
+                      width: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(3, 0),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: TextField(
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        controller: rating_number,
+                        decoration: InputDecoration(
+                          hintText: "1-5",
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                      child: Row(
+                        children: [
+                          Text(
+                            "Works",
+                            style: GoogleFonts.raleway(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width / 1.2,
+                      height: 190,
+                      child: Swiper(
+                          autoplay: true,
+                          itemCount: widget.data['image'].length,
+                          itemBuilder: ((context, index) => Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                elevation: 5,
+                                child: Container(
+                                  height: 140,
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.5,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                          fit: BoxFit.fill,
+                                          image: NetworkImage(
+                                              widget.data['image'][index]))),
+                                ),
+                              ))),
+                    ),
+                  ],
+                )),
+          ),
+          bottomSheet: GestureDetector(
+            onTap: () {
+              addReview(
+                  widget.data['job_profession'], widget.data['full_name']);
+            },
+            child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      offset: Offset(3, 0),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Text(
+                    "Submit",
+                    style: GoogleFonts.raleway(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                )),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class Field extends StatelessWidget {
@@ -522,9 +1092,9 @@ class Field extends StatelessWidget {
     this.field,
   }) : super(key: key);
 
-  final ServicePage widget;
-  final IconData icon;
   final String field;
+  final IconData icon;
+  final ServicePage widget;
 
   @override
   Widget build(BuildContext context) {
@@ -582,17 +1152,25 @@ class MainPageReturner extends StatefulWidget {
 }
 
 class _MainPageReturnerState extends State<MainPageReturner> {
+  int product_isSelected = 0;
   bool product_selected = true;
   bool rev_selected = false;
-  ScrollController _scrollController;
-  int product_isSelected = 0;
 
   PageController _pageController = PageController(initialPage: 0);
+  ScrollController _scrollController;
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  String chatRoomId(String user1, String user2) {
+    if (user1[0].toLowerCase().codeUnits[0] >
+        user2[0].toLowerCase().codeUnits[0]) {
+      return "$user1$user2";
+    }
+    return "$user2$user1";
   }
 
   @override
@@ -729,11 +1307,27 @@ class _MainPageReturnerState extends State<MainPageReturner> {
                                     icon: FontAwesomeIcons.check,
                                     title: "Set Appointments",
                                   ),
-                                  ElevatedButtonStore(
-                                    width:
-                                        MediaQuery.of(context).size.width / 4,
-                                    icon: Icons.message,
-                                    title: "Chat",
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Chatroom(
+                                            recipient: widget.data,
+                                            chatroomId: chatRoomId(
+                                                FirebaseAuth.instance
+                                                    .currentUser.displayName,
+                                                widget.data['full_name']),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: ElevatedButtonStore(
+                                      width:
+                                          MediaQuery.of(context).size.width / 4,
+                                      icon: Icons.message,
+                                      title: "Chat",
+                                    ),
                                   ),
                                   ElevatedButtonStore(
                                     width:
