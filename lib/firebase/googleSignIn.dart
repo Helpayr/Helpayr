@@ -30,7 +30,7 @@ class GoogleSignUpProvider extends ChangeNotifier {
       "email": FirebaseAuth.instance.currentUser.email,
       "dp": FirebaseAuth.instance.currentUser.photoURL,
       "last_login": FirebaseAuth.instance.currentUser.metadata.lastSignInTime,
-      "name": FirebaseAuth.instance.currentUser.displayName,
+      "full_name": FirebaseAuth.instance.currentUser.displayName,
       "status_log": "Online",
     });
     notifyListeners();

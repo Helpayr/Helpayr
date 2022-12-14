@@ -21,7 +21,6 @@ import 'package:hidable/hidable.dart';
 import '../firebase/List_data_page.dart';
 import '../services/designing/list_services.dart';
 import '../services/editing/editing_main.dart';
-import '../services/foodandother/foodAndOther.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // import 'package:helpayr/screens/product.dart';
@@ -101,14 +100,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
         bottomNavTiles(
           tileTitle: "Utility",
           icon: FontAwesomeIcons.tools,
-        ),
-        bottomNavTiles(
-          tileTitle: "Food",
-          icon: Icons.food_bank,
-        ),
-        bottomNavTiles(
-          tileTitle: "Others",
-          icon: Icons.music_note,
         ),
         bottomNavTiles(
           tileTitle: "Settings",
@@ -244,13 +235,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           Construction(),
         ],
       ),
-      Column(
-        children: <Widget>[
-          Food(),
-          Others(),
-        ],
-      ),
-      Others(),
       SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),

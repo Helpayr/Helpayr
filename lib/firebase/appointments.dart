@@ -3,8 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/firebase/getData.dart';
+import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'details_appointment.dart';
 
 class Appointment extends StatefulWidget {
@@ -18,45 +19,17 @@ class Appointment extends StatefulWidget {
 class _AppointmentState extends State<Appointment>
     with SingleTickerProviderStateMixin {
   int selected = 0;
-  List<String> days = [
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+
   String selected_day = "";
   bool morning = true;
 
   bool afternoon = false;
+
+  bool morning_end = false;
+  bool afternoon_end = false;
   PageController _pageController = PageController(initialPage: 0);
-  int hour_morningSelected = 0;
+  PageController _pageController_end = PageController(initialPage: 0);
+
   List<String> hour_morning = [
     "6:00 AM",
     "7:00 AM",
@@ -65,7 +38,7 @@ class _AppointmentState extends State<Appointment>
     "10:00 AM",
     "11:00 AM",
   ];
-  int hour_afternoonSelected = 0;
+
   List<String> hour_afternoon = [
     "1:00 PM",
     "2:00 PM",
@@ -79,11 +52,24 @@ class _AppointmentState extends State<Appointment>
   ];
   AnimationController _animationctrl;
   String selected_halfDay = "";
-  String selected_date = "";
-  String selected_hour = "";
+
+  int hour_afternoonSelected = 0;
+  int hour_morningSelected = 0;
+  int hour_morning_endSelected = 0;
+  int hour_afternoon_endSelected = 0;
+
+  //These shits are what I need!
 
   @override
   void initState() {
+    final DateTime today = DateTime.now();
+
+    selected_date = DateFormat('MMMM dd, yyyy').format(today).toString();
+    selected_endDate = DateFormat('MMMM dd, yyyy')
+        .format(today.add(Duration(days: 3)))
+        .toString();
+    _dateRangePickerController.selectedRange =
+        PickerDateRange(today, today.add(Duration(days: 3)));
     super.initState();
     _animationctrl = AnimationController(
       vsync: this,
@@ -103,6 +89,8 @@ class _AppointmentState extends State<Appointment>
     });
   }
 
+  DateRangePickerController _dateRangePickerController =
+      DateRangePickerController();
   String Appointment_Id(String user1, String user2) {
     if (user1[0].toLowerCase().codeUnits[0] >
         user2[0].toLowerCase().codeUnits[0]) {
@@ -121,16 +109,50 @@ class _AppointmentState extends State<Appointment>
         .doc()
         .set({
       "date": selected_date,
-      "day": selected_halfDay,
+      "end_Date": selected_endDate,
       "hour": selected_hour,
+      "hour_end": selected_hour_end,
       "servicer": widget.widget.data['full_name'],
       "user": FirebaseAuth.instance.currentUser.displayName,
       "time": FieldValue.serverTimestamp(),
       "servicer_dp": widget.widget.data['dp'],
       "user_dp": FirebaseAuth.instance.currentUser.photoURL,
       "is_accepted": true,
+      "notes": _notes.text,
+      "uid": FirebaseAuth.instance.currentUser.uid,
+      'is_pending': true,
     });
   }
+
+  void set_appointment_user(String service) async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser.uid)
+        .collection("Bookings")
+        .doc()
+        .set({
+      "date": selected_date,
+      "end_Date": selected_endDate,
+      "hour": selected_hour,
+      "hour_end": selected_hour_end,
+      "servicer": widget.widget.data['full_name'],
+      "user": FirebaseAuth.instance.currentUser.displayName,
+      "time": FieldValue.serverTimestamp(),
+      "servicer_dp": widget.widget.data['dp'],
+      "user_dp": FirebaseAuth.instance.currentUser.photoURL,
+      "is_accepted": true,
+      "notes": _notes.text,
+      "service": service,
+      "uid": FirebaseAuth.instance.currentUser.uid,
+      'is_pending': true,
+    });
+  }
+
+  String selected_hour = "";
+  String selected_date = "";
+  String selected_endDate = '';
+  String selected_hour_end = '';
+  TextEditingController _notes = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -152,471 +174,642 @@ class _AppointmentState extends State<Appointment>
         ),
       ),
       body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height * 1.2,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text("Select Date",
-                        style: GoogleFonts.manrope(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ))
-                  ],
-                ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("Select Date",
+                      style: GoogleFonts.manrope(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ))
+                ],
               ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 170,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: ((context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selected = index;
-                          selected_day = days[index];
-                          selected_date = "December ${index + 1}";
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 350,
+              child: SfDateRangePicker(
+                selectionMode: DateRangePickerSelectionMode.range,
+                showActionButtons: true,
+                onSelectionChanged: _onselectChange,
+                controller: _dateRangePickerController,
+                onSubmit: (dates) {
+                  print(dates);
+                },
+                onCancel: () {
+                  _dateRangePickerController.selectedRange = null;
+                },
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Starts in',
+                        style: GoogleFonts.manrope(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${selected_date} in the',
+                        style: GoogleFonts.manrope(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        morning = true;
+                        afternoon = false;
+                        hour_afternoonSelected = null;
+                        selected_halfDay = "Morning";
+                      });
+                      return _pageController.animateToPage(0,
+                          duration: Duration(milliseconds: 500),
+                          curve: Curves.easeInOut);
+                    },
+                    child: Flexible(
+                      child: Card(
+                        color: morning ? Colors.blueAccent : Colors.white,
+                        elevation: morning ? 10 : 1,
                         child: Container(
-                          width: selected == index
-                              ? MediaQuery.of(context).size.width / 1.7
-                              : MediaQuery.of(context).size.width / 2,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            color: selected == index
-                                ? Colors.blueAccent
-                                : Colors.white,
-                            elevation: selected == index ? 10 : 5,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                      height: 10,
-                                      width: 10,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: selected == index
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(days[index],
-                                        style: GoogleFonts.manrope(
-                                          color: selected == index
-                                              ? Colors.white
-                                              : Colors.black,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                        )),
-                                  ],
-                                ),
-                                Text(
-                                  "December ${index + 1}",
-                                  style: GoogleFonts.manrope(
-                                      color: selected == index
-                                          ? Colors.white
-                                          : Colors.black,
-                                      fontSize: selected == index ? 25 : 20,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                selected == index
-                                    ? Text("Proceed ",
-                                        style: GoogleFonts.manrope(
-                                          color: selected == index
-                                              ? Colors.white
-                                              : Colors.black,
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                        ))
-                                    : Text("Please Select a Date ",
-                                        style: GoogleFonts.manrope(
-                                          color: selected == index
-                                              ? Colors.white
-                                              : Colors.black,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                        )),
-                              ],
+                          height: 40,
+                          width: 100,
+                          child: Center(
+                            child: Text(
+                              "Morning",
+                              style: GoogleFonts.manrope(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: morning ? Colors.white : Colors.black),
                             ),
                           ),
                         ),
                       ),
-                    );
-                  }),
-                  itemCount: 31,
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Row(
-                  children: [
-                    Text(
-                      '${selected_day} in the',
-                      style: GoogleFonts.manrope(
-                          fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          morning = true;
-                          afternoon = false;
-                          hour_afternoonSelected = null;
-                          selected_halfDay = "Morning";
-                        });
-                        return _pageController.animateToPage(0,
-                            duration: Duration(milliseconds: 500),
-                            curve: Curves.easeInOut);
-                      },
-                      child: Flexible(
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        morning = false;
+                        afternoon = true;
+                        hour_morningSelected = null;
+                        selected_halfDay = "Afternoon";
+                      });
+                      return _pageController.animateToPage(1,
+                          duration: Duration(milliseconds: 500),
+                          curve: Curves.easeInOut);
+                    },
+                    child: Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
                         child: Card(
-                          color: morning ? Colors.blueAccent : Colors.white,
-                          elevation: morning ? 10 : 1,
+                          color: afternoon ? Colors.blueAccent : Colors.white,
+                          elevation: afternoon ? 10 : 1,
                           child: Container(
                             height: 40,
                             width: 100,
                             child: Center(
                               child: Text(
-                                "Morning",
+                                "Afternoon",
                                 style: GoogleFonts.manrope(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
-                                    color:
-                                        morning ? Colors.white : Colors.black),
+                                    color: afternoon
+                                        ? Colors.white
+                                        : Colors.black),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          morning = false;
-                          afternoon = true;
-                          hour_morningSelected = null;
-                          selected_halfDay = "Afternoon";
-                        });
-                        return _pageController.animateToPage(1,
-                            duration: Duration(milliseconds: 500),
-                            curve: Curves.easeInOut);
-                      },
-                      child: Flexible(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Card(
-                            color: afternoon ? Colors.blueAccent : Colors.white,
-                            elevation: afternoon ? 10 : 1,
-                            child: Container(
-                              height: 40,
-                              width: 100,
-                              child: Center(
-                                child: Text(
-                                  "Afternoon",
-                                  style: GoogleFonts.manrope(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: afternoon
-                                          ? Colors.white
-                                          : Colors.black),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 180,
-                child: PageView(
-                  physics: NeverScrollableScrollPhysics(),
-                  controller: _pageController,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 40,
-                      child: GridView.builder(
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: hour_morning.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 4),
-                          itemBuilder: ((context, index) => GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    hour_morningSelected = index;
-                                    selected_hour = hour_morning[index];
-                                  });
-                                },
-                                child: Container(
-                                  width: 110,
-                                  height: 40,
-                                  child: Card(
-                                    shadowColor: hour_morningSelected == index
-                                        ? Colors.blue
-                                        : Colors.grey,
-                                    color: hour_morningSelected == index
-                                        ? Colors.blue
-                                        : Colors.white,
-                                    elevation:
-                                        hour_morningSelected == index ? 10 : 5,
-                                    child: Center(
-                                      child: Text(
-                                        hour_morning[index],
-                                        style: GoogleFonts.manrope(
-                                            color: hour_morningSelected == index
-                                                ? Colors.white
-                                                : Colors.black,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ))),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 160,
-                      child: GridView.builder(
-                          itemCount: hour_afternoon.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 4),
-                          itemBuilder: ((context, index) => GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    hour_afternoonSelected = index;
-                                    selected_hour = hour_afternoon[index];
-                                  });
-                                },
-                                child: Container(
-                                  width: 110,
-                                  height: 20,
-                                  child: Card(
-                                    shadowColor: hour_afternoonSelected == index
-                                        ? Colors.blue
-                                        : Colors.grey,
-                                    color: hour_afternoonSelected == index
-                                        ? Colors.blue
-                                        : Colors.white,
-                                    elevation: hour_afternoonSelected == index
-                                        ? 10
-                                        : 5,
-                                    child: Center(
-                                      child: Text(hour_afternoon[index],
-                                          style: GoogleFonts.manrope(
-                                              color: hour_afternoonSelected ==
-                                                      index
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                              fontWeight: FontWeight.bold)),
-                                    ),
-                                  ),
-                                ),
-                              ))),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  Flexible(
-                    flex: 2,
-                    child: Card(
-                      elevation: 10,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width / 1.5,
-                        height: 120,
-                        child: Row(
-                          children: [
-                            Flexible(
-                                flex: 1,
-                                child: Container(
-                                  child: LottieBuilder.network(
-                                      "https://assets2.lottiefiles.com/private_files/lf30_8ry7qrbu.json"),
-                                )),
-                            SizedBox(
-                              width: 20,
-                            ),
-                            Flexible(
-                              flex: 1,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    selected_date,
-                                    style: GoogleFonts.manrope(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                  ),
-                                  Text(
-                                    selected_halfDay,
-                                    style: GoogleFonts.manrope(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                  ),
-                                  Text(
-                                    selected_hour,
-                                    style: GoogleFonts.manrope(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                     ),
                   ),
-                  Flexible(
-                    child: Card(
-                      elevation: 10,
-                      child: Card(
-                        elevation: 10,
-                        child: Container(
-                          child: LottieBuilder.network(
-                              "https://assets6.lottiefiles.com/packages/lf20_3vbOcw.json"),
-                        ),
-                      ),
-                    ),
-                  )
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Service Info",
-                      style: GoogleFonts.manrope(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
-                    ),
-                  ],
-                ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 180,
+              child: PageView(
+                physics: NeverScrollableScrollPhysics(),
+                controller: _pageController,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    child: GridView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: hour_morning.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4),
+                        itemBuilder: ((context, index) => GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  hour_morningSelected = index;
+                                  selected_hour = hour_morning[index];
+                                });
+                              },
+                              child: Container(
+                                width: 110,
+                                height: 40,
+                                child: Card(
+                                  shadowColor: hour_morningSelected == index
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                  color: hour_morningSelected == index
+                                      ? Colors.blue
+                                      : Colors.white,
+                                  elevation:
+                                      hour_morningSelected == index ? 10 : 5,
+                                  child: Center(
+                                    child: Text(
+                                      hour_morning[index],
+                                      style: GoogleFonts.manrope(
+                                          color: hour_morningSelected == index
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ))),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 160,
+                    child: GridView.builder(
+                        itemCount: hour_afternoon.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4),
+                        itemBuilder: ((context, index) => GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  hour_afternoonSelected = index;
+                                  selected_hour = hour_afternoon[index];
+                                });
+                              },
+                              child: Container(
+                                width: 110,
+                                height: 20,
+                                child: Card(
+                                  shadowColor: hour_afternoonSelected == index
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                  color: hour_afternoonSelected == index
+                                      ? Colors.blue
+                                      : Colors.white,
+                                  elevation:
+                                      hour_afternoonSelected == index ? 10 : 5,
+                                  child: Center(
+                                    child: Text(hour_afternoon[index],
+                                        style: GoogleFonts.manrope(
+                                            color:
+                                                hour_afternoonSelected == index
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                              ),
+                            ))),
+                  ),
+                ],
               ),
-              Card(
-                elevation: 10,
-                child: Container(
-                  height: 150,
-                  width: MediaQuery.of(context).size.width / 1.1,
-                  child: Row(
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Flexible(
+                      Text(
+                        'Ends in',
+                        style: GoogleFonts.manrope(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${selected_endDate} in the',
+                        style: GoogleFonts.manrope(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        morning_end = true;
+                        afternoon_end = false;
+                        hour_afternoon_endSelected = null;
+                        selected_halfDay = "Morning";
+                      });
+                      return _pageController_end.animateToPage(0,
+                          duration: Duration(milliseconds: 500),
+                          curve: Curves.easeInOut);
+                    },
+                    child: Flexible(
+                      child: Card(
+                        color: morning_end ? Colors.blueAccent : Colors.white,
+                        elevation: morning_end ? 10 : 1,
                         child: Container(
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image:
-                                      NetworkImage(widget.widget.data['dp']))),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Flexible(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '${widget.widget.data['full_name']}',
+                          height: 40,
+                          width: 100,
+                          child: Center(
+                            child: Text(
+                              "Morning",
                               style: GoogleFonts.manrope(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
+                                  color: morning_end
+                                      ? Colors.white
+                                      : Colors.black),
                             ),
-                            Text('${widget.widget.data['job_profession']}'),
-                          ],
+                          ),
                         ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              GestureDetector(
-                onTap: () {
-                  set_appointment(widget.widget.data['job_profession'],
-                      widget.widget.data['full_name']);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DetailsBooking(
-                        details: widget.widget.data,
                       ),
                     ),
-                  );
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.blueAccent,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Set Appointment",
-                      style: GoogleFonts.manrope(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        morning_end = false;
+                        afternoon_end = true;
+                        hour_morning_endSelected = null;
+                        selected_halfDay = "Afternoon";
+                      });
+                      return _pageController_end.animateToPage(1,
+                          duration: Duration(milliseconds: 500),
+                          curve: Curves.easeInOut);
+                    },
+                    child: Flexible(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          color:
+                              afternoon_end ? Colors.blueAccent : Colors.white,
+                          elevation: afternoon_end ? 10 : 1,
+                          child: Container(
+                            height: 40,
+                            width: 100,
+                            child: Center(
+                              child: Text(
+                                "Afternoon",
+                                style: GoogleFonts.manrope(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: afternoon_end
+                                        ? Colors.white
+                                        : Colors.black),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 180,
+              child: PageView(
+                physics: NeverScrollableScrollPhysics(),
+                controller: _pageController_end,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 40,
+                    child: GridView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: hour_morning.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4),
+                        itemBuilder: ((context, index) => GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  hour_morning_endSelected = index;
+                                  selected_hour_end = hour_morning[index];
+                                });
+                              },
+                              child: Container(
+                                width: 110,
+                                height: 40,
+                                child: Card(
+                                  shadowColor: hour_morning_endSelected == index
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                  color: hour_morning_endSelected == index
+                                      ? Colors.blue
+                                      : Colors.white,
+                                  elevation:
+                                      hour_morningSelected == index ? 10 : 5,
+                                  child: Center(
+                                    child: Text(
+                                      hour_morning[index],
+                                      style: GoogleFonts.manrope(
+                                          color:
+                                              hour_morning_endSelected == index
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ))),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 160,
+                    child: GridView.builder(
+                        itemCount: hour_afternoon.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4),
+                        itemBuilder: ((context, index) => GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  hour_afternoon_endSelected = index;
+                                  selected_hour_end = hour_afternoon[index];
+                                });
+                              },
+                              child: Container(
+                                width: 110,
+                                height: 20,
+                                child: Card(
+                                  shadowColor:
+                                      hour_afternoon_endSelected == index
+                                          ? Colors.blue
+                                          : Colors.grey,
+                                  color: hour_afternoon_endSelected == index
+                                      ? Colors.blue
+                                      : Colors.white,
+                                  elevation: hour_afternoon_endSelected == index
+                                      ? 10
+                                      : 5,
+                                  child: Center(
+                                    child: Text(hour_afternoon[index],
+                                        style: GoogleFonts.manrope(
+                                            color: hour_afternoon_endSelected ==
+                                                    index
+                                                ? Colors.white
+                                                : Colors.black,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                ),
+                              ),
+                            ))),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              "Summary",
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Card(
+              elevation: 10,
+              child: Container(
+                width: MediaQuery.of(context).size.width / 1.1,
+                height: 120,
+                child: Row(
+                  children: [
+                    Flexible(
+                        flex: 1,
+                        child: Container(
+                          child: LottieBuilder.network(
+                              "https://assets2.lottiefiles.com/private_files/lf30_8ry7qrbu.json"),
+                        )),
+                    SizedBox(
+                      width: 20,
+                    ),
+                    Flexible(
+                      flex: 2,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Starts in  $selected_date',
+                            style: GoogleFonts.manrope(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueAccent),
+                          ),
+                          Text(
+                            selected_hour,
+                            style: GoogleFonts.manrope(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueAccent),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Divider(
+                              height: 1,
+                              thickness: 2,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          Text(
+                            'Ends in  $selected_endDate',
+                            style: GoogleFonts.manrope(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red),
+                          ),
+                          Text(
+                            selected_hour_end,
+                            style: GoogleFonts.manrope(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              )
-            ],
-          ),
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Container(
+              height: 100,
+              width: MediaQuery.of(context).size.width / 1.2,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(3, 0),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
+              child: TextField(
+                textAlign: TextAlign.center,
+                controller: _notes,
+                maxLines: 5,
+                decoration: InputDecoration(
+                  hintText: "Add some notes",
+                  hintStyle: TextStyle(color: Colors.black),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "Service Info",
+                    style: GoogleFonts.manrope(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                  ),
+                ],
+              ),
+            ),
+            Card(
+              elevation: 10,
+              child: Container(
+                height: 150,
+                width: MediaQuery.of(context).size.width / 1.1,
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Container(
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                                fit: BoxFit.fill,
+                                image: NetworkImage(widget.widget.data['dp']))),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Flexible(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${widget.widget.data['full_name']}',
+                            style: GoogleFonts.manrope(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                          ),
+                          Text('${widget.widget.data['job_profession']}'),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            GestureDetector(
+              onTap: () {
+                set_appointment(widget.widget.data['job_profession'],
+                    widget.widget.data['full_name']);
+                set_appointment_user(widget.widget.data['job_profession']);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailsBooking(
+                      details: widget.widget.data,
+                    ),
+                  ),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Set Appointment",
+                    style: GoogleFonts.manrope(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );
+  }
+
+  void _onselectChange(DateRangePickerSelectionChangedArgs args) {
+    setState(() {
+      selected_date =
+          DateFormat('MMMM dd, yyyy').format(args.value.startDate).toString();
+      selected_endDate = DateFormat('MMMM dd, yyyy')
+          .format(args.value.endDate ?? args.value.startDate)
+          .toString();
+    });
   }
 }

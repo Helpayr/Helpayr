@@ -22,7 +22,10 @@ class Chatroom extends StatefulWidget {
 class _ChatroomState extends State<Chatroom> {
   final TextEditingController message_send = TextEditingController();
 
-  void onSend() async {
+  void onSend(
+    String url,
+    String sentTo,
+  ) async {
     if (message_send.text.isNotEmpty) {
       await _firebase
           .collection('chatroom')
@@ -32,6 +35,8 @@ class _ChatroomState extends State<Chatroom> {
         "sendby": FirebaseAuth.instance.currentUser.displayName,
         "message": message_send.text,
         "time": FieldValue.serverTimestamp(),
+        "sendToPic": url,
+        "sentTo": sentTo,
       });
     }
     message_send.clear();
@@ -46,7 +51,7 @@ class _ChatroomState extends State<Chatroom> {
     return Scaffold(
       extendBodyBehindAppBar: false,
       extendBody: true,
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         elevation: 0,
         actions: [
@@ -159,7 +164,8 @@ class _ChatroomState extends State<Chatroom> {
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
                       onTap: () {
-                        onSend();
+                        onSend(widget.recipient['dp'],
+                            widget.recipient['full_name']);
                       },
                       child: LottieBuilder.network(
                         "https://assets6.lottiefiles.com/packages/lf20_txpagpud.json",

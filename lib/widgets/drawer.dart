@@ -106,12 +106,13 @@ class NowDrawer extends StatelessWidget {
                     DrawerTile(
                         icon: FontAwesomeIcons.store,
                         onTap: () {
-                          if (currentPage != "Stores")
-                            Navigator.pushReplacementNamed(context, '/stores');
+                          if (currentPage != "Bookings")
+                            Navigator.pushReplacementNamed(
+                                context, '/user_app');
                         },
                         iconColor: HelpayrColors.info,
-                        title: "Stores",
-                        isSelected: currentPage == "Stores" ? true : false),
+                        title: "Bookings",
+                        isSelected: currentPage == "Bookings" ? true : false),
                     DrawerTile(
                         icon: Icons.message,
                         onTap: () {

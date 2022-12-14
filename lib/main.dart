@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:helpayr/firebase/googleSignIn.dart';
 import 'package:helpayr/helpayrapp.dart';
 import 'package:helpayr/screens/articles.dart';
+import 'package:helpayr/screens/dashboard_appointments_user.dart';
 import 'package:helpayr/screens/login.dart';
 import 'package:helpayr/screens/messaging.dart';
 import 'package:helpayr/screens/onboarding/onboarding.dart';
@@ -10,7 +11,6 @@ import 'package:helpayr/screens/onboarding/slide_onboarding.dart';
 import 'package:helpayr/screens/profile.dart';
 import 'package:helpayr/screens/settings.dart';
 import 'package:helpayr/screens/register.dart';
-import 'package:helpayr/screens/stores.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -51,8 +51,8 @@ class MyApp extends StatelessWidget {
               '/home': (BuildContext context) => noback(
                     wid: new Home(),
                   ),
-              '/stores': (BuildContext context) => noback(
-                    wid: new Stores(),
+              '/user_app': (BuildContext context) => noback(
+                    wid: new Dashboard_User(),
                   ),
               '/settings': (BuildContext context) => noback(
                     wid: new Settings_Home(

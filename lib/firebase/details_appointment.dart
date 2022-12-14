@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 
 import '../Message/widgets/avatar.dart';
+import '../screens/dashboard_appointments_user.dart';
 
 class DetailsBooking extends StatefulWidget {
   const DetailsBooking({
@@ -47,8 +48,11 @@ class _DetailsBookingState extends State<DetailsBooking> {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20.0, right: 20.0, top: 60, bottom: 60),
+                  padding: EdgeInsets.only(
+                      left: 20.0,
+                      right: 20.0,
+                      top: 60,
+                      bottom: snapshot.data.docs[0]['is_accepted'] ? 0 : 70),
                   child: Container(
                     child: Card(
                       shape: RoundedRectangleBorder(
@@ -57,7 +61,131 @@ class _DetailsBookingState extends State<DetailsBooking> {
                       elevation: 10,
                       child: snapshot.data.docs[0]['is_accepted']
                           ? if_accepted(context)
-                          : Text("Opppss you have been rejected!"),
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                  Container(
+                                    height: 10,
+                                    width: 50,
+                                    decoration: BoxDecoration(
+                                      color: Color.fromARGB(255, 12, 103, 179),
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(24),
+                                        bottomRight: Radius.circular(24),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 40,
+                                  ),
+                                  Image.asset(
+                                    "assets/helpayr logo2.png",
+                                    height: 50,
+                                    width: 100,
+                                  ),
+                                  LottieBuilder.network(
+                                      "https://assets3.lottiefiles.com/packages/lf20_aameaeix.json"),
+                                  Container(
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          offset: Offset(3, 0),
+                                          blurRadius: 6,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          "Failed",
+                                          style: TextStyle(
+                                            color: Colors.red,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20.0),
+                                    child: Text(
+                                      "${widget.details['full_name']} has rejected your request!",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 30,
+                                  ),
+                                  Expanded(
+                                      child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(10),
+                                        bottomRight: Radius.circular(10),
+                                      ),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "Your request has been rejected",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 30,
+                                        ),
+                                        Container(
+                                          width: 230,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black26,
+                                                offset: Offset(3, 0),
+                                                blurRadius: 6,
+                                              ),
+                                            ],
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: Center(
+                                              child: Text(
+                                                "Please try again later or hire another ${widget.details['job_profession']}",
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ))
+                                ]),
                     ),
                   ),
                 ),
@@ -121,7 +249,9 @@ class _DetailsBookingState extends State<DetailsBooking> {
             ),
             Flexible(
               child: LottieBuilder.network(
-                  "https://assets4.lottiefiles.com/packages/lf20_bqUlAq.json"),
+                "https://assets4.lottiefiles.com/packages/lf20_bqUlAq.json",
+                repeat: true,
+              ),
             ),
             Flexible(
               child: Container(
@@ -148,7 +278,7 @@ class _DetailsBookingState extends State<DetailsBooking> {
           ],
         ),
         SizedBox(
-          height: 20,
+          height: 10,
         ),
         Container(
           width: MediaQuery.of(context).size.width / 1.2,
@@ -170,7 +300,7 @@ class _DetailsBookingState extends State<DetailsBooking> {
                   ))),
         ),
         SizedBox(
-          height: 40,
+          height: 20,
         ),
         StreamBuilder(
             stream: FirebaseFirestore.instance
@@ -183,7 +313,7 @@ class _DetailsBookingState extends State<DetailsBooking> {
                     isEqualTo: FirebaseAuth.instance.currentUser.displayName)
                 .snapshots(),
             builder: ((context, snapshot) => Container(
-                  width: MediaQuery.of(context).size.width / 1.4,
+                  width: MediaQuery.of(context).size.width / 1.25,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     boxShadow: [
@@ -210,13 +340,38 @@ class _DetailsBookingState extends State<DetailsBooking> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${snapshot.data.docs[0]['date']} 2022, ${snapshot.data.docs[0]['hour']}  ',
+                                  '${snapshot.data.docs[0]['date']}, ${snapshot.data.docs[0]['hour']}  ',
                                   style: GoogleFonts.raleway(
                                       color: Colors.black,
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                Text("Booking Date")
+                                Text("Booking Date (Start)")
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(FontAwesomeIcons.calendar),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${snapshot.data.docs[0]['end_Date']}, ${snapshot.data.docs[0]['hour_end']}  ',
+                                  style: GoogleFonts.raleway(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text("Booking Date (End)")
                               ],
                             ),
                           ],
@@ -260,7 +415,7 @@ class _DetailsBookingState extends State<DetailsBooking> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${widget.details['store_name']} ',
+                                  '${widget.details['job_profession']} ',
                                   style: GoogleFonts.raleway(
                                       color: Colors.black,
                                       fontSize: 15,
@@ -299,7 +454,38 @@ class _DetailsBookingState extends State<DetailsBooking> {
                       ],
                     ),
                   ),
-                )))
+                ))),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                offset: Offset(3, 0),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Dashboard_User(),
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Text("Go to Dashboard",
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+        )
       ],
     );
   }

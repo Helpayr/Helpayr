@@ -91,7 +91,7 @@ class User_info extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Text(
-                                        data['name'],
+                                        data['full_name'],
                                         style: GoogleFonts.raleway(
                                             fontSize: 17,
                                             fontWeight: FontWeight.bold),

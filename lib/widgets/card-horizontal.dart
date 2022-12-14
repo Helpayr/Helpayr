@@ -71,6 +71,7 @@ class _CardHorizontalState extends State<CardHorizontal> {
         height: 130,
         child: GestureDetector(
           onTap: () {
+            widget.tap();
             setState(() {
               isElevated = !isElevated;
             });
@@ -136,14 +137,11 @@ class _CardHorizontalState extends State<CardHorizontal> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              GestureDetector(
-                                onTap: widget.tap,
-                                child: Text(widget.cta,
-                                    style: TextStyle(
-                                        color: HelpayrColors.white,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600)),
-                              ),
+                              Text(widget.cta,
+                                  style: TextStyle(
+                                      color: HelpayrColors.white,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600)),
                             ],
                           )
                         ],

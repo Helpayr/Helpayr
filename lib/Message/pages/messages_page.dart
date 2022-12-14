@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/Message/theme.dart';
 import 'package:helpayr/constants/Theme.dart';
+import 'package:intl/intl.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -66,150 +67,253 @@ class _MessagePageState extends State<MessagePage> {
     });
   }
 
+  int chatSelected = 0;
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: Padding(
-        padding: const EdgeInsets.only(right: 8.0, left: 8),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Flexible(
-                  child: AnimSearchBar(
-                    autoFocus: true,
-                    closeSearchOnSuffixTap: false,
-                    suffixIcon: Icon(Icons.search_rounded),
-                    width: 250,
-                    textController: name_search_controller,
-                    onSuffixTap: () {},
+      body: Column(
+        children: [
+          Row(
+            children: [
+              Flexible(
+                child: AnimSearchBar(
+                  autoFocus: true,
+                  closeSearchOnSuffixTap: false,
+                  suffixIcon: Icon(Icons.search_rounded),
+                  width: 250,
+                  textController: name_search_controller,
+                  onSuffixTap: () {},
+                ),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                      Colors.white,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                        Colors.white,
-                      ),
-                    ),
-                    onPressed: () {
-                      onSearch();
-                    },
-                    child: Text(
-                      "Search",
-                      style: GoogleFonts.raleway(
-                          color: Colors.black, fontWeight: FontWeight.bold),
-                    )),
-              ],
-            ),
-            _Stories(),
-            SizedBox(
-              height: 10,
-            ),
-            userInfo != null
-                ? GestureDetector(
-                    onTap: () {
-                      String roomId = chatRoomId(
-                          FirebaseAuth.instance.currentUser.displayName,
-                          userInfo['full_name']);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Chatroom(
-                                  recipient: userInfo,
-                                  chatroomId: roomId,
-                                )),
-                      );
-                    },
-                    child: StreamBuilder(
-                      stream: FirebaseFirestore.instance
-                          .collection('chatroom')
-                          .doc(chatRoomId(
-                              FirebaseAuth.instance.currentUser.displayName,
-                              userInfo['full_name']))
-                          .collection("chats")
-                          .orderBy("time", descending: false)
-                          .snapshots(),
-                      builder: (context, snapshot) => Card(
-                        elevation: 5,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: Container(
-                              height: 80,
-                              width: MediaQuery.of(context).size.width,
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 50,
-                                    height: 50,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            width: 3, color: Colors.black),
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                            image:
-                                                NetworkImage(userInfo['dp']))),
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        '${userInfo['full_name']}',
-                                        style: GoogleFonts.raleway(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        '${snapshot.data.docs[snapshot.data.docs.length - 1]['message']}',
-                                        style: GoogleFonts.raleway(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                ],
+                  onPressed: () {
+                    onSearch();
+                  },
+                  child: Text(
+                    "Search",
+                    style: GoogleFonts.raleway(
+                        color: Colors.black, fontWeight: FontWeight.bold),
+                  )),
+            ],
+          ),
+          _Stories(),
+          SizedBox(
+            height: 10,
+          ),
+          userInfo != null
+              ? GestureDetector(
+                  onTap: () {
+                    String roomId = chatRoomId(
+                        FirebaseAuth.instance.currentUser.displayName,
+                        userInfo['full_name']);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Chatroom(
+                                recipient: userInfo,
+                                chatroomId: roomId,
                               )),
-                        ),
+                    );
+                  },
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('chatroom')
+                        .doc(chatRoomId(
+                            FirebaseAuth.instance.currentUser.displayName,
+                            userInfo['full_name']))
+                        .collection("chats")
+                        .orderBy("time", descending: false)
+                        .snapshots(),
+                    builder: (context, snapshot) => Card(
+                      elevation: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Container(
+                            height: 80,
+                            width: MediaQuery.of(context).size.width,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 3, color: Colors.black),
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          image: NetworkImage(userInfo['dp']))),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      '${userInfo['full_name']}',
+                                      style: GoogleFonts.raleway(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      '${snapshot.data.docs[snapshot.data.docs.length - 1]['message']}',
+                                      style: GoogleFonts.raleway(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            )),
                       ),
                     ),
-                  )
-                : Expanded(
-                    child: StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection('Helpers')
-                            .doc('People')
-                            .collection("Servicers")
-                            .orderBy("time", descending: false)
-                            .snapshots(),
-                        builder: ((context, snapshot) {
-                          if (snapshot.hasData) {
-                            return ListView.builder(
-                              itemCount: snapshot.data.docs.length,
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  height: 30,
+                  ),
+                )
+              : Expanded(
+                  child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("Helpers")
+                        .doc("People")
+                        .collection("Servicers")
+                        .snapshots(),
+                    builder: (context, snapshot_user) {
+                      return ListView.builder(
+                        itemCount: snapshot_user.data.docs.length,
+                        itemBuilder: (context, index) {
+                          return StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection('chatroom')
+                                .doc(chatRoomId(
+                                    FirebaseAuth
+                                        .instance.currentUser.displayName,
+                                    snapshot_user.data.docs[index]
+                                        ['full_name']))
+                                .collection("chats")
+                                .orderBy("time", descending: false)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              DateTime lastLog =
+                                  (snapshot.data.docs[index]['time'].toDate());
+                              String time_sent =
+                                  DateFormat.yMMMd().add_jm().format(lastLog);
+
+                              return InkWell(
+                                onTap: () {
+                                  chatSelected = index;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Chatroom(
+                                        recipient: snapshot_user
+                                            .data.docs[chatSelected]
+                                            .data(),
+                                        chatroomId: mod_chat(
+                                          FirebaseAuth
+                                              .instance.currentUser.displayName,
+                                          snapshot_user.data.docs[chatSelected]
+                                              .data(),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  height: 120,
                                   width:
                                       MediaQuery.of(context).size.width / 1.2,
-                                  child: Card(),
-                                );
-                              },
-                            );
-                          }
-                          return Container(
-                            color: Colors.blue,
+                                  child: Card(
+                                      elevation: 10,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10.0),
+                                        child: Row(
+                                          children: [
+                                            Avatar.large(
+                                              url: snapshot_user
+                                                  .data.docs[index]['dp'],
+                                            ),
+                                            SizedBox(
+                                              width: 20,
+                                            ),
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${snapshot_user.data.docs[index]['full_name']}',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 15),
+                                                ),
+                                                SizedBox(
+                                                  height: 12,
+                                                ),
+                                                Text(
+                                                  '${snapshot.data.docs[snapshot.data.docs.length - 1]['message']}',
+                                                  style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight: snapshot.data
+                                                                          .docs[
+                                                                      index]
+                                                                  ['sendby'] !=
+                                                              FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser
+                                                                  .displayName
+                                                          ? FontWeight.bold
+                                                          : FontWeight.normal),
+                                                ),
+                                              ],
+                                            ),
+                                            Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      '${time_sent}',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          fontSize: 10),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      )),
+                                ),
+                              );
+                            },
                           );
-                        })),
-                  )
-          ],
-        ),
+                        },
+                      );
+                    },
+                  ),
+                )
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: Container(
@@ -253,6 +357,15 @@ class _MessagePageState extends State<MessagePage> {
             Helpers.randomPictureUrl()),
       ),
     );
+  }
+
+  String mod_chat(String currentUser, Map<String, dynamic> data) {
+    String sendTo = data['full_name'];
+    if (currentUser[0].toLowerCase().codeUnits[0] >
+        sendTo[0].toLowerCase().codeUnits[0]) {
+      return "$currentUser$sendTo";
+    }
+    return "$sendTo$currentUser";
   }
 }
 

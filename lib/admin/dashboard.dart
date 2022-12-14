@@ -106,7 +106,6 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
       print(doc_idToDelete);
     });
   }
-
   List<String> header = [
     "Overview",
     "Graph",
