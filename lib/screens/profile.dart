@@ -1,28 +1,30 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:helpayr/constants/Theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:helpayr/constants/Theme.dart';
 //widgets
 import 'package:helpayr/widgets/navbar.dart';
 import 'package:helpayr/widgets/drawer.dart';
-import 'package:helpayr/widgets/photo-album.dart';
-
-List<String> imgArray = [
-  "assets/imgs/album-1.jpg",
-  "assets/imgs/album-2.jpg",
-  "assets/imgs/album-3.jpg",
-  "assets/imgs/album-4.jpg",
-  "assets/imgs/album-5.jpg",
-  "assets/imgs/album-6.jpg"
-];
+import 'package:intl/intl.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import '../Message/widgets/avatar.dart';
 
 class Profile extends StatefulWidget {
+  const Profile({Key key, this.isServicer = false, this.service, this.name})
+      : super(key: key);
+
   @override
   State<Profile> createState() => _ProfileState();
+  final bool isServicer;
+  final String service;
+  final String name;
 }
 
 class _ProfileState extends State<Profile> {
   final user = FirebaseAuth.instance.currentUser;
+  ScrollController _scroll = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -40,13 +42,13 @@ class _ProfileState extends State<Profile> {
           transparent: true,
         ),
         backgroundColor: HelpayrColors.bgColorScreen,
-        drawer: NowDrawer(currentPage: "Profile"),
+        drawer: widget.isServicer ? null : NowDrawer(currentPage: "Profile"),
         body: Stack(
           children: <Widget>[
             Column(
               children: [
                 Flexible(
-                  flex: 2,
+                  flex: 1,
                   child: Stack(children: [
                     Container(
                       decoration: BoxDecoration(
@@ -64,11 +66,11 @@ class _ProfileState extends State<Profile> {
                             left: false,
                             child: Padding(
                               padding: const EdgeInsets.only(
-                                  left: 0, right: 0, top: 10),
+                                  left: 0, right: 0, top: 0),
                               child: Column(
                                 children: [
                                   CircleAvatar(
-                                      radius: 90,
+                                      radius: 70,
                                       backgroundImage:
                                           NetworkImage(user.photoURL)),
                                   Row(
@@ -76,7 +78,7 @@ class _ProfileState extends State<Profile> {
                                     children: [
                                       Padding(
                                         padding:
-                                            const EdgeInsets.only(top: 30.0),
+                                            const EdgeInsets.only(top: 10.0),
                                         child: Text(user.displayName,
                                             style: TextStyle(
                                                 color: HelpayrColors.white,
@@ -87,7 +89,7 @@ class _ProfileState extends State<Profile> {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8.0),
-                                    child: Text("Freelancer",
+                                    child: Text(widget.service,
                                         style: TextStyle(
                                             color: HelpayrColors.white
                                                 .withOpacity(0.85),
@@ -103,76 +105,6 @@ class _ProfileState extends State<Profile> {
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600)),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 24.0, left: 42, right: 32),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text("2K",
-                                                style: TextStyle(
-                                                    color: HelpayrColors.white,
-                                                    fontSize: 16.0,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            Text("Friends",
-                                                style: TextStyle(
-                                                    color: HelpayrColors.white
-                                                        .withOpacity(0.8),
-                                                    fontSize: 12.0))
-                                          ],
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text("26",
-                                                style: TextStyle(
-                                                    color: HelpayrColors.white,
-                                                    fontSize: 16.0,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            Text("Comments",
-                                                style: TextStyle(
-                                                    color: HelpayrColors.white
-                                                        .withOpacity(0.8),
-                                                    fontSize: 12.0))
-                                          ],
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text("48",
-                                                style: TextStyle(
-                                                    color: HelpayrColors.white,
-                                                    fontSize: 16.0,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            Text("Bookmarks",
-                                                style: TextStyle(
-                                                    color: HelpayrColors.white
-                                                        .withOpacity(0.8),
-                                                    fontSize: 12.0))
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -185,35 +117,121 @@ class _ProfileState extends State<Profile> {
                 Flexible(
                   flex: 1,
                   child: Container(
-                      child: SingleChildScrollView(
-                          child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 32.0, right: 32.0, top: 42.0),
-                    child: Column(children: [
-                      Text("About me",
-                          style: TextStyle(
-                              color: HelpayrColors.text,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 17.0)),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 24.0, right: 24, top: 30, bottom: 24),
-                        child: Text(
-                            "Tempor sunt sint aliquip sit ex.Commodo amet aliquip elit in. Dolore culpa laboris tempor mollit. Consequat mollit enim qui dolore irure. Qui eu nulla et ad et fugiat ad nisi ullamco. Ullamco sint do excepteur reprehenderit duis deserunt aute id esse ex esse.",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: HelpayrColors.black.withOpacity(.8))),
-                      ),
-                      PhotoAlbum(imgArray: imgArray)
-                    ]),
-                  ))),
+                    child: StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection("Helpers")
+                            .doc("Service")
+                            .collection(widget.service)
+                            .doc(widget.name)
+                            .collection("Ratings")
+                            .orderBy("time", descending: true)
+                            .snapshots(),
+                        builder: ((context, snapshot) {
+                          return ListView.builder(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            controller: _scroll,
+                            scrollDirection: Axis.vertical,
+                            itemCount: snapshot.data.docs.length,
+                            itemBuilder: ((context, index) {
+                              DateTime lastLog =
+                                  (snapshot.data.docs[index]['time'].toDate());
+                              String time_review =
+                                  DateFormat.yMMMd().add_jm().format(lastLog);
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  child: Card(
+                                      elevation: 10,
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(20.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Flexible(
+                                                  child: Avatar.medium(
+                                                      url: snapshot
+                                                              .data.docs[index]
+                                                          ['user_pic']),
+                                                ),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Flexible(
+                                                  flex: 2,
+                                                  child: Column(
+                                                    children: [
+                                                      Text(
+                                                        '${snapshot.data.docs[index]['user']}',
+                                                        style:
+                                                            GoogleFonts.raleway(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                      ),
+                                                      RatingBarIndicator(
+                                                        rating: snapshot.data
+                                                                .docs[index]
+                                                            ['user_rating'],
+                                                        itemBuilder:
+                                                            (context, index) =>
+                                                                Icon(
+                                                          Icons.star,
+                                                          color: Colors.blue,
+                                                        ),
+                                                        itemCount: 5,
+                                                        itemSize: 20.0,
+                                                        direction:
+                                                            Axis.horizontal,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  child: Text(
+                                                    '${time_review}',
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 10),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 15.0, vertical: 15),
+                                            child: Text(
+                                              '${snapshot.data.docs[index]['review']}',
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )),
+                                ),
+                              );
+                            }),
+                          );
+                        })),
+                  ),
                 ),
               ],
+            ),
+            SizedBox(
+              height: 20,
             ),
             Align(
               alignment: Alignment.center,
               child: Padding(
-                padding: const EdgeInsets.only(left: 0.0, top: 235),
+                padding: const EdgeInsets.only(left: 0.0, top: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -232,7 +250,7 @@ class _ProfileState extends State<Profile> {
                         child: Padding(
                             padding: EdgeInsets.only(
                                 left: 12.0, right: 12.0, top: 10, bottom: 10),
-                            child: Text("Follow",
+                            child: Text("Reviews",
                                 style: TextStyle(
                                     fontSize: 13.0, color: Colors.white))),
                       ),
@@ -244,7 +262,7 @@ class _ProfileState extends State<Profile> {
                         onPressed: () {},
                         elevation: 4.0,
                         fillColor: HelpayrColors.white,
-                        child: Icon(FontAwesomeIcons.twitter,
+                        child: Icon(FontAwesomeIcons.star,
                             size: 14.0, color: Colors.blue),
                         padding: EdgeInsets.all(0.0),
                         shape: CircleBorder(),
@@ -257,21 +275,11 @@ class _ProfileState extends State<Profile> {
                         onPressed: () {},
                         elevation: 4.0,
                         fillColor: HelpayrColors.white,
-                        child: Icon(FontAwesomeIcons.tiktok,
+                        child: Icon(FontAwesomeIcons.pen,
                             size: 14.0, color: Colors.black),
                         padding: EdgeInsets.all(0.0),
                         shape: CircleBorder(),
                       ),
-                    ),
-                    RawMaterialButton(
-                      constraints: BoxConstraints.tight(Size(38, 38)),
-                      onPressed: () {},
-                      elevation: 4.0,
-                      fillColor: HelpayrColors.white,
-                      child: Icon(FontAwesomeIcons.pinterest,
-                          size: 14.0, color: Colors.red),
-                      padding: EdgeInsets.all(0.0),
-                      shape: CircleBorder(),
                     ),
                   ],
                 ),

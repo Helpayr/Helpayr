@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:helpayr/screens/select_service.dart';
 import 'package:helpayr/screens/when_complete.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -339,7 +340,7 @@ class _ProfileMakerState extends State<ProfileMaker>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => WhenCompleted(),
+            builder: (context) => Service_ChooseFirst(),
           ),
         );
       }

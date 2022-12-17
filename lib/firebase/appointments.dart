@@ -121,8 +121,12 @@ class _AppointmentState extends State<Appointment>
       "notes": _notes.text,
       "uid": FirebaseAuth.instance.currentUser.uid,
       'is_pending': true,
+      "location": _location.text,
+      "phone_number_user": FirebaseAuth.instance.currentUser.phoneNumber,
     });
   }
+
+  TextEditingController _location = TextEditingController();
 
   void set_appointment_user(String service) async {
     await FirebaseFirestore.instance
@@ -145,6 +149,8 @@ class _AppointmentState extends State<Appointment>
       "service": service,
       "uid": FirebaseAuth.instance.currentUser.uid,
       'is_pending': true,
+      "location": _location.text,
+      "phone_number_user": FirebaseAuth.instance.currentUser.phoneNumber,
     });
   }
 
@@ -704,6 +710,34 @@ class _AppointmentState extends State<Appointment>
                 maxLines: 5,
                 decoration: InputDecoration(
                   hintText: "Add some notes",
+                  hintStyle: TextStyle(color: Colors.black),
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Container(
+              height: 50,
+              width: MediaQuery.of(context).size.width / 1.2,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(3, 0),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
+              child: TextField(
+                textAlign: TextAlign.center,
+                controller: _location,
+                maxLines: 5,
+                decoration: InputDecoration(
+                  hintText: "Add specific location",
                   hintStyle: TextStyle(color: Colors.black),
                   border: InputBorder.none,
                 ),

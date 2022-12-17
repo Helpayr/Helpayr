@@ -211,6 +211,13 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
                     child: PageView(
+                      onPageChanged: (value) {
+                        setState(() {
+                          pending = value == 0;
+                          accepted = value == 1;
+                          cancel = value == 2;
+                        });
+                      },
                       controller: _pageController,
                       children: [
                         Column(
@@ -225,274 +232,9 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                       .where('is_pending', isEqualTo: true)
                                       .snapshots(),
                                   builder: (context, snapshot) {
-                                    return ListView.builder(
-                                      itemCount: snapshot.data.docs.length,
-                                      itemBuilder: ((context, index) {
-                                        DateTime lastLog = (snapshot
-                                            .data.docs[index]['time']
-                                            .toDate());
-                                        String time_review = DateFormat.yMMMd()
-                                            .add_jm()
-                                            .format(lastLog);
-                                        return Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            elevation: 5,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      Avatar.large(
-                                                        url: snapshot.data
-                                                                .docs[index]
-                                                            ['servicer_dp'],
-                                                      ),
-                                                      SizedBox(
-                                                        width: 30,
-                                                      ),
-                                                      Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Text(
-                                                            "${snapshot.data.docs[index]['servicer']}",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 15,
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                            height: 5,
-                                                          ),
-                                                          Text(
-                                                            "${snapshot.data.docs[index]['service']}",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 12,
-                                                            ),
-                                                          ),
-                                                          Text("${time_review}")
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Icon(
-                                                        FontAwesomeIcons
-                                                            .calendar,
-                                                        color: Colors.black,
-                                                      ),
-                                                      SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            '${snapshot.data.docs[index]['date']}, ${snapshot.data.docs[index]['hour']}  ',
-                                                            style: GoogleFonts
-                                                                .raleway(
-                                                                    color: Colors
-                                                                        .black,
-                                                                    fontSize:
-                                                                        15,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                          ),
-                                                          Text(
-                                                            "Booking Date (Start)",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: 10,
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Icon(
-                                                        FontAwesomeIcons
-                                                            .calendarMinus,
-                                                        color: Colors.red,
-                                                      ),
-                                                      SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            '${snapshot.data.docs[index]['end_Date']}, ${snapshot.data.docs[index]['hour_end']}  ',
-                                                            style: GoogleFonts
-                                                                .raleway(
-                                                                    color: Colors
-                                                                        .red,
-                                                                    fontSize:
-                                                                        15,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                          ),
-                                                          Text(
-                                                            "Booking Date (End)",
-                                                            style: TextStyle(
-                                                              color: Colors.red,
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(
-                                                    height: 20,
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 50.0),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        GestureDetector(
-                                                          onTap: () async {
-                                                            FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    "Users")
-                                                                .doc(FirebaseAuth
-                                                                    .instance
-                                                                    .currentUser
-                                                                    .uid)
-                                                                .collection(
-                                                                    "Bookings")
-                                                                .where(
-                                                                    'is_pending',
-                                                                    isEqualTo:
-                                                                        true)
-                                                                .get()
-                                                                .then((value) =>
-                                                                    value.docs
-                                                                        .forEach(
-                                                                            (element) {
-                                                                      sorted
-                                                                          .add(
-                                                                        element
-                                                                            .reference
-                                                                            .id,
-                                                                      );
-                                                                    }));
-
-                                                            showDialog(
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    ((context) =>
-                                                                        AlertDialog(
-                                                                          actions: [
-                                                                            TextButton.icon(
-                                                                                onPressed: () async {
-                                                                                  await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser.uid).collection("Bookings").doc(sorted[index - 1]).delete();
-                                                                                },
-                                                                                icon: Icon(Icons.check),
-                                                                                label: Text("Yes")),
-                                                                            TextButton.icon(
-                                                                                onPressed: () async {
-                                                                                  Navigator.of(context).pop();
-                                                                                },
-                                                                                icon: Icon(Icons.deselect),
-                                                                                label: Text("No"))
-                                                                          ],
-                                                                          title:
-                                                                              Text(
-                                                                            "Cancel Confirmation",
-                                                                            style:
-                                                                                GoogleFonts.raleway(fontWeight: FontWeight.bold),
-                                                                          ),
-                                                                          content:
-                                                                              Text(
-                                                                            "The selected appointment will be permanently deleted. Proceed?",
-                                                                            style:
-                                                                                GoogleFonts.raleway(fontWeight: FontWeight.normal),
-                                                                          ),
-                                                                        )));
-                                                          },
-                                                          child: Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              border: Border.all(
-                                                                  width: 2,
-                                                                  color: Colors
-                                                                      .black),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                            ),
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(8.0),
-                                                              child: Text(
-                                                                "Cancel",
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        TextButton.icon(
-                                                            onPressed: () {},
-                                                            icon: Icon(
-                                                                Icons.message),
-                                                            label:
-                                                                Text("Message"))
-                                                      ],
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      }),
+                                    return Pending(
+                                      sorted: sorted,
+                                      snapshot: snapshot,
                                     );
                                   }),
                             )
@@ -557,13 +299,18 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                                               MainAxisAlignment
                                                                   .center,
                                                           children: [
-                                                            Text(
-                                                              "${snapshot.data.docs[index]['servicer']}",
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 15,
+                                                            FittedBox(
+                                                              fit: BoxFit
+                                                                  .fitWidth,
+                                                              child: Text(
+                                                                "${snapshot.data.docs[index]['servicer']}",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 15,
+                                                                ),
                                                               ),
                                                             ),
                                                             SizedBox(
@@ -669,7 +416,46 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                                       ],
                                                     ),
                                                     SizedBox(
-                                                      height: 20,
+                                                      height: 10,
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(
+                                                          FontAwesomeIcons
+                                                              .mapMarked,
+                                                          color: Colors.blue,
+                                                        ),
+                                                        SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              '${snapshot.data.docs[index]['location']} ',
+                                                              style: GoogleFonts.raleway(
+                                                                  color: Colors
+                                                                      .blue,
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                            Text(
+                                                              "Location",
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.blue,
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ],
                                                     ),
                                                     Padding(
                                                       padding: const EdgeInsets
@@ -690,7 +476,7 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                                                             Chatroom(
                                                                       recipient: snapshot_chat
                                                                           .data
-                                                                          .docs[index],
+                                                                          .data(),
                                                                       chatroomId: mod_chat(
                                                                           FirebaseAuth
                                                                               .instance
@@ -698,7 +484,7 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                                                               .displayName,
                                                                           snapshot_chat
                                                                               .data
-                                                                              .docs[index]),
+                                                                              .data()),
                                                                     ),
                                                                   ),
                                                                 );
@@ -771,13 +557,17 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                                             MainAxisAlignment
                                                                 .center,
                                                         children: [
-                                                          Text(
-                                                            "${snapshot.data.docs[index]['servicer']}",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 15,
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              "${snapshot.data.docs[index]['servicer']}",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 15,
+                                                              ),
                                                             ),
                                                           ),
                                                           SizedBox(
@@ -885,20 +675,65 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                                     ],
                                                   ),
                                                   SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Icon(
+                                                        FontAwesomeIcons
+                                                            .mapMarked,
+                                                        color: Colors.blue,
+                                                      ),
+                                                      SizedBox(
+                                                        width: 10,
+                                                      ),
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            '${snapshot.data.docs[index]['location']} ',
+                                                            style: GoogleFonts
+                                                                .raleway(
+                                                                    color: Colors
+                                                                        .blue,
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                          ),
+                                                          Text(
+                                                            "Location",
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.blue,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(
                                                     height: 20,
                                                   ),
                                                   GestureDetector(
                                                     onTap: () {
                                                       Chatroom(
                                                         recipient: snapshot
-                                                            .data.docs
+                                                            .data.docs[index]
                                                             .data(),
                                                         chatroomId: mod_chat(
                                                             FirebaseAuth
                                                                 .instance
                                                                 .currentUser
                                                                 .displayName,
-                                                            snapshot.data.docs
+                                                            snapshot.data
+                                                                .docs[index]
                                                                 .data()),
                                                       );
                                                     },
@@ -951,5 +786,261 @@ class _Dashboard_UserState extends State<Dashboard_User> {
       return "$currentUser$sendTo";
     }
     return "$sendTo$currentUser";
+  }
+}
+
+class Pending extends StatelessWidget {
+  const Pending({
+    Key key,
+    @required this.sorted,
+    this.snapshot,
+  }) : super(key: key);
+
+  final List<String> sorted;
+  final AsyncSnapshot<dynamic> snapshot;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: snapshot.data.docs.length,
+      itemBuilder: ((context, index) {
+        DateTime lastLog = (snapshot.data.docs[index]['time'].toDate());
+        String time_review = DateFormat.yMMMd().add_jm().format(lastLog);
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            elevation: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Avatar.large(
+                        url: snapshot.data.docs[index]['servicer_dp'],
+                      ),
+                      SizedBox(
+                        width: 30,
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FittedBox(
+                            fit: BoxFit.fitWidth,
+                            child: Text(
+                              "${snapshot.data.docs[index]['servicer']}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            "${snapshot.data.docs[index]['service']}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Text("${time_review}")
+                        ],
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.calendar,
+                        color: Colors.black,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${snapshot.data.docs[index]['date']}, ${snapshot.data.docs[index]['hour']}  ',
+                            style: GoogleFonts.raleway(
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "Booking Date (Start)",
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.calendarMinus,
+                        color: Colors.red,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${snapshot.data.docs[index]['end_Date']}, ${snapshot.data.docs[index]['hour_end']}  ',
+                            style: GoogleFonts.raleway(
+                                color: Colors.red,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "Booking Date (End)",
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        FontAwesomeIcons.mapMarked,
+                        color: Colors.blue,
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${snapshot.data.docs[index]['location']} ',
+                            style: GoogleFonts.raleway(
+                                color: Colors.blue,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "Location",
+                            style: TextStyle(
+                              color: Colors.blue,
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            FirebaseFirestore.instance
+                                .collection("Users")
+                                .doc(FirebaseAuth.instance.currentUser.uid)
+                                .collection("Bookings")
+                                .where('is_pending', isEqualTo: true)
+                                .get()
+                                .then((value) => value.docs.forEach((element) {
+                                      sorted.add(
+                                        element.reference.id,
+                                      );
+                                    }));
+
+                            showDialog(
+                                context: context,
+                                builder: ((context) => AlertDialog(
+                                      actions: [
+                                        TextButton.icon(
+                                            onPressed: () async {
+                                              await FirebaseFirestore.instance
+                                                  .collection("Users")
+                                                  .doc(FirebaseAuth
+                                                      .instance.currentUser.uid)
+                                                  .collection("Bookings")
+                                                  .doc(sorted[index])
+                                                  .delete()
+                                                  .whenComplete(() {
+                                                Navigator.of(context).pop();
+                                              });
+                                            },
+                                            icon: Icon(Icons.check),
+                                            label: Text("Yes")),
+                                        TextButton.icon(
+                                            onPressed: () async {
+                                              Navigator.of(context).pop();
+                                            },
+                                            icon: Icon(Icons.deselect),
+                                            label: Text("No"))
+                                      ],
+                                      title: Text(
+                                        "Cancel Confirmation",
+                                        style: GoogleFonts.raleway(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      content: Text(
+                                        "The selected appointment will be permanently deleted. Proceed?",
+                                        style: GoogleFonts.raleway(
+                                            fontWeight: FontWeight.normal),
+                                      ),
+                                    )));
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(width: 2, color: Colors.black),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        TextButton.icon(
+                            onPressed: () {},
+                            icon: Icon(Icons.message),
+                            label: Text("Message"))
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      }),
+    );
   }
 }

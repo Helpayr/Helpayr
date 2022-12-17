@@ -8,9 +8,11 @@ import 'package:helpayr/screens/messaging.dart';
 import 'package:helpayr/screens/onboarding/onboarding.dart';
 import 'package:helpayr/screens/home.dart';
 import 'package:helpayr/screens/onboarding/slide_onboarding.dart';
+import 'package:helpayr/screens/privacy_policy.dart';
 import 'package:helpayr/screens/profile.dart';
 import 'package:helpayr/screens/settings.dart';
 import 'package:helpayr/screens/register.dart';
+import 'package:helpayr/widgets/about_us.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -64,6 +66,12 @@ class MyApp extends StatelessWidget {
                   ),
               "/messaging": (BuildContext context) => noback(
                     wid: new Messaging(),
+                  ),
+              "/about": (BuildContext context) => noback(
+                    wid: new About_Us(),
+                  ),
+              "/privacy": (BuildContext context) => noback(
+                    wid: new Privacy(),
                   ),
               "/profile": (BuildContext context) => new Profile(),
               "/services": (BuildContext context) => new Services(),

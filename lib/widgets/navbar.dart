@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:helpayr/widgets/input.dart';
 
 import '../main.dart';
-import '../screens/profile.dart';
+import '../screens/user_profile.dart';
 
 class Navbar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
@@ -241,8 +241,67 @@ class _NavbarState extends State<Navbar> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => Profile(),
-                                      ),
+                                          builder: (context) => User_Profile(
+                                                ontap: () {
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return AlertDialog(
+                                                          title: Text(
+                                                              "Are you sure you want to log-out?"),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed:
+                                                                  () async {
+                                                                await FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        "Users")
+                                                                    .doc(FirebaseAuth
+                                                                        .instance
+                                                                        .currentUser
+                                                                        .uid)
+                                                                    .update({
+                                                                  "status_log":
+                                                                      "Offline"
+                                                                });
+                                                                final provider =
+                                                                    Provider.of<
+                                                                            GoogleSignUpProvider>(
+                                                                        context,
+                                                                        listen:
+                                                                            false);
+                                                                provider
+                                                                    .logout()
+                                                                    .then(
+                                                                        (value) {
+                                                                  Navigator
+                                                                      .push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          noback(
+                                                                              wid: ChooseLogin()),
+                                                                    ),
+                                                                  );
+                                                                });
+                                                              },
+                                                              child:
+                                                                  Text("Yes"),
+                                                            ),
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                },
+                                                                child:
+                                                                    Text("No"))
+                                                          ],
+                                                        );
+                                                      });
+                                                },
+                                              )),
                                     );
                                   },
                                   child: Padding(

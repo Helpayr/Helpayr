@@ -42,7 +42,11 @@ class _Servicer_DashboardState extends State<Servicer_Dashboard> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => Profile(),
+                    builder: (context) => Profile(
+                      isServicer: true,
+                      name: FirebaseAuth.instance.currentUser.displayName,
+                      service: widget.service,
+                    ),
                   ),
                 );
               },
@@ -207,7 +211,7 @@ class Home extends StatelessWidget {
                     .collection(widget.service)
                     .doc(FirebaseAuth.instance.currentUser.displayName)
                     .collection("Bookings")
-                    .orderBy('time', descending: true)
+                    .where('is_pending', isEqualTo: true)
                     .snapshots(),
                 builder: ((context, snapshot) {
                   return ListView.builder(
@@ -231,8 +235,6 @@ class Home extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            height: 200,
-                            width: MediaQuery.of(context).size.width / 1.1,
                             child: Card(
                               color: Colors.white,
                               elevation: 10,

@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/Message/widgets/widget.dart';
 import 'package:intl/intl.dart';
 
+import '../Message/pages/chatroom.dart';
+
 class Schedule_Service extends StatefulWidget {
   const Schedule_Service({key, this.service, this.controller});
   final String service;
@@ -25,6 +27,15 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
   List<String> sorted = [];
   List<String> user_sorted = [];
   List<String> sorted_accept = [];
+  String mod_chat(String currentUser, Map<String, dynamic> data) {
+    String sendTo = data['full_name'];
+    if (currentUser[0].toLowerCase().codeUnits[0] >
+        sendTo[0].toLowerCase().codeUnits[0]) {
+      return "$currentUser$sendTo";
+    }
+    return "$sendTo$currentUser";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -329,6 +340,45 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                               ],
                                             ),
                                             SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  FontAwesomeIcons.mapMarked,
+                                                  color: Colors.blue,
+                                                ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      '${snapshot.data.docs[index]['location']} ',
+                                                      style:
+                                                          GoogleFonts.raleway(
+                                                              color:
+                                                                  Colors.blue,
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                    ),
+                                                    Text(
+                                                      "Location",
+                                                      style: TextStyle(
+                                                        color: Colors.blue,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
                                               height: 20,
                                             ),
                                             Padding(
@@ -350,6 +400,9 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                                                     actions: [
                                                                       TextButton.icon(
                                                                           onPressed: () async {
+                                                                            _pageController.animateToPage(2, duration: Duration(milliseconds: 300), curve: Curves.easeInOut).whenComplete(() {
+                                                                              Navigator.of(context).pop();
+                                                                            });
                                                                             await FirebaseFirestore.instance.collection("Helpers").doc("Service").collection(widget.service).doc(FirebaseAuth.instance.currentUser.displayName).collection("Bookings").where('is_pending', isEqualTo: true).get().then((value) =>
                                                                                 value.docs.forEach((element) {
                                                                                   sorted.add(
@@ -357,23 +410,20 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                                                                   );
                                                                                 }));
 
-                                                                            FirebaseFirestore.instance.collection("Helpers").doc("Service").collection(widget.service).doc(FirebaseAuth.instance.currentUser.displayName).collection("Bookings").doc(sorted[index]).update({
-                                                                              'is_accepted': false,
+                                                                            await FirebaseFirestore.instance.collection("Helpers").doc("Service").collection(widget.service).doc(FirebaseAuth.instance.currentUser.displayName).collection("Bookings").doc(sorted[index]).update({
                                                                               'is_pending': false,
+                                                                              'is_accepted': false,
                                                                             });
 
-                                                                            FirebaseFirestore.instance.collection("Users").doc('${snapshot.data.docs[index]['uid']}').collection("Bookings").orderBy('time', descending: true).get().then((value) =>
+                                                                            await FirebaseFirestore.instance.collection("Users").doc('${snapshot.data.docs[index]['uid']}').collection("Bookings").orderBy('time', descending: true).get().then((value) =>
                                                                                 value.docs.forEach((element) {
                                                                                   user_sorted.add(
                                                                                     element.reference.id,
                                                                                   );
                                                                                 }));
-                                                                            FirebaseFirestore.instance.collection("Users").doc('${snapshot.data.docs[index]['uid']}').collection("Bookings").doc(user_sorted[index]).update({
+                                                                            await FirebaseFirestore.instance.collection("Users").doc('${snapshot.data.docs[index]['uid']}').collection("Bookings").doc(user_sorted[index]).update({
                                                                               'is_accepted': false,
                                                                               'is_pending': false,
-                                                                            });
-                                                                            _pageController.animateToPage(2, duration: Duration(milliseconds: 300), curve: Curves.easeInOut).whenComplete(() {
-                                                                              Navigator.of(context).pop();
                                                                             });
                                                                           },
                                                                           icon: Icon(Icons.check),
@@ -434,7 +484,10 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                                                     actions: [
                                                                       TextButton.icon(
                                                                           onPressed: () async {
-                                                                            FirebaseFirestore.instance.collection("Helpers").doc("Service").collection(widget.service).doc(FirebaseAuth.instance.currentUser.displayName).collection("Bookings").where('is_pending', isEqualTo: true).get().then((value) =>
+                                                                            _pageController.animateToPage(1, duration: Duration(milliseconds: 300), curve: Curves.easeInOut).whenComplete(() {
+                                                                              Navigator.of(context).pop();
+                                                                            });
+                                                                            await FirebaseFirestore.instance.collection("Helpers").doc("Service").collection(widget.service).doc(FirebaseAuth.instance.currentUser.displayName).collection("Bookings").where('is_pending', isEqualTo: true).get().then((value) =>
                                                                                 value.docs.forEach((element) {
                                                                                   sorted.add(
                                                                                     element.reference.id,
@@ -446,7 +499,7 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                                                               'is_pending': false,
                                                                             });
 
-                                                                            FirebaseFirestore.instance.collection("Users").doc('${snapshot.data.docs[index]['uid']}').collection("Bookings").orderBy('time', descending: true).get().then((value) =>
+                                                                            await FirebaseFirestore.instance.collection("Users").doc('${snapshot.data.docs[index]['uid']}').collection("Bookings").orderBy('time', descending: true).get().then((value) =>
                                                                                 value.docs.forEach((element) {
                                                                                   user_sorted.add(
                                                                                     element.reference.id,
@@ -455,9 +508,6 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                                                             await FirebaseFirestore.instance.collection("Users").doc('${snapshot.data.docs[index]['uid']}').collection("Bookings").doc(user_sorted[index]).update({
                                                                               'is_accepted': true,
                                                                               'is_pending': false,
-                                                                            });
-                                                                            _pageController.animateToPage(1, duration: Duration(milliseconds: 300), curve: Curves.easeInOut).whenComplete(() {
-                                                                              Navigator.of(context).pop();
                                                                             });
                                                                           },
                                                                           icon: Icon(Icons.check),
@@ -545,128 +595,217 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                   String time_review = DateFormat.yMMMd()
                                       .add_jm()
                                       .format(lastLog);
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Card(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      elevation: 5,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Avatar.large(
-                                                  url: snapshot.data.docs[index]
-                                                      ['user_dp'],
-                                                ),
-                                                SizedBox(
-                                                  width: 30,
-                                                ),
-                                                Column(
+                                  return StreamBuilder(
+                                    stream: FirebaseFirestore.instance
+                                        .collection("Users")
+                                        .doc(snapshot.data.docs[index]['uid'])
+                                        .snapshots(),
+                                    builder: (context, snapchat) => Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Card(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        elevation: 5,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Avatar.large(
+                                                    url: snapshot.data
+                                                        .docs[index]['user_dp'],
+                                                  ),
+                                                  SizedBox(
+                                                    width: 30,
+                                                  ),
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(
+                                                        "${snapshot.data.docs[index]['user']}",
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 18,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 10,
+                                                      ),
+                                                      Text("${time_review}")
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    FontAwesomeIcons.calendar,
+                                                    color: Colors.black,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        '${snapshot.data.docs[index]['date']}, ${snapshot.data.docs[index]['hour']}  ',
+                                                        style:
+                                                            GoogleFonts.raleway(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                      ),
+                                                      Text(
+                                                        "Booking Date (Start)",
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    FontAwesomeIcons
+                                                        .calendarMinus,
+                                                    color: Colors.red,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        '${snapshot.data.docs[index]['end_Date']}, ${snapshot.data.docs[index]['hour_end']}  ',
+                                                        style:
+                                                            GoogleFonts.raleway(
+                                                                color:
+                                                                    Colors.red,
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                      ),
+                                                      Text(
+                                                        "Booking Date (End)",
+                                                        style: TextStyle(
+                                                          color: Colors.red,
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Icon(
+                                                    FontAwesomeIcons.mapMarked,
+                                                    color: Colors.blue,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        '${snapshot.data.docs[index]['location']} ',
+                                                        style:
+                                                            GoogleFonts.raleway(
+                                                                color:
+                                                                    Colors.blue,
+                                                                fontSize: 15,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                      ),
+                                                      Text(
+                                                        "Location",
+                                                        style: TextStyle(
+                                                          color: Colors.blue,
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 20,
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 50.0),
+                                                child: Row(
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   children: [
-                                                    Text(
-                                                      "${snapshot.data.docs[index]['user']}",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 18,
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      height: 10,
-                                                    ),
-                                                    Text("${time_review}")
-                                                  ],
-                                                )
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  FontAwesomeIcons.calendar,
-                                                  color: Colors.black,
-                                                ),
-                                                SizedBox(
-                                                  width: 10,
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      '${snapshot.data.docs[index]['date']}, ${snapshot.data.docs[index]['hour']}  ',
-                                                      style:
-                                                          GoogleFonts.raleway(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                    ),
-                                                    Text(
-                                                      "Booking Date (Start)",
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                      ),
-                                                    )
+                                                    TextButton.icon(
+                                                        onPressed: () {
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder:
+                                                                  (context) =>
+                                                                      Chatroom(
+                                                                recipient:
+                                                                    snapchat
+                                                                        .data
+                                                                        .data(),
+                                                                chatroomId: mod_chat(
+                                                                    FirebaseAuth
+                                                                        .instance
+                                                                        .currentUser
+                                                                        .displayName,
+                                                                    snapchat
+                                                                        .data
+                                                                        .data()),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                        icon:
+                                                            Icon(Icons.message),
+                                                        label: Text("Message"))
                                                   ],
                                                 ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: 10,
-                                            ),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  FontAwesomeIcons
-                                                      .calendarMinus,
-                                                  color: Colors.red,
-                                                ),
-                                                SizedBox(
-                                                  width: 10,
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      '${snapshot.data.docs[index]['end_Date']}, ${snapshot.data.docs[index]['hour_end']}  ',
-                                                      style:
-                                                          GoogleFonts.raleway(
-                                                              color: Colors.red,
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                    ),
-                                                    Text(
-                                                      "Booking Date (End)",
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                          ],
+                                              )
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -813,6 +952,45 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                                       "Booking Date (End)",
                                                       style: TextStyle(
                                                         color: Colors.red,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(
+                                                  FontAwesomeIcons.mapMarked,
+                                                  color: Colors.blue,
+                                                ),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      '${snapshot.data.docs[index]['location']} ',
+                                                      style:
+                                                          GoogleFonts.raleway(
+                                                              color:
+                                                                  Colors.blue,
+                                                              fontSize: 15,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                    ),
+                                                    Text(
+                                                      "Location",
+                                                      style: TextStyle(
+                                                        color: Colors.blue,
                                                       ),
                                                     )
                                                   ],

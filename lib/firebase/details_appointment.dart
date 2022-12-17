@@ -51,7 +51,7 @@ class _DetailsBookingState extends State<DetailsBooking> {
                   padding: EdgeInsets.only(
                       left: 20.0,
                       right: 20.0,
-                      top: 60,
+                      top: 40,
                       bottom: snapshot.data.docs[0]['is_accepted'] ? 0 : 70),
                   child: Container(
                     child: Card(
@@ -480,7 +480,7 @@ class _DetailsBookingState extends State<DetailsBooking> {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(10.0),
               child: Text("Go to Dashboard",
                   style: TextStyle(fontWeight: FontWeight.bold)),
             ),

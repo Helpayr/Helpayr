@@ -3,8 +3,7 @@ import 'package:circle_bottom_navigation_bar/widgets/tab_data.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:helpayr/Message/pages/messages_page.dart';
-import 'package:helpayr/Message/widgets/widget.dart';
-import 'package:helpayr/screens/profile.dart';
+import 'package:helpayr/screens/user_profile.dart';
 import 'package:helpayr/widgets/drawer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -34,19 +33,13 @@ class _MessagingState extends State<Messaging> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        leading: Center(
-          child: IconBackground(
-            onTap: () {},
-            icon: Icons.search,
-          ),
-        ),
         actions: [
           GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => Profile(),
+                  builder: (context) => User_Profile(),
                 ),
               );
             },

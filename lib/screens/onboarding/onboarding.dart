@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:helpayr/constants/Theme.dart';
 import 'package:helpayr/screens/googleLogin.dart';
+import 'package:helpayr/screens/terms_and_conditions.dart';
 import 'package:page_transition/page_transition.dart';
 
 class Onboarding extends StatefulWidget {
@@ -10,6 +11,7 @@ class Onboarding extends StatefulWidget {
 }
 
 class _OnboardingState extends State<Onboarding> {
+  bool isClicked = false;
   @override
   Widget build(BuildContext context) {
     final ButtonStyle button = TextButton.styleFrom(
@@ -68,22 +70,24 @@ class _OnboardingState extends State<Onboarding> {
         SafeArea(
             child: Center(
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 70.0),
+            padding: const EdgeInsets.only(bottom: 100.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      PageTransition(
-                        type: PageTransitionType.rightToLeft,
-                        duration: Duration(milliseconds: 200),
-                        child: ChooseLogin(),
-                        childCurrent: Onboarding(),
-                      ),
-                    );
-                  },
+                  onTap: isClicked
+                      ? () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                              type: PageTransitionType.rightToLeft,
+                              duration: Duration(milliseconds: 200),
+                              child: ChooseLogin(),
+                              childCurrent: Onboarding(),
+                            ),
+                          );
+                        }
+                      : null,
                   child: Container(
                     width: MediaQuery.of(context).size.width / 2,
                     height: 50,
@@ -114,9 +118,11 @@ class _OnboardingState extends State<Onboarding> {
                   height: 10,
                 ),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
+                  onTap: isClicked
+                      ? () {
+                          Navigator.pushNamed(context, '/login');
+                        }
+                      : null,
                   child: Container(
                     child: Center(
                       child: Text(
@@ -143,6 +149,38 @@ class _OnboardingState extends State<Onboarding> {
                     ),
                   ),
                 ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                        activeColor: Colors.blue,
+                        fillColor: MaterialStateProperty.all(Colors.white),
+                        value: isClicked,
+                        onChanged: (newbool) {
+                          setState(() {
+                            isClicked = newbool;
+                          });
+                          print(isClicked);
+                        }),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Terms(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Terms and Conditions ",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),

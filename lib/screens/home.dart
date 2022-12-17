@@ -20,7 +20,6 @@ import 'package:hidable/hidable.dart';
 
 import '../firebase/List_data_page.dart';
 import '../services/designing/list_services.dart';
-import '../services/editing/editing_main.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // import 'package:helpayr/screens/product.dart';
@@ -77,8 +76,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
 
   List<String> header = [
     "Frequents",
-    "Designing",
-    "Multimedia",
+    "Favorites",
   ];
 
   CurvedNavigationBar navbar() {
@@ -163,8 +161,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                     curve: Curves.easeInCirc,
                     height: isSelected == index ? 67 : 65,
                     width: isSelected == index
-                        ? MediaQuery.of(context).size.width / 2.6
-                        : MediaQuery.of(context).size.width / 3.8,
+                        ? MediaQuery.of(context).size.width / 2.0
+                        : MediaQuery.of(context).size.width / 3.0,
                     child: Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -223,7 +221,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   scrollController: listviewctrl,
                 ),
                 Designing(),
-                Editing(),
               ],
             ),
           )
@@ -255,7 +252,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
             ? null
             : Hidable(
                 wOpacity: true,
-                preferredWidgetSize: Size.fromHeight(195),
+                preferredWidgetSize: Size.fromHeight(150),
                 controller: _scrollController,
                 child: Navbar(
                   greetings: true,
@@ -265,10 +262,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   title: "Home",
                   searchBar: true,
                   isOnSearch: true,
-                  category1_icon: FontAwesomeIcons.arrowUp,
-                  category2_icon: FontAwesomeIcons.heart,
-                  categoryOne: "Trending",
-                  categoryTwo: "Favorites",
                 ),
               ),
         backgroundColor: HelpayrColors.bgColorScreen,

@@ -4,10 +4,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/admin/dashboard.dart';
 import 'package:helpayr/screens/login.dart';
-import 'package:helpayr/screens/select_service.dart';
 import 'package:helpayr/screens/sign_up.dart';
 import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
+import '../Message/screens/welcome_helper.dart';
 import '../constants/Theme.dart';
 import '../firebase/authenticate.dart';
 import '../firebase/googleSignIn.dart';
@@ -579,8 +579,7 @@ class _ChooseLoginState extends State<ChooseLogin> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            Service_ChooseFirst(),
+                                        builder: (context) => Welcome_Helper(),
                                       ),
                                     );
                                   });

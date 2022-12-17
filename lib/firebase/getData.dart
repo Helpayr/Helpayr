@@ -612,191 +612,254 @@ class _ServicePageState extends State<ServicePage> {
 
   Scaffold Show_reviews(BuildContext context) {
     ScrollController _scroll = ScrollController();
-    double total_review = 0;
+
     return Scaffold(
       extendBody: true,
-      extendBodyBehindAppBar: false,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
         centerTitle: true,
+        leading: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ServicePage(widget.data, widget.widget),
+              ),
+            );
+          },
+          child: Icon(Icons.arrow_back_ios, color: Colors.black),
+        ),
         title: Text(
           "Ratings and Reviews",
-          style: GoogleFonts.raleway(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.black),
         ),
       ),
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedContainer(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    offset: Offset(3, 0),
-                    blurRadius: 6,
-                  ),
-                ],
-              ),
-              curve: Curves.easeInOut,
-              duration: Duration(milliseconds: 400),
-              height: 150,
-              width: MediaQuery.of(context).size.width / 1.3,
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 15,
-                child: Row(
-                  children: [
-                    Flexible(
-                        flex: 2,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                bottomLeft: Radius.circular(10),
-                              ),
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: NetworkImage(widget.data['dp']))),
-                        )),
-                    Flexible(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            FittedBox(
-                              child: Text(
-                                '${widget.data['full_name']}',
-                                style: GoogleFonts.raleway(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              fit: BoxFit.fitWidth,
-                            ),
-                            Text('${widget.data['job_profession']}'),
-                          ],
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            Expanded(
-              child: StreamBuilder(
-                  stream: FirebaseFirestore.instance
-                      .collection("Helpers")
-                      .doc("Service")
-                      .collection(widget.data['job_profession'])
-                      .doc(widget.data['full_name'])
-                      .collection("Ratings")
-                      .orderBy("time", descending: true)
-                      .snapshots(),
-                  builder: ((context, snapshot) {
-                    return ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      controller: _scroll,
-                      scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data.docs.length,
-                      itemBuilder: ((context, index) {
-                        total_review +=
-                            snapshot.data.docs[index]['user_rating'];
-
-                        DateTime lastLog =
-                            (snapshot.data.docs[index]['time'].toDate());
-                        String time_review =
-                            DateFormat.yMMMd().add_jm().format(lastLog);
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            child: Card(
-                                elevation: 10,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Flexible(
-                                            child: Avatar.medium(
-                                                url: snapshot.data.docs[index]
-                                                    ['user_pic']),
-                                          ),
-                                          SizedBox(
-                                            width: 20,
-                                          ),
-                                          Flexible(
-                                            flex: 2,
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  '${snapshot.data.docs[index]['user']}',
-                                                  style: GoogleFonts.raleway(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                RatingBarIndicator(
-                                                  rating:
-                                                      snapshot.data.docs[index]
-                                                          ['user_rating'],
-                                                  itemBuilder:
-                                                      (context, index) => Icon(
-                                                    Icons.star,
-                                                    color: Colors.blue,
-                                                  ),
-                                                  itemCount: 5,
-                                                  itemSize: 20.0,
-                                                  direction: Axis.horizontal,
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Flexible(
-                                            child: Text(
-                                              '${time_review}',
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 10),
-                                            ),
-                                          ),
-                                        ],
+      body: SafeArea(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 235,
+                  width: MediaQuery.of(context).size.width,
+                  child: Stack(children: [
+                    Container(
+                      height: 210,
+                      width: MediaQuery.of(context).size.width,
+                      child: Swiper(
+                          autoplay: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: widget.data['image'].length,
+                          itemBuilder: ((context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Container(
+                                height: 220,
+                                width: MediaQuery.of(context).size.width,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        offset: Offset(3, 0),
+                                        blurRadius: 6,
                                       ),
+                                    ],
+                                    image: DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: NetworkImage(
+                                            widget.data['image'][index]))),
+                              ),
+                            );
+                          })),
+                    ),
+                    Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Container(
+                          height: 100,
+                          width: 100,
+                          decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  offset: Offset(3, 0),
+                                  blurRadius: 6,
+                                ),
+                              ],
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(widget.data['dp']))),
+                        ))
+                  ]),
+                ),
+              ),
+              StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection("Helpers")
+                    .doc("Service")
+                    .collection("${widget.data['job_profession']}")
+                    .doc('${widget.data['full_name']}')
+                    .collection("Ratings")
+                    .snapshots(),
+                builder: (context, snapshot) => Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(24),
+                      bottomRight: Radius.circular(24),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 20),
+                    child: Column(
+                      children: [
+                        Row(children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('${widget.data['job_profession']}'),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: [
+                                  Icon(Icons.person),
+                                  Text(
+                                    '${widget.data['full_name']}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15.0, vertical: 15),
-                                      child: Text(
-                                        '${snapshot.data.docs[index]['review']}',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.normal,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ]),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: Colors.blue,
+                            ),
+                            Text('${snapshot.data.docs.length} Reviews')
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("Helpers")
+                        .doc("Service")
+                        .collection(widget.data['job_profession'])
+                        .doc(widget.data['full_name'])
+                        .collection("Ratings")
+                        .orderBy("time", descending: true)
+                        .snapshots(),
+                    builder: ((context, snapshot) {
+                      return ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: _scroll,
+                        scrollDirection: Axis.vertical,
+                        itemCount: snapshot.data.docs.length,
+                        itemBuilder: ((context, index) {
+                          DateTime lastLog =
+                              (snapshot.data.docs[index]['time'].toDate());
+                          String time_review =
+                              DateFormat.yMMMd().add_jm().format(lastLog);
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              child: Card(
+                                  elevation: 10,
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(20.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Flexible(
+                                              child: Avatar.medium(
+                                                  url: snapshot.data.docs[index]
+                                                      ['user_pic']),
+                                            ),
+                                            SizedBox(
+                                              width: 20,
+                                            ),
+                                            Flexible(
+                                              flex: 2,
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    '${snapshot.data.docs[index]['user']}',
+                                                    style: GoogleFonts.raleway(
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  RatingBarIndicator(
+                                                    rating: snapshot
+                                                            .data.docs[index]
+                                                        ['user_rating'],
+                                                    itemBuilder:
+                                                        (context, index) =>
+                                                            Icon(
+                                                      Icons.star,
+                                                      color: Colors.blue,
+                                                    ),
+                                                    itemCount: 5,
+                                                    itemSize: 20.0,
+                                                    direction: Axis.horizontal,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Flexible(
+                                              child: Text(
+                                                '${time_review}',
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 10),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                )),
-                          ),
-                        );
-                      }),
-                    );
-                  })),
-            ),
-          ],
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 15.0, vertical: 15),
+                                        child: Text(
+                                          '${snapshot.data.docs[index]['review']}',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )),
+                            ),
+                          );
+                        }),
+                      );
+                    })),
+              ),
+            ],
+          ),
         ),
       ),
       bottomSheet: Hidable(
@@ -1056,6 +1119,12 @@ class _ServicePageState extends State<ServicePage> {
             onTap: () {
               addReview(
                   widget.data['job_profession'], widget.data['full_name']);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Show_reviews(context),
+                ),
+              );
             },
             child: Container(
                 width: MediaQuery.of(context).size.width,

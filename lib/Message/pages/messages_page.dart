@@ -234,7 +234,10 @@ class _MessagePageState extends State<MessagePage> {
                                   width:
                                       MediaQuery.of(context).size.width / 1.2,
                                   child: Card(
-                                      elevation: 10,
+                                      elevation: 5,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 10.0),
@@ -266,7 +269,7 @@ class _MessagePageState extends State<MessagePage> {
                                                 Text(
                                                   '${snapshot.data.docs[snapshot.data.docs.length - 1]['message']}',
                                                   style: TextStyle(
-                                                      fontSize: 13,
+                                                      fontSize: 10,
                                                       fontWeight: snapshot.data
                                                                           .docs[
                                                                       index]

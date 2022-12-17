@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/constants/services_tentative.dart';
 
 import '../constants/Theme.dart';
-import '../firebase/auth_login.dart';
+import 'home.dart';
 
 class signUpContext extends StatefulWidget {
   const signUpContext({
@@ -81,9 +81,7 @@ class _signUpContextState extends State<signUpContext> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => AuthPageSign(
-              isSignup: true,
-            ),
+            builder: (context) => Home(),
           ),
         );
       });
@@ -455,7 +453,12 @@ class _signUpContextState extends State<signUpContext> {
                           setState(() {
                             isElevated = !isElevated;
                           });
-                          signUp();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Home(),
+                            ),
+                          );
                         },
                         child: AnimatedContainer(
                             duration: Duration(milliseconds: 300),

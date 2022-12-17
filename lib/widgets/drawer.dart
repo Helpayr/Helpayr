@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:helpayr/screens/settings.dart';
 import 'package:helpayr/screens/when_complete.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -124,30 +123,24 @@ class NowDrawer extends StatelessWidget {
                         title: "Messaging",
                         isSelected: currentPage == "Messaging" ? true : false),
                     DrawerTile(
-                        icon: FontAwesomeIcons.user,
+                        icon: FontAwesomeIcons.questionCircle,
                         onTap: () {
-                          if (currentPage != "Profile")
-                            Navigator.pushReplacementNamed(context, '/profile');
+                          if (currentPage != "About Us")
+                            Navigator.pushReplacementNamed(context, '/about');
                         },
-                        iconColor: HelpayrColors.warning,
-                        title: "Profile",
-                        isSelected: currentPage == "Profile" ? true : false),
+                        iconColor: HelpayrColors.info,
+                        title: "About Us",
+                        isSelected: currentPage == "About Us" ? true : false),
                     DrawerTile(
-                        icon: FontAwesomeIcons.cog,
+                        icon: FontAwesomeIcons.shieldAlt,
                         onTap: () {
-                          if (currentPage != "Settings")
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Settings_Home(
-                                  isHome: true,
-                                ),
-                              ),
-                            );
+                          if (currentPage != "Privacy Policy")
+                            Navigator.pushReplacementNamed(context, '/privacy');
                         },
-                        iconColor: HelpayrColors.success,
-                        title: "Settings",
-                        isSelected: currentPage == "Settings" ? true : false),
+                        iconColor: HelpayrColors.info,
+                        title: "Privacy Policy",
+                        isSelected:
+                            currentPage == "Privacy Policy" ? true : false),
                   ],
                 ),
         ),
