@@ -18,7 +18,7 @@ class FullScreen extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           image: DecorationImage(
-            fit: BoxFit.cover,
+            fit: BoxFit.fill,
             image: NetworkImage(pic),
           ),
         ),
