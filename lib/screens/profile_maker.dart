@@ -186,6 +186,8 @@ class _ProfileMakerState extends State<ProfileMaker>
       'bg': bg_service,
       'image': uploadedImageService,
       'uid': uid,
+      "status": "",
+      "status_log": "",
     });
   }
 

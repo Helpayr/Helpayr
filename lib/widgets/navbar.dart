@@ -42,6 +42,7 @@ class Navbar extends StatefulWidget implements PreferredSizeWidget {
   final bool isProfile;
   final bool greetings;
   final String name;
+  final String service;
 
   Navbar(
       {this.title = "Home",
@@ -66,7 +67,8 @@ class Navbar extends StatefulWidget implements PreferredSizeWidget {
       this.url,
       this.isProfile = false,
       this.greetings = false,
-      this.name = "User"});
+      this.name = "User",
+      this.service});
 
   final double _prefferedHeight = 180.0;
 
@@ -194,6 +196,30 @@ class _NavbarState extends State<Navbar> {
                                             actions: [
                                               TextButton(
                                                 onPressed: () async {
+                                                  FirebaseFirestore.instance
+                                                      .collection("Helpers")
+                                                      .doc('People')
+                                                      .collection(
+                                                          widget.service)
+                                                      .doc(FirebaseAuth
+                                                          .instance
+                                                          .currentUser
+                                                          .displayName)
+                                                      .update({
+                                                    "status": "Offline",
+                                                  });
+                                                  FirebaseFirestore.instance
+                                                      .collection("Helpers")
+                                                      .doc('Service')
+                                                      .collection(
+                                                          widget.service)
+                                                      .doc(FirebaseAuth
+                                                          .instance
+                                                          .currentUser
+                                                          .displayName)
+                                                      .update({
+                                                    "status": "Offline",
+                                                  });
                                                   final provider = Provider.of<
                                                           GoogleSignUpProvider>(
                                                       context,

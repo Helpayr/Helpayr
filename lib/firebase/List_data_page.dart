@@ -119,6 +119,34 @@ class _ListDataPageState extends State<ListDataPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: Container(
+                          child: Stack(
+                              alignment: Alignment.bottomRight,
+                              children: [
+                                Container(
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 3, color: Colors.white),
+                                    color: data['status'] == "Online" &&
+                                            data['status_log'] == "Online"
+                                        ? Colors.green
+                                        : data['status'] == "Online" &&
+                                                data['status_log'] == "Offline"
+                                            ? Colors.orange
+                                            : data['status'] == "Offline" &&
+                                                    data['status_log'] ==
+                                                        "Online"
+                                                ? Colors.yellow
+                                                : data['status'] == "Offline" &&
+                                                        data['status_log'] ==
+                                                            "Offline"
+                                                    ? Colors.grey
+                                                    : Colors.black,
+                                    shape: BoxShape.circle,
+                                  ),
+                                )
+                              ]),
                           height: 90,
                           width: 90,
                           decoration: BoxDecoration(

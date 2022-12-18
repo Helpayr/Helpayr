@@ -266,6 +266,16 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                         children: [
                                           LottieBuilder.network(
                                               "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 15.0),
+                                            child: Text(
+                                              "Bookings that have been accepted by the Helpers will be added here!",
+                                              textAlign: TextAlign.center,
+                                              style: GoogleFonts.raleway(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          )
                                         ],
                                       );
                                     }

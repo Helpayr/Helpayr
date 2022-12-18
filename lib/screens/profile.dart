@@ -38,6 +38,7 @@ class _ProfileState extends State<Profile> {
         extendBodyBehindAppBar: true,
         appBar: Navbar(
           isProfile: true,
+          service: widget.service,
           title: "Profile",
           transparent: true,
         ),

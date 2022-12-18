@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:helpayr/Message/pages/full_screen.dart';
 import 'package:lottie/lottie.dart';
 
 import '../Message/widgets/avatar.dart';
@@ -164,14 +165,26 @@ class _DetailsBookingState extends State<DetailsBooking> {
                 itemCount: widget.details['image'].length,
                 itemBuilder: ((context, index) => Card(
                       elevation: 5,
-                      child: Container(
-                        height: 140,
-                        width: MediaQuery.of(context).size.width / 1.5,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                fit: BoxFit.fill,
-                                image: NetworkImage(
-                                    widget.details['image'][index]))),
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FullScreen(
+                                pic: widget.details['image'][index],
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          height: 140,
+                          width: MediaQuery.of(context).size.width / 1.5,
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: NetworkImage(
+                                      widget.details['image'][index]))),
+                        ),
                       ),
                     ))),
           ),

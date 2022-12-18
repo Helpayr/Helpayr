@@ -12,9 +12,9 @@ import 'package:helpayr/screens/profile.dart';
 import 'package:helpayr/screens/schedules_services.dart';
 import 'package:hidable/hidable.dart';
 import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
+import '../Message/pages/full_screen.dart';
 import '../Message/pages/message_service.dart';
 
 class Servicer_Dashboard extends StatefulWidget {
@@ -25,7 +25,44 @@ class Servicer_Dashboard extends StatefulWidget {
   State<Servicer_Dashboard> createState() => _Servicer_DashboardState();
 }
 
-class _Servicer_DashboardState extends State<Servicer_Dashboard> {
+class _Servicer_DashboardState extends State<Servicer_Dashboard>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    setStatus_service("Online");
+  }
+
+  void setStatus_service(String status) {
+    FirebaseFirestore.instance
+        .collection("Helpers")
+        .doc('Service')
+        .collection(widget.service)
+        .doc(FirebaseAuth.instance.currentUser.displayName)
+        .update({
+      "status": status,
+      "status_log": status,
+    });
+    FirebaseFirestore.instance
+        .collection("Helpers")
+        .doc('People')
+        .collection('Servicers')
+        .doc(FirebaseAuth.instance.currentUser.uid)
+        .update({
+      "status": status,
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      setStatus_service("Online");
+    } else {
+      setStatus_service("Offline");
+    }
+  }
+
   TextEditingController search = TextEditingController();
   dynamic selected;
   var heart = false;
@@ -117,7 +154,7 @@ class _Servicer_DashboardState extends State<Servicer_Dashboard> {
                   ),
                   backgroundColor: Colors.purpleAccent,
                   selectedColor: Colors.deepPurple,
-                  title: const Text('Profile')),
+                  title: const Text('Bookings')),
             ],
             iconSize: 32,
             barAnimation: BarAnimation.blink,
@@ -136,19 +173,24 @@ class _Servicer_DashboardState extends State<Servicer_Dashboard> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
+            controller.jumpToPage(3);
             setState(() {
               heart = !heart;
+              selected = null;
             });
           },
           backgroundColor: Colors.white,
           child: Icon(
-            heart ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+            heart
+                ? CupertinoIcons.pencil_circle_fill
+                : CupertinoIcons.pencil_circle,
             color: Colors.red,
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         body: SafeArea(
           child: PageView(
+            physics: NeverScrollableScrollPhysics(),
             controller: controller,
             children: [
               Home(
@@ -160,10 +202,338 @@ class _Servicer_DashboardState extends State<Servicer_Dashboard> {
                 service: widget.service,
                 controller: _controller,
               ),
+              EditProfile(widget: widget),
             ],
           ),
         ),
         extendBody: false,
+      ),
+    );
+  }
+}
+
+class EditProfile extends StatefulWidget {
+  const EditProfile({
+    Key key,
+    @required this.widget,
+  }) : super(key: key);
+
+  final Servicer_Dashboard widget;
+
+  @override
+  State<EditProfile> createState() => _EditProfileState();
+}
+
+class _EditProfileState extends State<EditProfile> {
+  bool works = false;
+  bool profile = true;
+  PageController _ctrl = PageController(initialPage: 0);
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("Helpers")
+          .doc('Service')
+          .collection(widget.widget.service)
+          .doc(FirebaseAuth.instance.currentUser.displayName)
+          .snapshots(),
+      builder: (context, snappy) => Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                child: Row(
+                  children: [
+                    Text(
+                      "Edit Profile",
+                      style: GoogleFonts.raleway(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Icon(
+                        Icons.edit,
+                      ),
+                    ),
+                    height: 180,
+                    width: 180,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(snappy.data['dp'])),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          offset: Offset(3, 0),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          profile = true;
+                          works = false;
+                        });
+                        _ctrl.animateToPage(0,
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeInOut);
+                      },
+                      child: Card(
+                        color: profile ? Colors.blueAccent : Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Text(
+                            "Profile",
+                            style: TextStyle(
+                                color: profile ? Colors.white : Colors.black,
+                                fontWeight: profile
+                                    ? FontWeight.bold
+                                    : FontWeight.normal),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          profile = false;
+                          works = true;
+                        });
+                        _ctrl.animateToPage(1,
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.easeInOut);
+                      },
+                      child: Card(
+                        color: works ? Colors.blueAccent : Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Text(
+                            "Gallery",
+                            style: TextStyle(
+                                color: works ? Colors.white : Colors.black,
+                                fontWeight: works
+                                    ? FontWeight.bold
+                                    : FontWeight.normal),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Expanded(
+                  child: Card(
+                elevation: 5,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: PageView(
+                    onPageChanged: (int) {
+                      setState(() {
+                        profile = int == 0;
+                        works = int == 1;
+                      });
+                    },
+                    controller: _ctrl,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Column(
+                              children: [
+                                Text(
+                                  "Personal Information",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                ),
+                                Image.asset(
+                                  "assets/pngs/underline.png",
+                                  height: 40,
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.2,
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${snappy.data['full_name']}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                Text(
+                                  'Full Name',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${snappy.data['Address']}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  'Address',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${snappy.data['Age']}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  'Age',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${snappy.data['job_profession']}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  'Profession',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        ),
+                      ),
+                      GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2),
+                          itemCount: snappy.data['image'].length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FullScreen(
+                                        pic: snappy.data['image'][index],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          offset: Offset(3, 0),
+                                          blurRadius: 6,
+                                        ),
+                                      ],
+                                      borderRadius: BorderRadius.circular(10),
+                                      image: DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: NetworkImage(
+                                              snappy.data['image'][index]))),
+                                ),
+                              ),
+                            );
+                          })
+                    ],
+                  ),
+                ),
+              ))
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -216,11 +586,23 @@ class Home extends StatelessWidget {
                     .snapshots(),
                 builder: ((context, snapshot) {
                   if (snapshot.data.docs.isEmpty) {
-                    return Column(
-                      children: [
-                        LottieBuilder.network(
-                            "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
-                      ],
+                    return Card(
+                      color: Color.fromARGB(255, 48, 63, 88),
+                      elevation: 5,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Column(
+                          children: [
+                            Image.asset("assets/helpayrblue.png"),
+                            Text(
+                              "No Bookings for today's video!",
+                              style: GoogleFonts.raleway(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      ),
                     );
                   }
                   return ListView.builder(

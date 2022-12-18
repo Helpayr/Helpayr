@@ -61,6 +61,7 @@ class GoogleSignUpProvider extends ChangeNotifier {
       "last_login": FirebaseAuth.instance.currentUser.metadata.lastSignInTime,
       "full_name": FirebaseAuth.instance.currentUser.displayName,
       "status_log": "Online",
+      'status': "",
     });
     notifyListeners();
   }
