@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hidable/hidable.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
 import '../Message/pages/chatroom.dart';
 import '../Message/widgets/avatar.dart';
@@ -232,6 +233,14 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                       .where('is_pending', isEqualTo: true)
                                       .snapshots(),
                                   builder: (context, snapshot) {
+                                    if (snapshot.data.docs.isEmpty) {
+                                      return Column(
+                                        children: [
+                                          LottieBuilder.network(
+                                              "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                                        ],
+                                      );
+                                    }
                                     return Pending(
                                       sorted: sorted,
                                       snapshot: snapshot,
@@ -252,6 +261,14 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                       .where('is_accepted', isEqualTo: true)
                                       .snapshots(),
                                   builder: (context, snapshot) {
+                                    if (snapshot.data.docs.isEmpty) {
+                                      return Column(
+                                        children: [
+                                          LottieBuilder.network(
+                                              "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                                        ],
+                                      );
+                                    }
                                     return ListView.builder(
                                       itemCount: snapshot.data.docs.length,
                                       itemBuilder: ((context, index) {
@@ -520,6 +537,19 @@ class _Dashboard_UserState extends State<Dashboard_User> {
                                       .where('is_accepted', isEqualTo: false)
                                       .snapshots(),
                                   builder: (context, snapshot) {
+                                    if (snapshot.data.docs.isEmpty) {
+                                      return Column(
+                                        children: [
+                                          LottieBuilder.network(
+                                              "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                                          Text(
+                                            "Nothing to see here",
+                                            style: GoogleFonts.oswald(
+                                                fontWeight: FontWeight.bold),
+                                          )
+                                        ],
+                                      );
+                                    }
                                     return ListView.builder(
                                       itemCount: snapshot.data.docs.length,
                                       itemBuilder: ((context, index) {
@@ -980,6 +1010,17 @@ class Pending extends StatelessWidget {
                                       actions: [
                                         TextButton.icon(
                                             onPressed: () async {
+                                              await FirebaseFirestore.instance
+                                                  .collection("Helpers")
+                                                  .doc("Service")
+                                                  .collection(
+                                                      '${snapshot.data.docs[index]['service']}')
+                                                  .doc(
+                                                      '${snapshot.data.docs[index]['servicer']}')
+                                                  .collection("Bookings")
+                                                  .doc(
+                                                      '${snapshot.data.docs[index]['uid']}')
+                                                  .delete();
                                               await FirebaseFirestore.instance
                                                   .collection("Users")
                                                   .doc(FirebaseAuth

@@ -8,6 +8,7 @@ import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/Message/pages/chatroom.dart';
+import 'package:helpayr/Message/pages/full_screen.dart';
 import 'package:helpayr/Message/widgets/widget.dart';
 import 'package:helpayr/firebase/details.dart';
 import 'package:helpayr/firebase/products.dart';
@@ -417,37 +418,52 @@ class _ServicePageState extends State<ServicePage> {
                                           scrollDirection: Axis.horizontal,
                                           itemCount:
                                               widget.data['image'].length,
-                                          itemBuilder: ((context, index) =>
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width /
-                                                      1.5,
-                                                  height: 50,
-                                                  child: Card(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                    ),
-                                                    color: Colors.white,
-                                                    elevation: 10,
-                                                    child: Column(
-                                                      children: [
-                                                        Expanded(
-                                                          child: Card(
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          20),
-                                                            ),
-                                                            elevation: 10,
+                                          itemBuilder: ((context, index) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    1.5,
+                                                height: 50,
+                                                child: Card(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                  ),
+                                                  color: Colors.white,
+                                                  elevation: 10,
+                                                  child: Column(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Card(
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                          ),
+                                                          elevation: 10,
+                                                          child:
+                                                              GestureDetector(
+                                                            onTap: () {
+                                                              Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          FullScreen(
+                                                                    pic: widget.data[
+                                                                            'image']
+                                                                        [index],
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            },
                                                             child: Container(
                                                               decoration:
                                                                   BoxDecoration(
@@ -470,11 +486,13 @@ class _ServicePageState extends State<ServicePage> {
                                                             ),
                                                           ),
                                                         ),
-                                                      ],
-                                                    ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              )),
+                                              ),
+                                            );
+                                          }),
                                         ),
                                       ),
                                     ),
@@ -1398,11 +1416,14 @@ class _MainPageReturnerState extends State<MainPageReturner> {
                                       title: "Chat",
                                     ),
                                   ),
-                                  ElevatedButtonStore(
-                                    width:
-                                        MediaQuery.of(context).size.width / 8,
-                                    icon: FontAwesomeIcons.heart,
-                                    title: "",
+                                  GestureDetector(
+                                    onTap: () {},
+                                    child: ElevatedButtonStore(
+                                      width:
+                                          MediaQuery.of(context).size.width / 8,
+                                      icon: FontAwesomeIcons.heart,
+                                      title: "",
+                                    ),
                                   ),
                                 ],
                               ),
@@ -1829,7 +1850,7 @@ class _ElevatedButtonStoreState extends State<ElevatedButtonStore> {
           children: widget.isHeart
               ? Icon(
                   widget.icon,
-                  color: Colors.white,
+                  color: Colors.red,
                 )
               : [
                   Icon(

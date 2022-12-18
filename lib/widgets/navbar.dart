@@ -194,14 +194,6 @@ class _NavbarState extends State<Navbar> {
                                             actions: [
                                               TextButton(
                                                 onPressed: () async {
-                                                  await FirebaseFirestore
-                                                      .instance
-                                                      .collection("Users")
-                                                      .doc(FirebaseAuth.instance
-                                                          .currentUser.uid)
-                                                      .update({
-                                                    "status_log": "Offline"
-                                                  });
                                                   final provider = Provider.of<
                                                           GoogleSignUpProvider>(
                                                       context,

@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/Message/widgets/widget.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
 import '../Message/pages/chatroom.dart';
 
@@ -210,6 +211,19 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                 .where('is_pending', isEqualTo: true)
                                 .snapshots(),
                             builder: (context, snapshot) {
+                              if (snapshot.data.docs.isEmpty) {
+                                return Column(
+                                  children: [
+                                    LottieBuilder.network(
+                                        "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                                    Text(
+                                      "Nothing to see here",
+                                      style: GoogleFonts.oswald(
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                );
+                              }
                               return ListView.builder(
                                 controller: _controller,
                                 itemCount: snapshot.data.docs.length,
@@ -585,6 +599,19 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                 .where('is_accepted', isEqualTo: true)
                                 .snapshots(),
                             builder: (context, snapshot) {
+                              if (snapshot.data.docs.isEmpty) {
+                                return Column(
+                                  children: [
+                                    LottieBuilder.network(
+                                        "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                                    Text(
+                                      "Nothing to see here",
+                                      style: GoogleFonts.oswald(
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                );
+                              }
                               return ListView.builder(
                                 controller: _controller,
                                 itemCount: snapshot.data.docs.length,
@@ -830,6 +857,19 @@ class _Schedule_ServiceState extends State<Schedule_Service> {
                                 .where('is_accepted', isEqualTo: false)
                                 .snapshots(),
                             builder: (context, snapshot) {
+                              if (snapshot.data.docs.isEmpty) {
+                                return Column(
+                                  children: [
+                                    LottieBuilder.network(
+                                        "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                                    Text(
+                                      "Nothing to see here",
+                                      style: GoogleFonts.oswald(
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                );
+                              }
                               return ListView.builder(
                                 controller: _controller,
                                 itemCount: snapshot.data.docs.length,

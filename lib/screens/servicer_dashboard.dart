@@ -12,6 +12,7 @@ import 'package:helpayr/screens/profile.dart';
 import 'package:helpayr/screens/schedules_services.dart';
 import 'package:hidable/hidable.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 import '../Message/pages/message_service.dart';
@@ -214,6 +215,14 @@ class Home extends StatelessWidget {
                     .where('is_pending', isEqualTo: true)
                     .snapshots(),
                 builder: ((context, snapshot) {
+                  if (snapshot.data.docs.isEmpty) {
+                    return Column(
+                      children: [
+                        LottieBuilder.network(
+                            "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                      ],
+                    );
+                  }
                   return ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: snapshot.data.docs.length,

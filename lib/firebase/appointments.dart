@@ -106,7 +106,7 @@ class _AppointmentState extends State<Appointment>
         .collection(service)
         .doc(name)
         .collection("Bookings")
-        .doc()
+        .doc(FirebaseAuth.instance.currentUser.uid)
         .set({
       "date": selected_date,
       "end_Date": selected_endDate,
@@ -117,7 +117,7 @@ class _AppointmentState extends State<Appointment>
       "time": FieldValue.serverTimestamp(),
       "servicer_dp": widget.widget.data['dp'],
       "user_dp": FirebaseAuth.instance.currentUser.photoURL,
-      "is_accepted": true,
+      "is_accepted": false,
       "notes": _notes.text,
       "uid": FirebaseAuth.instance.currentUser.uid,
       'is_pending': true,
@@ -133,7 +133,7 @@ class _AppointmentState extends State<Appointment>
         .collection("Users")
         .doc(FirebaseAuth.instance.currentUser.uid)
         .collection("Bookings")
-        .doc()
+        .doc(widget.widget.data['full_name'])
         .set({
       "date": selected_date,
       "end_Date": selected_endDate,
@@ -144,7 +144,7 @@ class _AppointmentState extends State<Appointment>
       "time": FieldValue.serverTimestamp(),
       "servicer_dp": widget.widget.data['dp'],
       "user_dp": FirebaseAuth.instance.currentUser.photoURL,
-      "is_accepted": true,
+      "is_accepted": false,
       "notes": _notes.text,
       "service": service,
       "uid": FirebaseAuth.instance.currentUser.uid,

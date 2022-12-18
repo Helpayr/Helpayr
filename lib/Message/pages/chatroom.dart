@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:helpayr/Message/pages/full_screen.dart';
 import 'package:helpayr/Message/widgets/widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
@@ -164,6 +165,14 @@ class _ChatroomState extends State<Chatroom> {
                   .orderBy("time", descending: false)
                   .snapshots(),
               builder: (context, snapshot) {
+                if (snapshot.data.docs.isEmpty) {
+                  return Column(
+                    children: [
+                      LottieBuilder.network(
+                          "https://assets8.lottiefiles.com/packages/lf20_q1g5qcgm.json"),
+                    ],
+                  );
+                }
                 if (snapshot.data != null) {
                   return ListView.builder(
                       controller: _automaticScrollDown,
@@ -224,13 +233,16 @@ class _ChatroomState extends State<Chatroom> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
                 child: Stack(children: [
-                  AutoSizeTextField(
-                    maxLines: 4,
-                    textAlign: TextAlign.start,
-                    controller: message_send,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Enter message",
+                  GestureDetector(
+                    onTap: _scrollDown,
+                    child: AutoSizeTextField(
+                      maxLines: 4,
+                      textAlign: TextAlign.start,
+                      controller: message_send,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Enter message",
+                      ),
                     ),
                   ),
                   Align(
@@ -246,10 +258,10 @@ class _ChatroomState extends State<Chatroom> {
                               "https://assets5.lottiefiles.com/packages/lf20_urbk83vw.json"),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            _scrollDown();
+                          onTap: () async {
                             onSend(widget.recipient['dp'],
                                 widget.recipient['full_name']);
+                            await _scrollDown();
                           },
                           child: LottieBuilder.network(
                             "https://assets6.lottiefiles.com/packages/lf20_txpagpud.json",
@@ -284,7 +296,7 @@ class _ChatroomState extends State<Chatroom> {
               )));
             },
             child: Container(
-              width: size.width,
+              width: size.width / 2,
               alignment: data['sendby'] ==
                       FirebaseAuth.instance.currentUser.displayName
                   ? Alignment.centerRight
@@ -420,23 +432,87 @@ class _ChatroomState extends State<Chatroom> {
               ),
             ),
           )
-        : Container(
-            height: size.height / 2.5,
-            width: size.width,
-            alignment:
-                data['sendby'] == FirebaseAuth.instance.currentUser.displayName
-                    ? Alignment.centerRight
-                    : Alignment.centerLeft,
+        : Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-              ),
               height: size.height / 2.5,
-              width: size.width / 2,
-              alignment: Alignment.center,
-              child: data['message'] != ""
-                  ? Image.network(data['message'])
-                  : CircularProgressIndicator(),
+              width: size.width,
+              alignment: data['sendby'] ==
+                      FirebaseAuth.instance.currentUser.displayName
+                  ? Alignment.centerRight
+                  : Alignment.centerLeft,
+              child: Row(
+                crossAxisAlignment: data['sendby'] ==
+                        FirebaseAuth.instance.currentUser.displayName
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
+                mainAxisAlignment: data['sendby'] ==
+                        FirebaseAuth.instance.currentUser.displayName
+                    ? MainAxisAlignment.end
+                    : MainAxisAlignment.start,
+                children: data['sendby'] ==
+                        FirebaseAuth.instance.currentUser.displayName
+                    ? [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    FullScreen(pic: data['message']),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            height: size.height / 2.5,
+                            width: size.width / 2,
+                            alignment: Alignment.center,
+                            child: data['message'] != ""
+                                ? Image.network(
+                                    data['message'],
+                                    fit: BoxFit.cover,
+                                  )
+                                : CircularProgressIndicator(),
+                          ),
+                        ),
+                        Avatar.small(
+                          url: FirebaseAuth.instance.currentUser.photoURL,
+                        ),
+                      ]
+                    : [
+                        Avatar.small(
+                          url: widget.recipient['dp'],
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    FullScreen(pic: data['message']),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            height: size.height / 2.5,
+                            width: size.width / 2,
+                            alignment: Alignment.center,
+                            child: data['message'] != ""
+                                ? Image.network(
+                                    data['message'],
+                                    fit: BoxFit.cover,
+                                  )
+                                : CircularProgressIndicator(),
+                          ),
+                        ),
+                      ],
+              ),
             ),
           );
   }

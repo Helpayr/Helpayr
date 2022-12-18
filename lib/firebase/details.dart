@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:helpayr/firebase/appointments.dart';
 
 import '../Message/pages/chatroom.dart';
@@ -15,6 +17,36 @@ class DetailsHelper extends StatelessWidget {
       return "$user1$user2";
     }
     return "$user2$user1";
+  }
+
+  Future addFave(
+      String address,
+      String age,
+      String des,
+      String bg,
+      String dp,
+      String fb,
+      String full_name,
+      List<dynamic> image,
+      String job,
+      String price) async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser.uid)
+        .collection("favs")
+        .doc(full_name)
+        .set({
+      "Address": address,
+      "Age": age,
+      "Description": des,
+      "bg": bg,
+      "dp": dp,
+      "fb": fb,
+      "full_name": full_name,
+      "image": image,
+      "job_profession": job,
+      "prices": price,
+    });
   }
 
   @override
@@ -134,11 +166,82 @@ class DetailsHelper extends StatelessWidget {
                     title: "Chat",
                   ),
                 ),
-                ElevatedButtonStore(
-                  width: MediaQuery.of(context).size.width / 8,
-                  icon: FontAwesomeIcons.heart,
-                  title: "",
+                SizedBox(
+                  width: 5,
                 ),
+                GestureDetector(
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: ((context) => AlertDialog(
+                                actions: [
+                                  TextButton.icon(
+                                      onPressed: () async {
+                                        addFave(
+                                                widget.data['Address'],
+                                                widget.data['Age'],
+                                                widget.data['Description'],
+                                                widget.data['bg'],
+                                                widget.data['dp'],
+                                                widget.data['fb'],
+                                                widget.data['full_name'],
+                                                widget.data['image'],
+                                                widget.data['job_profession'],
+                                                widget.data['prices'][0])
+                                            .whenComplete(() {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              duration: Duration(seconds: 4),
+                                              content: Text(
+                                                  "The service has been added to your Favorites!"),
+                                            ),
+                                          );
+
+                                          Navigator.of(context).pop();
+                                        });
+                                      },
+                                      icon: Icon(Icons.check),
+                                      label: Text("Yes")),
+                                  TextButton.icon(
+                                      onPressed: () async {
+                                        Navigator.of(context).pop();
+                                      },
+                                      icon: Icon(Icons.deselect),
+                                      label: Text("No"))
+                                ],
+                                title: Text(
+                                  "Add to My Favorites",
+                                  style: GoogleFonts.raleway(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                content: Text(
+                                  "The selected service will be added to your Favorites. Proceed?",
+                                  style: GoogleFonts.raleway(
+                                      fontWeight: FontWeight.normal),
+                                ),
+                              )));
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(3, 0),
+                            blurRadius: 6,
+                          ),
+                        ],
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Icon(
+                          FontAwesomeIcons.heart,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    )),
               ],
             ),
           ),

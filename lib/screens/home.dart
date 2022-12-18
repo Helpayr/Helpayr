@@ -18,8 +18,8 @@ import 'package:helpayr/widgets/card-horizontal.dart';
 import 'package:helpayr/widgets/drawer.dart';
 import 'package:hidable/hidable.dart';
 
+import '../Message/pages/chatroom.dart';
 import '../firebase/List_data_page.dart';
-import '../services/designing/list_services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // import 'package:helpayr/screens/product.dart';
@@ -35,6 +35,15 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     setStatus_user("Online");
+  }
+
+  String mod_chat(String currentUser, Map<String, dynamic> data) {
+    String sendTo = data['full_name'];
+    if (currentUser[0].toLowerCase().codeUnits[0] >
+        sendTo[0].toLowerCase().codeUnits[0]) {
+      return "$currentUser$sendTo";
+    }
+    return "$sendTo$currentUser";
   }
 
   void setStatus_user(String status) {
@@ -65,6 +74,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
   final PageController _pageController = PageController(initialPage: 0);
   final ScrollController listviewctrl = ScrollController();
+  final ScrollController ctrl = ScrollController();
 
   @override
   void dispose() {
@@ -112,6 +122,9 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       letIndexChange: (index) => true,
     );
   }
+
+  List<String> servicers = [];
+  List<String> chat = [];
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +233,228 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   helper_type: 'Service',
                   scrollController: listviewctrl,
                 ),
-                Designing(),
+                StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection("Users")
+                        .doc(FirebaseAuth.instance.currentUser.uid)
+                        .collection("favs")
+                        .snapshots(),
+                    builder: (context, snappy) {
+                      return ListView.builder(
+                        controller: ctrl,
+                        itemCount: snappy.data.docs.length,
+                        itemBuilder: (context, index) {
+                          FirebaseFirestore.instance
+                              .collection("Users")
+                              .doc(FirebaseAuth.instance.currentUser.uid)
+                              .collection("favs")
+                              .get()
+                              .then((value) {
+                            value.docs.forEach((element) {
+                              chat.add(element.reference.id);
+                            });
+                          });
+                          return StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection("Users")
+                                .snapshots(),
+                            builder: (context, snapshot_chat) => StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection("Users")
+                                  .doc(FirebaseAuth.instance.currentUser.uid)
+                                  .collection("favs")
+                                  .doc(snappy.data.docs[index]['full_name'])
+                                  .snapshots(),
+                              builder: (context, snapchat) => Card(
+                                elevation: 5,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        height: 120,
+                                        width: 100,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black26,
+                                                offset: Offset(3, 0),
+                                                blurRadius: 6,
+                                              ),
+                                            ],
+                                            image: DecorationImage(
+                                                fit: BoxFit.cover,
+                                                image: NetworkImage(snappy
+                                                    .data.docs[index]["dp"]))),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "${snappy.data.docs[index]['full_name']}",
+                                            style: GoogleFonts.raleway(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            "${snappy.data.docs[index]['Address']}",
+                                            style: GoogleFonts.raleway(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            "${snappy.data.docs[index]['job_profession']}",
+                                            style: GoogleFonts.raleway(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          Text(
+                                            "Php. ${snappy.data.docs[index]['prices']}",
+                                            style: GoogleFonts.raleway(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              TextButton.icon(
+                                                  onPressed: () async {
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection("Users")
+                                                        .doc(FirebaseAuth
+                                                            .instance
+                                                            .currentUser
+                                                            .uid)
+                                                        .collection("favs")
+                                                        .get()
+                                                        .then((value) {
+                                                      value.docs
+                                                          .forEach((element) {
+                                                        servicers.add(element
+                                                            .reference.id);
+                                                      });
+                                                    });
+                                                    showDialog(
+                                                        context: context,
+                                                        builder:
+                                                            ((context) =>
+                                                                AlertDialog(
+                                                                  actions: [
+                                                                    TextButton.icon(
+                                                                        onPressed: () async {
+                                                                          await FirebaseFirestore
+                                                                              .instance
+                                                                              .collection("Users")
+                                                                              .doc(FirebaseAuth.instance.currentUser.uid)
+                                                                              .collection("favs")
+                                                                              .doc(servicers[index])
+                                                                              .delete()
+                                                                              .whenComplete(() {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(
+                                                                                duration: Duration(seconds: 4),
+                                                                                content: Text("The service has been removed!"),
+                                                                              ),
+                                                                            );
+
+                                                                            Navigator.of(context).pop();
+                                                                          });
+                                                                        },
+                                                                        icon: Icon(Icons.check),
+                                                                        label: Text("Yes")),
+                                                                    TextButton.icon(
+                                                                        onPressed: () async {
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                        },
+                                                                        icon: Icon(Icons.deselect),
+                                                                        label: Text("No"))
+                                                                  ],
+                                                                  title: Text(
+                                                                    "Remove from My Favorites",
+                                                                    style: GoogleFonts.raleway(
+                                                                        fontWeight:
+                                                                            FontWeight.bold),
+                                                                  ),
+                                                                  content: Text(
+                                                                    "The selected service will be removed from your Favorites. Proceed?",
+                                                                    style: GoogleFonts.raleway(
+                                                                        fontWeight:
+                                                                            FontWeight.normal),
+                                                                  ),
+                                                                )));
+                                                  },
+                                                  icon: Icon(Icons.remove,
+                                                      color: Colors.redAccent),
+                                                  label: Text(
+                                                    "Remove",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color:
+                                                            Colors.redAccent),
+                                                  )),
+                                              TextButton.icon(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            Chatroom(
+                                                          recipient: snapchat
+                                                              .data
+                                                              .data(),
+                                                          chatroomId: mod_chat(
+                                                              FirebaseAuth
+                                                                  .instance
+                                                                  .currentUser
+                                                                  .displayName,
+                                                              snapchat.data
+                                                                  .data()),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  icon: Icon(Icons.message),
+                                                  label: Text(
+                                                    "Chat",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: Colors.blue),
+                                                  ))
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    }),
               ],
             ),
           )
