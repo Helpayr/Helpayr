@@ -9,6 +9,7 @@ import 'package:helpayr/widgets/navbar.dart';
 import 'package:helpayr/widgets/drawer.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:lottie/lottie.dart';
 import '../Message/widgets/avatar.dart';
 
 class Profile extends StatefulWidget {
@@ -128,6 +129,19 @@ class _ProfileState extends State<Profile> {
                             .orderBy("time", descending: true)
                             .snapshots(),
                         builder: ((context, snapshot) {
+                          if (snapshot.data.docs.isEmpty) {
+                            return Column(
+                              children: [
+                                LottieBuilder.network(
+                                    "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                                Text(
+                                  "Nothing to see here",
+                                  style: GoogleFonts.oswald(
+                                      fontWeight: FontWeight.bold),
+                                )
+                              ],
+                            );
+                          }
                           return ListView.builder(
                             physics: const AlwaysScrollableScrollPhysics(),
                             controller: _scroll,

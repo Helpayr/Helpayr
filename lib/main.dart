@@ -3,6 +3,7 @@ import 'package:helpayr/firebase/googleSignIn.dart';
 import 'package:helpayr/helpayrapp.dart';
 import 'package:helpayr/screens/articles.dart';
 import 'package:helpayr/screens/dashboard_appointments_user.dart';
+import 'package:helpayr/screens/history.dart';
 import 'package:helpayr/screens/login.dart';
 import 'package:helpayr/screens/messaging.dart';
 import 'package:helpayr/screens/onboarding/onboarding.dart';
@@ -52,6 +53,9 @@ class MyApp extends StatelessWidget {
             routes: <String, WidgetBuilder>{
               '/home': (BuildContext context) => noback(
                     wid: new Home(),
+                  ),
+              '/history': (BuildContext context) => noback(
+                    wid: new History(),
                   ),
               '/user_app': (BuildContext context) => noback(
                     wid: new Dashboard_User(),

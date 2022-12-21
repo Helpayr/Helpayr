@@ -12,6 +12,7 @@ import 'package:helpayr/screens/profile.dart';
 import 'package:helpayr/screens/schedules_services.dart';
 import 'package:hidable/hidable.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
 import '../Message/pages/full_screen.dart';
@@ -63,6 +64,7 @@ class _Servicer_DashboardState extends State<Servicer_Dashboard>
     }
   }
 
+  List<String> history_list = [];
   TextEditingController search = TextEditingController();
   dynamic selected;
   var heart = false;
@@ -155,6 +157,16 @@ class _Servicer_DashboardState extends State<Servicer_Dashboard>
                   backgroundColor: Colors.purpleAccent,
                   selectedColor: Colors.deepPurple,
                   title: const Text('Bookings')),
+              AnimatedBarItems(
+                  icon: const Icon(
+                    FontAwesomeIcons.clock,
+                  ),
+                  selectedIcon: const Icon(
+                    Icons.person,
+                  ),
+                  backgroundColor: Colors.purpleAccent,
+                  selectedColor: Colors.deepPurple,
+                  title: const Text('History')),
             ],
             iconSize: 32,
             barAnimation: BarAnimation.blink,
@@ -201,6 +213,228 @@ class _Servicer_DashboardState extends State<Servicer_Dashboard>
               Schedule_Service(
                 service: widget.service,
                 controller: _controller,
+              ),
+              Scaffold(
+                body: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Text(
+                        "History",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Expanded(
+                      child: StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection("Helpers")
+                              .doc("Service")
+                              .collection(widget.service)
+                              .doc(
+                                  FirebaseAuth.instance.currentUser.displayName)
+                              .collection("History")
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.data.docs.isEmpty) {
+                              return Column(
+                                children: [
+                                  LottieBuilder.network(
+                                      "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                                  Text(
+                                    "Nothing to see here",
+                                    style: GoogleFonts.oswald(
+                                        fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              );
+                            }
+                            return ListView.builder(
+                                itemCount: snapshot.data.docs.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: Card(
+                                      elevation: 10,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(25.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Flexible(
+                                              child: Container(
+                                                child: Stack(children: [
+                                                  Card(
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              5.0),
+                                                      child: Text(
+                                                        "Success",
+                                                        style: TextStyle(
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ]),
+                                                height: 120,
+                                                width: 120,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  image: DecorationImage(
+                                                      fit: BoxFit.cover,
+                                                      image: NetworkImage(
+                                                          snapshot.data
+                                                                  .docs[index]
+                                                              ['user_dp'])),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black26,
+                                                      offset: Offset(3, 0),
+                                                      blurRadius: 6,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            FittedBox(
+                                              fit: BoxFit.fitWidth,
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    '${snapshot.data.docs[index]['user']}',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Text(
+                                                    'Needed an',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${snapshot.data.docs[index]['service']}',
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 15,
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: () async {
+                                                      FirebaseFirestore.instance
+                                                          .collection("Helpers")
+                                                          .doc("Service")
+                                                          .collection(
+                                                              widget.service)
+                                                          .doc(FirebaseAuth
+                                                              .instance
+                                                              .currentUser
+                                                              .displayName)
+                                                          .collection("History")
+                                                          .get()
+                                                          .then((value) =>
+                                                              value.docs.forEach(
+                                                                  (element) {
+                                                                history_list
+                                                                    .add(element
+                                                                        .reference
+                                                                        .id);
+                                                              }));
+
+                                                      showDialog(
+                                                          context: context,
+                                                          builder:
+                                                              ((context) =>
+                                                                  AlertDialog(
+                                                                    actions: [
+                                                                      TextButton.icon(
+                                                                          onPressed: () async {
+                                                                            await FirebaseFirestore.instance.collection("Helpers").doc("Service").collection(widget.service).doc(FirebaseAuth.instance.currentUser.displayName).collection("History").doc(history_list[index]).delete().whenComplete(() {
+                                                                              Navigator.of(context).pop();
+                                                                            });
+                                                                          },
+                                                                          icon: Icon(Icons.check),
+                                                                          label: Text("Yes")),
+                                                                      TextButton.icon(
+                                                                          onPressed: () async {
+                                                                            Navigator.of(context).pop();
+                                                                          },
+                                                                          icon: Icon(Icons.deselect),
+                                                                          label: Text("No"))
+                                                                    ],
+                                                                    title: Text(
+                                                                      "Delete Confirmation",
+                                                                      style: GoogleFonts.raleway(
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                    content:
+                                                                        Text(
+                                                                      "The selected history file will be permanently deleted. Proceed?",
+                                                                      style: GoogleFonts.raleway(
+                                                                          fontWeight:
+                                                                              FontWeight.normal),
+                                                                    ),
+                                                                  )));
+                                                    },
+                                                    child: Container(
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(
+                                                              FontAwesomeIcons
+                                                                  .trash,
+                                                              color: Colors.red,
+                                                            ),
+                                                            Text(
+                                                              "Delete",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .red),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                });
+                          }),
+                    )
+                  ],
+                ),
               ),
               EditProfile(widget: widget),
             ],

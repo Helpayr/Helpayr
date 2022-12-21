@@ -113,6 +113,15 @@ class NowDrawer extends StatelessWidget {
                         title: "Bookings",
                         isSelected: currentPage == "Bookings" ? true : false),
                     DrawerTile(
+                        icon: FontAwesomeIcons.clock,
+                        onTap: () {
+                          if (currentPage != "History")
+                            Navigator.pushReplacementNamed(context, '/history');
+                        },
+                        iconColor: HelpayrColors.info,
+                        title: "History",
+                        isSelected: currentPage == "History" ? true : false),
+                    DrawerTile(
                         icon: Icons.message,
                         onTap: () {
                           if (currentPage != "Messaging")

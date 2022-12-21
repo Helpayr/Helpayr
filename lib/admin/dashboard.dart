@@ -106,11 +106,9 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
       print(doc_idToDelete);
     });
   }
+
   List<String> header = [
     "Overview",
-    "Graph",
-    "Details",
-    "More",
   ];
   int header_selected = 0;
   final ScrollController _scrollController = ScrollController();
@@ -855,15 +853,6 @@ class _Admin_DashboardState extends State<Admin_Dashboard> {
                                   ),
                                 ],
                               ),
-                            ),
-                            Container(
-                              color: Colors.red,
-                            ),
-                            Container(
-                              color: Colors.green,
-                            ),
-                            Container(
-                              color: Colors.pink,
                             ),
                           ],
                         ),

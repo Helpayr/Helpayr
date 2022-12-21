@@ -108,9 +108,10 @@ class DetailsHelper extends StatelessWidget {
             field: 'Age',
           ),
           Field(
+            isArray: true,
             widget: widget,
-            icon: FontAwesomeIcons.check,
-            field: 'avail',
+            icon: FontAwesomeIcons.moneyBill,
+            field: 'prices',
           ),
           SizedBox(
             height: 10,
@@ -143,7 +144,7 @@ class DetailsHelper extends StatelessWidget {
                   child: ElevatedButtonStore(
                     width: MediaQuery.of(context).size.width / 2,
                     icon: FontAwesomeIcons.check,
-                    title: "Set Appointments",
+                    title: "Book Now",
                   ),
                 ),
                 GestureDetector(

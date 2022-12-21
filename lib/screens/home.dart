@@ -17,6 +17,7 @@ import 'package:helpayr/widgets/navbar.dart';
 import 'package:helpayr/widgets/card-horizontal.dart';
 import 'package:helpayr/widgets/drawer.dart';
 import 'package:hidable/hidable.dart';
+import 'package:lottie/lottie.dart';
 
 import '../Message/pages/chatroom.dart';
 import '../firebase/List_data_page.dart';
@@ -244,6 +245,24 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                         controller: ctrl,
                         itemCount: snappy.data.docs.length,
                         itemBuilder: (context, index) {
+                          if (snappy.data.docs.isEmpty) {
+                            return Column(
+                              children: [
+                                LottieBuilder.network(
+                                    "https://assets3.lottiefiles.com/packages/lf20_EMTsq1.json"),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15.0),
+                                  child: Text(
+                                    "Nothing to see here!",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.raleway(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                )
+                              ],
+                            );
+                          }
                           FirebaseFirestore.instance
                               .collection("Users")
                               .doc(FirebaseAuth.instance.currentUser.uid)
@@ -273,178 +292,178 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        height: 120,
-                                        width: 100,
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black26,
-                                                offset: Offset(3, 0),
-                                                blurRadius: 6,
-                                              ),
-                                            ],
-                                            image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                image: NetworkImage(snappy
-                                                    .data.docs[index]["dp"]))),
+                                      Flexible(
+                                        child: Container(
+                                          height: 120,
+                                          width: 100,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black26,
+                                                  offset: Offset(3, 0),
+                                                  blurRadius: 6,
+                                                ),
+                                              ],
+                                              image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: NetworkImage(snappy
+                                                      .data
+                                                      .docs[index]["dp"]))),
+                                        ),
                                       ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            "${snappy.data.docs[index]['full_name']}",
-                                            style: GoogleFonts.raleway(
-                                              fontWeight: FontWeight.bold,
+                                      Flexible(
+                                        flex: 2,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "${snappy.data.docs[index]['full_name']}",
+                                              style: GoogleFonts.raleway(
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
-                                          ),
-                                          Text(
-                                            "${snappy.data.docs[index]['Address']}",
-                                            style: GoogleFonts.raleway(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 12,
+                                            Text(
+                                              "${snappy.data.docs[index]['Address']}",
+                                              style: GoogleFonts.raleway(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 12,
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Text(
-                                            "${snappy.data.docs[index]['job_profession']}",
-                                            style: GoogleFonts.raleway(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
+                                            SizedBox(
+                                              height: 10,
                                             ),
-                                          ),
-                                          Text(
-                                            "Php. ${snappy.data.docs[index]['prices']}",
-                                            style: GoogleFonts.raleway(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 12,
+                                            Text(
+                                              "${snappy.data.docs[index]['job_profession']}",
+                                              style: GoogleFonts.raleway(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 12,
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              TextButton.icon(
-                                                  onPressed: () async {
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection("Users")
-                                                        .doc(FirebaseAuth
-                                                            .instance
-                                                            .currentUser
-                                                            .uid)
-                                                        .collection("favs")
-                                                        .get()
-                                                        .then((value) {
-                                                      value.docs
-                                                          .forEach((element) {
-                                                        servicers.add(element
-                                                            .reference.id);
+                                            Text(
+                                              "Php. ${snappy.data.docs[index]['prices']}",
+                                              style: GoogleFonts.raleway(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                TextButton.icon(
+                                                    onPressed: () async {
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection("Users")
+                                                          .doc(FirebaseAuth
+                                                              .instance
+                                                              .currentUser
+                                                              .uid)
+                                                          .collection("favs")
+                                                          .get()
+                                                          .then((value) {
+                                                        value.docs
+                                                            .forEach((element) {
+                                                          servicers.add(element
+                                                              .reference.id);
+                                                        });
                                                       });
-                                                    });
-                                                    showDialog(
-                                                        context: context,
-                                                        builder:
-                                                            ((context) =>
-                                                                AlertDialog(
-                                                                  actions: [
-                                                                    TextButton.icon(
-                                                                        onPressed: () async {
-                                                                          await FirebaseFirestore
-                                                                              .instance
-                                                                              .collection("Users")
-                                                                              .doc(FirebaseAuth.instance.currentUser.uid)
-                                                                              .collection("favs")
-                                                                              .doc(servicers[index])
-                                                                              .delete()
-                                                                              .whenComplete(() {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              SnackBar(
-                                                                                duration: Duration(seconds: 4),
-                                                                                content: Text("The service has been removed!"),
-                                                                              ),
-                                                                            );
+                                                      showDialog(
+                                                          context: context,
+                                                          builder:
+                                                              ((context) =>
+                                                                  AlertDialog(
+                                                                    actions: [
+                                                                      TextButton.icon(
+                                                                          onPressed: () async {
+                                                                            await FirebaseFirestore.instance.collection("Users").doc(FirebaseAuth.instance.currentUser.uid).collection("favs").doc(servicers[index]).delete().whenComplete(() {
+                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                SnackBar(
+                                                                                  duration: Duration(seconds: 4),
+                                                                                  content: Text("The service has been removed!"),
+                                                                                ),
+                                                                              );
 
+                                                                              Navigator.of(context).pop();
+                                                                            });
+                                                                          },
+                                                                          icon: Icon(Icons.check),
+                                                                          label: Text("Yes")),
+                                                                      TextButton.icon(
+                                                                          onPressed: () async {
                                                                             Navigator.of(context).pop();
-                                                                          });
-                                                                        },
-                                                                        icon: Icon(Icons.check),
-                                                                        label: Text("Yes")),
-                                                                    TextButton.icon(
-                                                                        onPressed: () async {
-                                                                          Navigator.of(context)
-                                                                              .pop();
-                                                                        },
-                                                                        icon: Icon(Icons.deselect),
-                                                                        label: Text("No"))
-                                                                  ],
-                                                                  title: Text(
-                                                                    "Remove from My Favorites",
-                                                                    style: GoogleFonts.raleway(
-                                                                        fontWeight:
-                                                                            FontWeight.bold),
-                                                                  ),
-                                                                  content: Text(
-                                                                    "The selected service will be removed from your Favorites. Proceed?",
-                                                                    style: GoogleFonts.raleway(
-                                                                        fontWeight:
-                                                                            FontWeight.normal),
-                                                                  ),
-                                                                )));
-                                                  },
-                                                  icon: Icon(Icons.remove,
-                                                      color: Colors.redAccent),
-                                                  label: Text(
-                                                    "Remove",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 12,
+                                                                          },
+                                                                          icon: Icon(Icons.deselect),
+                                                                          label: Text("No"))
+                                                                    ],
+                                                                    title: Text(
+                                                                      "Remove from My Favorites",
+                                                                      style: GoogleFonts.raleway(
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                    content:
+                                                                        Text(
+                                                                      "The selected service will be removed from your Favorites. Proceed?",
+                                                                      style: GoogleFonts.raleway(
+                                                                          fontWeight:
+                                                                              FontWeight.normal),
+                                                                    ),
+                                                                  )));
+                                                    },
+                                                    icon: Icon(Icons.remove,
                                                         color:
                                                             Colors.redAccent),
-                                                  )),
-                                              TextButton.icon(
-                                                  onPressed: () {
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            Chatroom(
-                                                          recipient: snapchat
-                                                              .data
-                                                              .data(),
-                                                          chatroomId: mod_chat(
-                                                              FirebaseAuth
-                                                                  .instance
-                                                                  .currentUser
-                                                                  .displayName,
-                                                              snapchat.data
-                                                                  .data()),
+                                                    label: Text(
+                                                      "Remove",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color:
+                                                              Colors.redAccent),
+                                                    )),
+                                                TextButton.icon(
+                                                    onPressed: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              Chatroom(
+                                                            recipient: snapchat
+                                                                .data
+                                                                .data(),
+                                                            chatroomId: mod_chat(
+                                                                FirebaseAuth
+                                                                    .instance
+                                                                    .currentUser
+                                                                    .displayName,
+                                                                snapchat.data
+                                                                    .data()),
+                                                          ),
                                                         ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  icon: Icon(Icons.message),
-                                                  label: Text(
-                                                    "Chat",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 12,
-                                                        color: Colors.blue),
-                                                  ))
-                                            ],
-                                          )
-                                        ],
+                                                      );
+                                                    },
+                                                    icon: Icon(Icons.message),
+                                                    label: Text(
+                                                      "Chat",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 12,
+                                                          color: Colors.blue),
+                                                    ))
+                                              ],
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -486,7 +505,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
             ? null
             : Hidable(
                 wOpacity: true,
-                preferredWidgetSize: Size.fromHeight(150),
+                preferredWidgetSize: Size.fromHeight(100),
                 controller: _scrollController,
                 child: Navbar(
                   greetings: true,
@@ -494,8 +513,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                   name: user.displayName,
                   url: user.photoURL,
                   title: "Home",
-                  searchBar: true,
-                  isOnSearch: true,
                 ),
               ),
         backgroundColor: HelpayrColors.bgColorScreen,

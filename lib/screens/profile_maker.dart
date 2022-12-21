@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:helpayr/screens/select_service.dart';
+import 'package:helpayr/screens/servicer_dashboard.dart';
 import 'package:helpayr/screens/when_complete.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +32,8 @@ class _ProfileMakerState extends State<ProfileMaker>
   PlatformFile pickedFileDp;
   PlatformFile pickedFileServiceBg;
   PlatformFile pickedFileServiceDp;
+
+  List<String> price = [];
 
   final ImagePicker imgPicker = ImagePicker();
 
@@ -163,7 +165,7 @@ class _ProfileMakerState extends State<ProfileMaker>
     String service_addressEC,
     String service_descEC,
     String service_facebookEc,
-    String service_priceEc,
+    List<String> service_priceEc,
     String dp_service,
     String bg_service,
     List<String> uploadedImageService,
@@ -175,13 +177,13 @@ class _ProfileMakerState extends State<ProfileMaker>
         .collection(dropValue)
         .doc(FirebaseAuth.instance.currentUser.displayName)
         .set({
-      'full_name': fullname,
+      'full_name': FirebaseAuth.instance.currentUser.displayName,
       'job_profession': service,
       'Age': service_ageEC,
       'Address': service_addressEC,
       'Description': service_descEC,
       'fb': service_facebookEc,
-      'price': service_priceEc,
+      'prices': service_priceEc,
       'dp': dp_service,
       'bg': bg_service,
       'image': uploadedImageService,
@@ -192,16 +194,17 @@ class _ProfileMakerState extends State<ProfileMaker>
   }
 
   Future uploadWorks_Service() async {
+    await price.add(service_priceEc.text);
     await uploadImagesService();
     await uploadImageSingleProfileService();
     await addServiceDetails(
-        fullNameEC.text.trim(),
+        FirebaseAuth.instance.currentUser.displayName,
         dropValue,
         service_ageEC.text.trim(),
         service_addressEC.text.trim(),
         service_descEC.text.trim(),
         service_facebookEc.text.trim(),
-        service_priceEc.text.trim(),
+        price,
         dp_service,
         bg_service,
         uploadedImageService,
@@ -329,8 +332,22 @@ class _ProfileMakerState extends State<ProfileMaker>
   AnimationController _animationctrl;
 
   @override
+  void dispose() {
+    service_ageEC.dispose();
+    fullNameEC.dispose();
+    service_addressEC.dispose();
+    service_descEC.dispose();
+    service_facebookEc.dispose();
+    service_priceEc.dispose();
+
+    _animationctrl.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
+
     _animationctrl = AnimationController(
       vsync: this,
       duration: Duration(
@@ -342,24 +359,13 @@ class _ProfileMakerState extends State<ProfileMaker>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => Service_ChooseFirst(),
+            builder: (context) => Servicer_Dashboard(
+              service: dropValue,
+            ),
           ),
         );
       }
     });
-  }
-
-  @override
-  void dispose() {
-    service_ageEC.dispose();
-    fullNameEC.dispose();
-    service_addressEC.dispose();
-    service_descEC.dispose();
-    service_facebookEc.dispose();
-    service_priceEc.dispose();
-
-    _animationctrl.dispose();
-    super.dispose();
   }
 
   @override
@@ -402,12 +408,12 @@ class _ProfileMakerState extends State<ProfileMaker>
                         Flexible(
                           flex: 3,
                           child: Text(
-                            "Register As",
+                            "Please Register First",
                             style: TextStyle(
                               color: isHelpersSelected
                                   ? Colors.white
                                   : Colors.black,
-                              fontSize: 20,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -533,9 +539,6 @@ class _ProfileMakerState extends State<ProfileMaker>
                                   isHelpersSelected = false;
                                   isServiceSelected = true;
                                 });
-                                return _pageController.nextPage(
-                                    duration: Duration(milliseconds: 200),
-                                    curve: Curves.easeIn);
                               },
                               child: AnimatedContainer(
                                 duration: Duration(milliseconds: 500),
@@ -554,7 +557,7 @@ class _ProfileMakerState extends State<ProfileMaker>
                                         elevation: 10,
                                         child: Center(
                                           child: Text(
-                                            "Store",
+                                            "",
                                             style: TextStyle(
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.bold,
@@ -564,7 +567,7 @@ class _ProfileMakerState extends State<ProfileMaker>
                                       )
                                     : Center(
                                         child: Text(
-                                          "Store",
+                                          "",
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
@@ -1187,7 +1190,7 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                             TextInputType
                                                                 .number,
                                                         controller:
-                                                            store_priceEc,
+                                                            service_priceEc,
                                                         textInputAction:
                                                             TextInputAction
                                                                 .next,
@@ -2128,6 +2131,8 @@ class _ProfileMakerState extends State<ProfileMaker>
                                                       decoration:
                                                           const BoxDecoration(),
                                                       child: TextField(
+                                                        controller:
+                                                            service_priceEc,
                                                         textInputAction:
                                                             TextInputAction
                                                                 .next,

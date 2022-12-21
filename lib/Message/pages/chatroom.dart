@@ -286,14 +286,15 @@ class _ChatroomState extends State<Chatroom> {
         ? GestureDetector(
             onLongPress: () {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  duration: Duration(seconds: 3),
                   content: Row(
-                children: [
-                  TextButton.icon(
-                      onPressed: onDelete,
-                      icon: Icon(Icons.delete_forever),
-                      label: Text("Delete"))
-                ],
-              )));
+                    children: [
+                      TextButton.icon(
+                          onPressed: onDelete,
+                          icon: Icon(Icons.delete_forever),
+                          label: Text("Delete"))
+                    ],
+                  )));
             },
             child: Container(
               width: size.width / 2,

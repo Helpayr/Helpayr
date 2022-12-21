@@ -117,38 +117,6 @@ class _OnboardingState extends State<Onboarding> {
                 SizedBox(
                   height: 10,
                 ),
-                GestureDetector(
-                  onTap: isClicked
-                      ? () {
-                          Navigator.pushNamed(context, '/login');
-                        }
-                      : null,
-                  child: Container(
-                    child: Center(
-                      child: Text(
-                        "Sign In",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    width: MediaQuery.of(context).size.width / 2,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.blue,
-                          blurRadius: 15,
-                          offset: Offset(4, 4),
-                        )
-                      ],
-                      color: HelpayrColors.white,
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

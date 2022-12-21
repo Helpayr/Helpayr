@@ -529,7 +529,7 @@ class _StoriesState extends State<_Stories> {
                     Padding(
                       padding: EdgeInsets.only(left: 16.0, top: 8, bottom: 16),
                       child: Text(
-                        'Stories',
+                        'Contacts',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,

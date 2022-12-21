@@ -195,20 +195,22 @@ class _AppointmentState extends State<Appointment>
                 ],
               ),
             ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 350,
-              child: SfDateRangePicker(
-                selectionMode: DateRangePickerSelectionMode.range,
-                showActionButtons: true,
-                onSelectionChanged: _onselectChange,
-                controller: _dateRangePickerController,
-                onSubmit: (dates) {
-                  print(dates);
-                },
-                onCancel: () {
-                  _dateRangePickerController.selectedRange = null;
-                },
+            Card(
+              elevation: 5,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SfDateRangePicker(
+                  selectionMode: DateRangePickerSelectionMode.range,
+                  showActionButtons: true,
+                  onSelectionChanged: _onselectChange,
+                  controller: _dateRangePickerController,
+                  onSubmit: (dates) {
+                    print(dates);
+                  },
+                  onCancel: () {
+                    _dateRangePickerController.selectedRange = null;
+                  },
+                ),
               ),
             ),
             SizedBox(
@@ -616,17 +618,20 @@ class _AppointmentState extends State<Appointment>
             SizedBox(
               height: 10,
             ),
-            Text(
-              "Summary",
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Summary",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             Card(
               elevation: 10,
               child: Container(
-                width: MediaQuery.of(context).size.width / 1.1,
+                width: MediaQuery.of(context).size.width,
                 height: 120,
                 child: Row(
                   children: [
@@ -637,7 +642,7 @@ class _AppointmentState extends State<Appointment>
                               "https://assets2.lottiefiles.com/private_files/lf30_8ry7qrbu.json"),
                         )),
                     SizedBox(
-                      width: 20,
+                      width: 5,
                     ),
                     Flexible(
                       flex: 2,
@@ -710,7 +715,7 @@ class _AppointmentState extends State<Appointment>
                 maxLines: 5,
                 decoration: InputDecoration(
                   hintText: "Add some notes",
-                  hintStyle: TextStyle(color: Colors.black),
+                  hintStyle: TextStyle(color: Colors.grey),
                   border: InputBorder.none,
                 ),
               ),
@@ -738,7 +743,7 @@ class _AppointmentState extends State<Appointment>
                 maxLines: 5,
                 decoration: InputDecoration(
                   hintText: "Add specific location",
-                  hintStyle: TextStyle(color: Colors.black),
+                  hintStyle: TextStyle(color: Colors.grey),
                   border: InputBorder.none,
                 ),
               ),
@@ -776,9 +781,6 @@ class _AppointmentState extends State<Appointment>
                                 image: NetworkImage(widget.widget.data['dp']))),
                       ),
                     ),
-                    SizedBox(
-                      width: 5,
-                    ),
                     Flexible(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -802,27 +804,31 @@ class _AppointmentState extends State<Appointment>
               height: 10,
             ),
             GestureDetector(
-              onTap: () {
-                set_appointment(widget.widget.data['job_profession'],
-                    widget.widget.data['full_name']);
-                set_appointment_user(widget.widget.data['job_profession']);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetailsBooking(
-                      details: widget.widget.data,
-                    ),
-                  ),
-                );
-              },
+              onTap: _location.text.isEmpty
+                  ? null
+                  : () {
+                      set_appointment(widget.widget.data['job_profession'],
+                          widget.widget.data['full_name']);
+                      set_appointment_user(
+                          widget.widget.data['job_profession']);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailsBooking(
+                            details: widget.widget.data,
+                          ),
+                        ),
+                      );
+                    },
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.blueAccent,
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(15.0),
                   child: Text(
-                    "Set Appointment",
+                    "Set Booking",
                     style: GoogleFonts.manrope(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,

@@ -40,7 +40,7 @@ class _DetailsBookingState extends State<DetailsBooking> {
           body: SafeArea(
             child: SingleChildScrollView(
               child: Container(
-                height: MediaQuery.of(context).size.height,
+                height: MediaQuery.of(context).size.height * 1.01,
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   image: DecorationImage(
@@ -50,10 +50,10 @@ class _DetailsBookingState extends State<DetailsBooking> {
                 ),
                 child: Padding(
                   padding: EdgeInsets.only(
-                      left: 20.0,
-                      right: 20.0,
-                      top: 40,
-                      bottom: snapshot.data.docs[0]['is_accepted'] ? 0 : 70),
+                      left: 10.0,
+                      right: 10.0,
+                      top: 20,
+                      bottom: snapshot.data.docs[0]['is_accepted'] ? 5 : 70),
                   child: Container(
                     child: Card(
                         shape: RoundedRectangleBorder(
@@ -215,132 +215,135 @@ class _DetailsBookingState extends State<DetailsBooking> {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(FontAwesomeIcons.calendar),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${snapshot.data.docs[0]['date']}, ${snapshot.data.docs[0]['hour']}  ',
-                                    style: GoogleFonts.raleway(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text("Booking Date (Start)")
-                                ],
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(FontAwesomeIcons.calendar),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${snapshot.data.docs[0]['end_Date']}, ${snapshot.data.docs[0]['hour_end']}  ',
-                                    style: GoogleFonts.raleway(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text("Booking Date (End)")
-                                ],
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(FontAwesomeIcons.locationArrow),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${widget.details['Address']} ',
-                                    style: GoogleFonts.raleway(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text("Location")
-                                ],
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(Icons.work),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${widget.details['job_profession']} ',
-                                    style: GoogleFonts.raleway(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text("Service"),
-                                ],
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(Icons.person),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '${widget.details['full_name']} ',
-                                    style: GoogleFonts.raleway(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text("Name"),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
+                      child: FittedBox(
+                        fit: BoxFit.fitWidth,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(FontAwesomeIcons.calendar),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${snapshot.data.docs[0]['date']}, ${snapshot.data.docs[0]['hour']}  ',
+                                      style: GoogleFonts.raleway(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text("Booking Date (Start)")
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(FontAwesomeIcons.calendar),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${snapshot.data.docs[0]['end_Date']}, ${snapshot.data.docs[0]['hour_end']}  ',
+                                      style: GoogleFonts.raleway(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text("Booking Date (End)")
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(FontAwesomeIcons.locationArrow),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${widget.details['Address']} ',
+                                      style: GoogleFonts.raleway(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text("Location")
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(Icons.work),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${widget.details['job_profession']} ',
+                                      style: GoogleFonts.raleway(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text("Service"),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Icon(Icons.person),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${widget.details['full_name']} ',
+                                      style: GoogleFonts.raleway(
+                                          color: Colors.black,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text("Name"),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ))),
