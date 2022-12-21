@@ -7,12 +7,10 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:helpayr/Message/pages/chatroom.dart';
 import 'package:helpayr/Message/pages/full_screen.dart';
 import 'package:helpayr/Message/widgets/widget.dart';
 import 'package:helpayr/firebase/details.dart';
 import 'package:helpayr/firebase/products.dart';
-import 'package:hidable/hidable.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 
@@ -880,33 +878,6 @@ class _ServicePageState extends State<ServicePage> {
           ),
         ),
       ),
-      bottomSheet: Hidable(
-        controller: _scroll,
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: 50,
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                offset: Offset(3, 0),
-                blurRadius: 6,
-              ),
-            ],
-          ),
-          child: ElevatedButton(
-              onPressed: () {
-                Write_review().whenComplete(() {
-                  Navigator.of(context).pop();
-                });
-              },
-              child: Text(
-                "Write a review",
-                style: GoogleFonts.raleway(
-                    color: Colors.white, fontWeight: FontWeight.bold),
-              )),
-        ),
-      ),
     );
   }
 
@@ -1177,11 +1148,13 @@ class Field extends StatelessWidget {
     @required this.widget,
     this.icon,
     this.field,
+    this.isArray = false,
   }) : super(key: key);
 
   final String field;
   final IconData icon;
   final ServicePage widget;
+  final bool isArray;
 
   @override
   Widget build(BuildContext context) {
@@ -1205,7 +1178,9 @@ class Field extends StatelessWidget {
           FittedBox(
             fit: BoxFit.fitWidth,
             child: Text(
-              '${widget.data[field]}',
+              isArray
+                  ? 'Php ${widget.data[field][0]}'
+                  : '${widget.data[field]}',
               style: TextStyle(
                 shadows: [
                   Shadow(
@@ -1378,51 +1353,6 @@ class _MainPageReturnerState extends State<MainPageReturner> {
                                           )
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  ElevatedButtonStore(
-                                    width:
-                                        MediaQuery.of(context).size.width / 2,
-                                    icon: FontAwesomeIcons.check,
-                                    title: "Set Appointments",
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => Chatroom(
-                                            recipient: widget.data,
-                                            chatroomId: chatRoomId(
-                                                FirebaseAuth.instance
-                                                    .currentUser.displayName,
-                                                widget.data['full_name']),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: ElevatedButtonStore(
-                                      width:
-                                          MediaQuery.of(context).size.width / 4,
-                                      icon: Icons.message,
-                                      title: "Chat",
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {},
-                                    child: ElevatedButtonStore(
-                                      width:
-                                          MediaQuery.of(context).size.width / 8,
-                                      icon: FontAwesomeIcons.heart,
-                                      title: "",
                                     ),
                                   ),
                                 ],
